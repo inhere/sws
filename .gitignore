@@ -1,0 +1,15 @@
+.idea/
+.phpintel/
+.vscode/
+vendor/
+node_modules/
+tmp/*
+!README.md
+composer.lock
+.local
+*.pid
+*.log
+.DS_Store
+.idea/
+.project
+dist/

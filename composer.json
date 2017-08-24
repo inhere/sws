@@ -1,0 +1,55 @@
+{
+    "name": "inhere/mder",
+    "description": "A markdown documents read project.",
+    "keywords": [
+        "chat",
+        "websocket",
+        "router",
+        "swoole"
+    ],
+    "homepage": "http://yzone.net",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "inhere",
+            "email": "in.798@qq.com",
+            "homepage": "http://yzone.net"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "symfony/yaml": "^3.0",
+        "inhere/console": "dev-master",
+        "inhere/http": "dev-master",
+        "inhere/library": "dev-master",
+        "inhere/library-plus": "dev-master",
+        "inhere/lock": "dev-master",
+        "inhere/php-validate": "dev-master",
+        "inhere/queue": "dev-master",
+        "inhere/shm": "dev-master",
+        "inhere/server": "dev-master",
+        "inhere/websocket": "dev-master",
+        "inhere/sroute": "dev-master",
+        "overtrue/pinyin": "^3.0"
+    },
+    "require-dev": {
+        "inhere/simple-print-tool": "dev-master"
+    },
+    "autoload": {
+        "classmap": ["app/Sws.php"],
+        "psr-4": {
+            "app\\": "app/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php -r \"copy('.local.example', '.local');\""
+        ]
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    }
+}

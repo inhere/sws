@@ -1,0 +1,5 @@
+; local config file. is ini format file
+
+env = pdt
+debug = false
+enableCsrfToken = true

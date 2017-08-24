@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+define('BASE_PATH', dirname(__DIR__) );
+
+$config = require BASE_PATH . '/config/server.php';
+
+// $mgr = new \inhere\server\extend\WebSocketServer($config);
+$mgr = new \inhere\server\BoxServer($config);
+
+$mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
+    'host' => '0.0.0.0',
+    'port' => '9762',
+]));
+
+$mgr->run();

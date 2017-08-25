@@ -29,7 +29,11 @@ return [
     'main_server' => [
         'type' => 'ws', // http https tcp udp ws wss
         'port' => 9501,
-        'extend_server' => WebSocketServer::class,
+        //'extend_server' => WebSocketServer::class,
+        'extend_events' => [
+            'onConnect',
+            'onRequest', // 增加 http 请求支持
+        ],
     ],
 
     // attach port server by config

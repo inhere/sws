@@ -3,15 +3,16 @@
 
 define('BASE_PATH', dirname(__DIR__) );
 
-require BASE_PATH . '/boot/web.php';
+session_start();
 
+require BASE_PATH . '/boot/web.php';
 
 //$app->run();
 
 $config = require BASE_PATH . '/config/server.php';
 
-// $mgr = new \inhere\server\extend\WebSocketServer($config);
-$mgr = new \inhere\server\BoxServer($config);
+$mgr = new \sws\server\WebSocketServer($config);
+//$mgr = new \inhere\server\BoxServer($config);
 
 $mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
     'host' => '0.0.0.0',

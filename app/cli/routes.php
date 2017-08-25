@@ -8,15 +8,13 @@
  */
 
 $app->commands([
-    // src/console/commands/DemoCommand.php
-    'demo' => \app\console\commands\DemoCommand::class,
-    'book:export' => \app\console\commands\ExportCommand::class,
-    'book:import' => \app\console\commands\ImportCommand::class,
+    'test' => function () {
+        echo 'test';
+    },
+//    'demo' => \app\console\commands\DemoCommand::class,
     //'book:build' => \app\console\commands\BuildCommand::class,
 ]);
 
 $app->controllers([
-    'home' => \app\console\controllers\HomeController::class,
-    'cache' => \app\console\controllers\CacheController::class,
-    'search' => \app\console\controllers\CacheController::class,
+//    'home' => \app\console\controllers\HomeController::class,
 ]);

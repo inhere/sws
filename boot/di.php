@@ -7,3 +7,8 @@
  *
  * @var $di \inhere\library\di\Container
  */
+
+use inhere\library\collections\Collection;
+use inhere\library\di\ContainerManager;
+
+$di = ContainerManager::make();

@@ -10,6 +10,5 @@ composer.lock
 *.pid
 *.log
 .DS_Store
-.idea/
 .project
 dist/

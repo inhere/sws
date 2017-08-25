@@ -30,6 +30,8 @@
         "inhere/server": "dev-master",
         "inhere/websocket": "dev-master",
         "inhere/sroute": "dev-master",
+        "psr/log": "~1.0",
+        "psr/http-message": "^1.0",
         "overtrue/pinyin": "^3.0"
     },
     "require-dev": {
@@ -38,7 +40,8 @@
     "autoload": {
         "classmap": ["app/Sws.php"],
         "psr-4": {
-            "app\\": "app/"
+            "app\\": "app/",
+            "sws\\": "lib/sws/"
         }
     },
     "scripts": {

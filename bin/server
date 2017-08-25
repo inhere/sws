@@ -3,6 +3,11 @@
 
 define('BASE_PATH', dirname(__DIR__) );
 
+require BASE_PATH . '/boot/web.php';
+
+
+//$app->run();
+
 $config = require BASE_PATH . '/config/server.php';
 
 // $mgr = new \inhere\server\extend\WebSocketServer($config);

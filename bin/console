@@ -4,4 +4,6 @@
 // define project path
 define('BASE_PATH', dirname(__DIR__) );
 
-require dirname(__DIR__) . '/boot/console.php';
+require dirname(__DIR__) . '/boot/cli.php';
+
+$di['app']->run();

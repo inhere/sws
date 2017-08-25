@@ -6,6 +6,7 @@
  * Time: 17:36
  */
 
-return [
 
-];
+return array_merge(require __DIR__ . '/base.php',[
+   'debug' => false,
+]);

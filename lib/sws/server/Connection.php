@@ -97,9 +97,12 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * handshake
+     * @param Request $request
      */
-    public function handshake()
+    public function handshake(Request $request)
     {
+        $this->path = $request->getPath();
+        $this->request = $request;
         $this->handshake = true;
         $this->handshakeTime = time();
     }

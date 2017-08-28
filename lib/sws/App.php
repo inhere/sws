@@ -10,10 +10,15 @@ namespace sws;
 
 use inhere\library\di\Container;
 
+use Swoole\Server;
+use sws\http\Request;
+use sws\http\Response;
+use sws\http\Uri;
 use sws\http\WSResponse;
 use sws\module\ModuleInterface;
 use sws\module\RootModule;
 use sws\server\WebSocketServer;
+use sws\server\WsServerInterface;
 
 use Swoole\Websocket\Frame;
 use Swoole\Http\Request as SwRequest;
@@ -23,9 +28,8 @@ use Swoole\Http\Response as SwResponse;
  * Class App
  * @package sws
  */
-class App extends WebSocketServer
+class App extends WebSocketServer implements WsServerInterface
 {
-
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
 
@@ -63,13 +67,48 @@ class App extends WebSocketServer
         parent::start($daemon);
     }
 
-    public function handleHttpRequest(SwRequest $request, SwResponse $response)
+    /**
+     * @param SwRequest $swRequest
+     * @param SwResponse $swResponse
+     * @return array
+     */
+    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
-        $content = 'hello, welcome';
+        //
+        $method = $swRequest->server['request_method'];
+        $uriStr = $swRequest->server['request_uri'];
+
+        $request = new Request($method, Uri::createFromString($uriStr));
+        $request->setQueryParams($swRequest->get ?: []);
+        $request->setParsedBody($swRequest->post ?: []);
+        $request->setHeaders($swRequest->header ?: []);
+        $request->setCookies($swRequest->cookie ?: []);
+        $serverData = array_change_key_case($swRequest->server, CASE_UPPER);
+
+        // 将HTTP头信息赋值给 $_SERVER 超全局变量
+        foreach ((array)$swRequest->header as $key => $value) {
+            $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+            $serverData[$_key] = $value;
+        }
+
+        $request->setServerData($serverData);
+
+        $content = '';
+        $resp = $this->di['router']->dispatch();
+
+        if ($resp instanceof Response) {
+            $content = $resp->getBody();
+        } elseif ($resp) {
+            $content = (string)$resp;
+        }
 
         return [200, [], $content];
     }
 
+    /**
+     * @param Server $server
+     * @param Frame $frame
+     */
     public function handleWsRequest($server, Frame $frame)
     {
         $meta = $this->getConnection($frame->fd);

@@ -14,7 +14,7 @@ namespace sws\server;
  */
 interface WsServerInterface
 {
-    const WS_KEY_PATTEN  = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+//    const WS_KEY_PATTEN  = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
 
     /**
      * @param $data

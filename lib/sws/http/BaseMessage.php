@@ -53,10 +53,14 @@ abstract class BaseMessage
     protected $cookies;
 
     /**
+     * @var array
+     */
+    private $files = [];
+
+    /**
      * @var string
      */
     protected $body;
-
 
     /**
      * A map of valid protocol versions
@@ -159,11 +163,20 @@ abstract class BaseMessage
 
     /**
      * @param string $name
+     * @return \string[]
+     */
+    public function getHeader(string $name)
+    {
+        return $this->headers->get($name, []);
+    }
+
+    /**
+     * @param string $name
      * @return string
      */
-    public function getHeader(string $name): string
+    public function getHeaderLine($name): string
     {
-        return $this->headers->get($name);
+        return implode(',', $this->headers->get($name, []));
     }
 
     /**
@@ -196,6 +209,30 @@ abstract class BaseMessage
 
         return $this;
     }
+
+    /*******************************************************************************
+     * Files
+     ******************************************************************************/
+
+    /**
+     * @return array
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * @param array $files
+     */
+    public function setFiles(array $files)
+    {
+        $this->files = $files;
+    }
+
+    /*******************************************************************************
+     * Cookies
+     ******************************************************************************/
 
     /**
      * @param string $name

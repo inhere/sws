@@ -36,7 +36,7 @@ class OriginCheck
      */
     public function check($request)
     {
-        $header = $request->getHeader('Origin');
+        $header = $request->getHeaderLine('Origin');
         $origin = parse_url($header, PHP_URL_HOST) ?: $header;
 
         return in_array($origin, $this->allowedOrigins, true);

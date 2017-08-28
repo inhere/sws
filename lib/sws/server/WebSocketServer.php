@@ -26,7 +26,7 @@ use sws\http\Uri;
  *
  * @property Server $server
  */
-class WebSocketServer extends HttpServer implements WsServerInterface
+class WebSocketServer extends HttpServer
 {
     use EventTrait;
 
@@ -43,6 +43,8 @@ class WebSocketServer extends HttpServer implements WsServerInterface
     const EVT_PARSE_ERROR = 'parseError';
 
     const WS_VERSION = 13;
+    const WS_KEY_PATTEN  = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+    const SIGN_KEY = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
     const HANDSHAKE_OK = 0;
     const HANDSHAKE_FAIL = 25;
@@ -91,6 +93,34 @@ class WebSocketServer extends HttpServer implements WsServerInterface
     }
 
     /**
+     * @param SwRequest $swRequest
+     * @return Request
+     */
+    protected function createRequest(SwRequest $swRequest)
+    {
+        $method = $swRequest->server['request_method'];
+        $uriStr = $swRequest->server['request_uri'];
+
+        $request = new Request($method, Uri::createFromString($uriStr));
+        $request->setQueryParams($swRequest->get ?: []);
+        $request->setParsedBody($swRequest->post ?: []);
+        $request->setHeaders($swRequest->header ?: []);
+        $request->setFiles($swRequest->files ?: []);
+        $request->setCookies($swRequest->cookie ?? []);
+        $serverData = array_change_key_case($swRequest->server, CASE_UPPER);
+
+        // 将HTTP头信息赋值给 $_SERVER 超全局变量
+        foreach ((array)$swRequest->header as $key => $value) {
+            $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+            $serverData[$_key] = $value;
+        }
+
+        $request->setServerData($serverData);
+
+        return $request;
+    }
+
+    /**
      * webSocket 建立连接后进行握手。WebSocket服务器已经内置了handshake，
      * 如果用户希望自己进行握手处理，可以设置 onHandShake 事件回调函数。
      *
@@ -100,12 +130,12 @@ class WebSocketServer extends HttpServer implements WsServerInterface
      */
     public function onHandShake(SwRequest $swRequest, SwResponse $swResponse)
     {
-        $this->log("onHandShake: Client [fd: {$swRequest->fd}] send handShake request");
-
         $cid = $swRequest->fd;
         $info = $this->getClientInfo($cid);
-        // $data = $this->getPeerName($fd);
-        $meta = [
+
+        $this->log("onHandShake: Client [fd: {$swRequest->fd}] send handShake request, info: " . var_export($info, 1));
+
+        $metaAry = [
             'ip' => $info['remote_ip'],
             'port' => $info['remote_port'],
             'path' => '/',
@@ -115,18 +145,10 @@ class WebSocketServer extends HttpServer implements WsServerInterface
         ];
 
         // 初始化客户端信息
-        $this->connections[$cid] = new Connection($meta);
+        $this->connections[$cid] = $meta = new Connection($metaAry);
 
         // begin start handshake
-        $method = $swRequest->server['request_method'];
-        $uriStr = $swRequest->server['request_uri'];
-
-        $request = new Request($method, Uri::createFromString($uriStr));
-        $request->setHeaders($swRequest->header ?: []);
-
-        if ($cookies = $swRequest->cookie ?? null) {
-            $request->setCookies($cookies);
-        }
+        $request = $this->createRequest($swRequest);
 
         $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
 
@@ -152,7 +174,7 @@ class WebSocketServer extends HttpServer implements WsServerInterface
 
             $swResponse->status($response->getStatusCode());
 
-            foreach ($response->getHeaders() as $name => $value) {
+            foreach ($response->getHeaders()->getLines() as $name => $value) {
                 $swResponse->header($name, $value);
             }
 
@@ -179,23 +201,13 @@ class WebSocketServer extends HttpServer implements WsServerInterface
 
         // 响应握手成功
         $swResponse->status($response->getStatusCode());
-        foreach ($response->getHeaders() as $name => $value) {
+        foreach ($response->getHeaders()->getLines() as $name => $value) {
             $swResponse->header($name, $value);
         }
 
-//        $respData = $response->toString();
-//        $this->debug("Handshake: response info:\n" . $respData);
-//        $r = $this->server->send($cid, $respData);
-
-
-        // 客户端连接单独保存
-//        $this->clients[$cid] = $socket;
-        $this->clientNumber++;
         // 标记已经握手 更新路由 path
-        $meta = $this->connections[$cid];
-        $meta->setRequest($request);
-        $meta['handshake'] = true;
-        $meta['path'] = $request->getPath();
+        $meta->handshake($request);
+        $this->clientNumber++;
 
         $this->log("Handshake: The #$cid client connection handshake successful! Meta:", $meta->all());
         $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
@@ -302,9 +314,6 @@ class WebSocketServer extends HttpServer implements WsServerInterface
 ////////////////////////////////////////////////////////////////////////
 /// message send methods
 ////////////////////////////////////////////////////////////////////////
-
-    const WS_KEY_PATTEN  = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
-    const SIGN_KEY = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
     /**
      * Generate WebSocket sign.(for server)

@@ -24,23 +24,87 @@ class Headers extends SimpleCollection
     const HEADER_END = "\r\n\r\n";
 
     /**
-     * @inheritdoc
+     * Special HTTP headers that do not have the "HTTP_" prefix
+     *
+     * @var array
      */
-    public function set($key, $value)
+    protected static $special = [
+        'CONTENT_TYPE' => 1,
+        'CONTENT_LENGTH' => 1,
+        'PHP_AUTH_USER' => 1,
+        'PHP_AUTH_PW' => 1,
+        'PHP_AUTH_DIGEST' => 1,
+        'AUTH_TYPE' => 1,
+    ];
+
+
+    /**
+     * Return array of HTTP header names and values.
+     * This method returns the _original_ header name
+     * as specified by the end user.
+     *
+     * @return array
+     */
+    public function all()
     {
-        if (!$value) {
-            return $this->remove($key);
+        $all = parent::all();
+        $out = [];
+        foreach ($all as $key => $props) {
+            $out[$props['originalKey']] = $props['value'];
         }
 
-        return parent::set($this->normalizeKey($key), $value);
+        return $out;
     }
 
     /**
-     * @inheritdoc
+     * Set HTTP header value
+     * This method sets a header value. It replaces
+     * any values that may already exist for the header name.
+     * @param string $key The case-insensitive header name
+     * @param string|array $value The header value
+     * @return mixed
+     */
+    public function set($key, $value)
+    {
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        return parent::set($this->normalizeKey($key), [
+            'value' => $value,
+            'originalKey' => $key
+        ]);
+    }
+
+    /**
+     * Get HTTP header value
+     *
+     * @param  string  $key     The case-insensitive header name
+     * @param  mixed   $default The default value if key does not exist
+     *
+     * @return string[]
      */
     public function get(string $key, $default = null)
     {
-        return parent::get($this->normalizeKey($key), $default);
+        if ($this->has($key)) {
+            return parent::get($this->normalizeKey($key))['value'];
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param $name
+     * @param null $default
+     * @return null|string
+     */
+    public function getLine($name, $default = null)
+    {
+        if ($val = $this->get($name)) {
+            return implode(',', $val);
+        }
+
+        return $default;
     }
 
     /**
@@ -77,11 +141,9 @@ class Headers extends SimpleCollection
      */
     public function normalizeKey($key)
     {
-        // $key = str_replace('_', '-', strtolower($key));
-        $key = str_replace('_', '-', trim($key));
-        $key = ucwords($key, '-');
+        $key = str_replace('_', '-', strtolower($key));
 
-        if (strpos($key, 'Http-') === 0) {
+        if (strpos($key, 'http-') === 0) {
             $key = substr($key, 5);
         }
 
@@ -97,9 +159,9 @@ class Headers extends SimpleCollection
     {
         $ls = [];
 
-        if ($value = $this->get('Accept-Language')) {
+        if ($value = $this->getLine('Accept-Language')) {
             if (strpos($value, ';')) {
-                [$value,] = explode(';', $value, 2);
+                list($value,) = explode(';', $value, 2);
             }
 
             $value = str_replace(' ', '', $value);
@@ -118,9 +180,9 @@ class Headers extends SimpleCollection
     {
         $ens = [];
 
-        if ($value = $this->get('Accept-Encoding')) {
+        if ($value = $this->getLine('Accept-Encoding')) {
             if (strpos($value, ';')) {
-                [$value,] = explode(';', $value, 2);
+                list($value,) = explode(';', $value, 2);
             }
 
             $value = str_replace(' ', '', $value);
@@ -138,11 +200,27 @@ class Headers extends SimpleCollection
     {
         $output = [];
 
-        foreach ($this->data as $name => $value) {
-            // $name = ucwords($name, '-');
-            $output[] .= "$name: $value" . self::EOL;
+        foreach ($this->data as $name => $info) {
+            $name = ucwords($name, '-');
+            $value = implode(',', $info['value']);
+            $output[] = "$name: $value\r\n";
         }
 
         return $toString ? implode('', $output) : $output;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLines()
+    {
+        $output = [];
+
+        foreach ($this->data as $name => $info) {
+            $name = ucwords($name, '-');
+            $output[$name] = implode(',', $info['value']);
+        }
+
+        return $output;
     }
 }

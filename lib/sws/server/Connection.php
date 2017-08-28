@@ -10,6 +10,7 @@ namespace sws\server;
 
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
+use sws\http\Request;
 use Traversable;
 
 /**
@@ -61,6 +62,11 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     private $handshakeTime = 0;
 
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
      * ClientMetadata constructor.
      * @param array $config
      */
@@ -69,7 +75,7 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
         parent::__construct($config);
 
         $this->connectTime = time();
-        $this->generateClientId();
+        $this->generateId();
     }
 
     /**
@@ -101,7 +107,7 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     /**
      * generateClientId
      */
-    protected function generateClientId(): void
+    protected function generateId(): void
     {
         $this->id = bin2hex(random_bytes(32));
     }
@@ -224,6 +230,22 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     public function getHandshakeTime(): int
     {
         return $this->handshakeTime;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request)
+    {
+        $this->request = $request;
     }
 
     /**

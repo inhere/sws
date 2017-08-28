@@ -26,7 +26,7 @@ use sws\http\Uri;
  *
  * @property Server $server
  */
-class WebSocketServer extends HttpServer
+class WebSocketServer extends HttpServer implements WsServerInterface
 {
     use EventTrait;
 
@@ -74,31 +74,17 @@ class WebSocketServer extends HttpServer
 ////////////////////// WS Server event //////////////////////
 
     /**
+     * 这里还无法判断是否是 webSocket 或者 http
      * @param Server $server
      * @param int $fd
      * @param $fromId
      */
     public function onConnect($server, $fd, $fromId)
     {
-        $this->log("onConnect: PID {$server->master_pid}, form reactor ID: $fromId, connection ID: $fd");
+        $info = $this->getClientInfo($fd);
+        $this->log("onConnect: PID {$server->master_pid}, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
+
         $cid = $this->resourceId($fd);
-        $data = $this->getPeerName($fd);
-        $meta = [
-            'ip' => $data['ip'],
-            'port' => $data['port'],
-            'handshake' => false,
-            'path' => '/',
-            'connectTime' => time(),
-            'resourceId' => $cid,
-        ];
-
-        // 初始化客户端信息
-        $this->connections[$cid] = new Connection($meta);
-        // 客户端连接单独保存
-//        $this->clients[$cid] = $socket;
-        $this->clientNumber++;
-
-        $this->log("Connect: A new client connected, ID: $cid, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
 
         // 触发 connect 事件回调
         $this->fire(self::EVT_WS_CONNECT, [$this, $cid]);
@@ -117,6 +103,19 @@ class WebSocketServer extends HttpServer
         $this->log("onHandShake: Client [fd: {$swRequest->fd}] send handShake request");
 
         $cid = $swRequest->fd;
+        $info = $this->getClientInfo($cid);
+        // $data = $this->getPeerName($fd);
+        $meta = [
+            'ip' => $info['remote_ip'],
+            'port' => $info['remote_port'],
+            'path' => '/',
+            'handshake' => false,
+            'connectTime' => $info['connect_time'],
+            'resourceId' => $cid,
+        ];
+
+        // 初始化客户端信息
+        $this->connections[$cid] = new Connection($meta);
 
         // begin start handshake
         $method = $swRequest->server['request_method'];
@@ -162,7 +161,6 @@ class WebSocketServer extends HttpServer
             }
 
             $swResponse->end();
-
             $this->delConnection($cid);
 
             return false;
@@ -189,8 +187,13 @@ class WebSocketServer extends HttpServer
 //        $this->debug("Handshake: response info:\n" . $respData);
 //        $r = $this->server->send($cid, $respData);
 
+
+        // 客户端连接单独保存
+//        $this->clients[$cid] = $socket;
+        $this->clientNumber++;
         // 标记已经握手 更新路由 path
         $meta = $this->connections[$cid];
+        $meta->setRequest($request);
         $meta['handshake'] = true;
         $meta['path'] = $request->getPath();
 
@@ -239,6 +242,10 @@ class WebSocketServer extends HttpServer
         $server->push($frame->fd, "server: {$frame->data}");
     }
 
+    public function handleWsRequest($server, Frame $frame)
+    {
+    }
+
     /**
      * webSocket断开连接
      * @param  Server $server
@@ -265,7 +272,7 @@ class WebSocketServer extends HttpServer
         */
         $fdInfo = $server->connection_info($fd);
 
-        // is socket request
+        // is web socket request
         if ($fdInfo['websocket_status'] > 0) {
             $meta = $this->delConnection($fd);
 

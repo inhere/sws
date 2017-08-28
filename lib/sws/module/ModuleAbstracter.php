@@ -9,10 +9,10 @@
 namespace sws\module;
 
 use inhere\library\traits\OptionsTrait;
-use sws\Application;
-use sws\server\ClientMetadata;
-use sws\server\dataParser\ComplexDataParser;
-use sws\server\dataParser\DataParserInterface;
+use sws\App;
+use sws\server\Connection;
+use sws\dataParser\ComplexDataParser;
+use sws\dataParser\DataParserInterface;
 use sws\http\Request;
 use sws\http\Response;
 use sws\http\WSResponse;
@@ -32,7 +32,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     const ERROR_HANDLER = 3;
 
     /**
-     * @var Application
+     * @var App
      */
     private $app;
 
@@ -87,7 +87,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function __construct(array $options = [], DataParserInterface $dataParser = null)
     {
-        $this->setOptions($options, true);
+        $this->setOptions($options);
 
         $this->_dataParser = $dataParser;
     }
@@ -111,7 +111,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @inheritdoc
      */
-    public function onClose(int $cid, ClientMetadata $client)
+    public function onClose(int $cid, Connection $client)
     {
         $this->log('A user has been disconnected. Path: ' . $client['path']);
     }
@@ -119,7 +119,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @inheritdoc
      */
-    public function onError(Application $app, string $msg)
+    public function onError(App $app, string $msg)
     {
         $this->log('Accepts a connection on a socket error, when request : ' . $msg, 'error');
     }
@@ -303,7 +303,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function respond($data, string $msg = 'success', int $code = 0, bool $doSend = true)
     {
-        return $this->app->respond($data, $msg, $code, $doSend);
+        return $this->app->wsRespond($data, $msg, $code, $doSend);
     }
 
     /**
@@ -369,17 +369,17 @@ abstract class ModuleAbstracter implements ModuleInterface
     }
 
     /**
-     * @return Application
+     * @return App
      */
-    public function getApp(): Application
+    public function getApp(): App
     {
         return $this->app;
     }
 
     /**
-     * @param Application $app
+     * @param App $app
      */
-    public function setApp(Application $app)
+    public function setApp(App $app)
     {
         $this->app = $app;
     }

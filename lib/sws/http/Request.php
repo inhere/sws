@@ -117,14 +117,14 @@ class Request extends BaseMessage
         $first = array_shift($list);
         $data = array_map('trim', explode(' ', trim($first)));
 
-        [$method, $uri, $protoStr] = $data;
-        [$protocol, $protocolVersion] = explode('/', $protoStr);
+        list($method, $uri, $protoStr) = $data;
+        list($protocol, $protocolVersion) = explode('/', $protoStr);
 
         // other header info
         $headers = [];
         foreach ($list as $item) {
             if ($item) {
-                [$name, $value] = explode(': ', trim($item));
+                list($name, $value) = explode(': ', trim($item));
                 $headers[$name] = trim($value);
             }
         }
@@ -138,7 +138,7 @@ class Request extends BaseMessage
         $port = 80;
         $host = '';
         if ($val = $headers['Host'] ?? '') {
-            [$host, $port] = strpos($val, ':') ? explode(':', $val) : [$val, 80];
+            list($host, $port) = strpos($val, ':') ? explode(':', $val) : [$val, 80];
         }
 
         $path = $uri;

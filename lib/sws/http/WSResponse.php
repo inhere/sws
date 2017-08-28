@@ -10,7 +10,7 @@ namespace sws\http;
 
 use inhere\library\traits\ArrayAccessByPropertyTrait;
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
-use sws\server\ServerInterface;
+use sws\server\WsServerInterface;
 
 /**
  * Class WSResponse
@@ -23,7 +23,7 @@ class WSResponse implements \ArrayAccess
     use PropertyAccessByGetterSetterTrait;
 
     /**
-     * @var ServerInterface
+     * @var WsServerInterface
      */
     private $ws;
 
@@ -89,7 +89,7 @@ class WSResponse implements \ArrayAccess
     public function send(bool $reset = true)
     {
         if (!$this->ws) {
-            throw new \InvalidArgumentException('Please set the property [ws], is instance of the ServerInterface');
+            throw new \InvalidArgumentException('Please set the property [ws], is instance of the WsServerInterface');
         }
 
         // if message have been sent, stop and return last status code
@@ -281,18 +281,18 @@ class WSResponse implements \ArrayAccess
     }
 
     /**
-     * @return ServerInterface
+     * @return WsServerInterface
      */
-    public function getWs(): ServerInterface
+    public function getWs(): WsServerInterface
     {
         return $this->ws;
     }
 
     /**
-     * @param ServerInterface $ws
+     * @param WsServerInterface $ws
      * @return self
      */
-    public function setWs(ServerInterface $ws)
+    public function setWs(WsServerInterface $ws)
     {
         if (!$this->ws) {
             $this->ws = $ws;

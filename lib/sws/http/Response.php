@@ -4,29 +4,32 @@
  * User: Inhere
  * Date: 2017/3/29 0029
  * Time: 00:19
- *
  * @from Slim 3
  */
 
 namespace sws\http;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Class Response
  * response for handshake
  * @package sws\http
- *
- * @property int $statusCode
+ * @property int $status
  * @property string $statusMsg
- *
  * @property array $body
+ *
+ * @link https://github.com/php-fig/http-message/blob/master/src/MessageInterface.php
+ * @link https://github.com/php-fig/http-message/blob/master/src/ResponseInterface.php
  */
-class Response extends BaseMessage
+class Response extends BaseMessage implements ResponseInterface
 {
     /**
      * eg: 404
      * @var int
      */
-    private $statusCode;
+    private $status;
 
     /**
      * eg: 'OK'
@@ -36,7 +39,6 @@ class Response extends BaseMessage
 
     /**
      * Status codes and reason phrases
-     *
      * @var array
      */
     protected static $messages = [
@@ -112,30 +114,44 @@ class Response extends BaseMessage
     ];
 
     public static function make(
-        int $statusCode = 200, array $headers = [], array $cookies = [], $body = '',
+        int $status = 200, array $headers = [], array $cookies = [], StreamInterface $body = null,
         string $protocol = 'HTTP', string $protocolVersion = '1.1'
     )
     {
-        return new self($statusCode, $headers, $cookies, $body, $protocol, $protocolVersion);
+        return new self($status, $headers, $cookies, $body, $protocol, $protocolVersion);
     }
 
     /**
      * Request constructor.
-     * @param int $statusCode
+     * @param int $status
      * @param array $headers
      * @param array $cookies
-     * @param string|array $body
+     * @param StreamInterface $body
      * @param string $protocol
      * @param string $protocolVersion
      */
     public function __construct(
-        int $statusCode = 200, array $headers = [], array $cookies = [], string $body = '',
+        int $status = 200, array $headers = [], array $cookies = [], StreamInterface $body = null,
         string $protocol = 'HTTP', string $protocolVersion = '1.1'
-    )
-    {
-        $this->setStatus($statusCode);
+    ) {
+        $this->status = $this->filterStatus($status);
+        $this->headers = new Headers($headers);
+        $this->body = $body ? : new Body(fopen('php://temp', 'rb+'));
 
-        parent::__construct($protocol, $protocolVersion, $headers, $cookies, $body);
+        parent::__construct($protocol, $protocolVersion, $headers, $cookies);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
+    }
+
+    public function __clone()
+    {
+        $this->headers = clone $this->headers;
     }
 
     /**
@@ -143,6 +159,7 @@ class Response extends BaseMessage
      */
     protected function buildFirstLine()
     {
+        // `GET /path HTTP/1.1`
         return sprintf(
             '%s/%s %s %s',
             $this->getProtocol(),
@@ -174,6 +191,51 @@ class Response extends BaseMessage
         return $output . $this->getBody();
     }
 
+    /*******************************************************************************
+     * Status
+     ******************************************************************************/
+
+    /**
+     * Return an instance with the specified status code and, optionally, reason phrase.
+     * If no reason phrase is specified, implementations MAY choose to default
+     * to the RFC 7231 or IANA recommended reason phrase for the response's
+     * status code.
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * updated status and reason phrase.
+     * @link http://tools.ietf.org/html/rfc7231#section-6
+     * @link http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+     * @param int $code The 3-digit integer result code to set.
+     * @param string $reasonPhrase The reason phrase to use with the
+     *     provided status code; if none is provided, implementations MAY
+     *     use the defaults as suggested in the HTTP specification.
+     * @return static
+     * @throws \InvalidArgumentException For invalid status code arguments.
+     */
+    public function withStatus($code, $reasonPhrase = '')
+    {
+        $code = $this->filterStatus($code);
+
+        if (!is_string($reasonPhrase) && !method_exists($reasonPhrase, '__toString')) {
+            throw new \InvalidArgumentException('ReasonPhrase must be a string');
+        }
+
+        $clone = clone $this;
+        $clone->status = $code;
+
+        if ($reasonPhrase === '' && isset(static::$messages[$code])) {
+            $reasonPhrase = static::$messages[$code];
+        }
+
+        if ($reasonPhrase === '') {
+            throw new \InvalidArgumentException('ReasonPhrase must be supplied for this code');
+        }
+
+        $clone->reasonPhrase = $reasonPhrase;
+
+        return $clone;
+    }
+
     /**
      * @param $code
      * @param string $reasonPhrase
@@ -187,7 +249,7 @@ class Response extends BaseMessage
             throw new \InvalidArgumentException('ReasonPhrase must be a string');
         }
 
-        $this->statusCode = $code;
+        $this->status = $code;
         if ($reasonPhrase === '' && isset(static::$messages[$code])) {
             $reasonPhrase = static::$messages[$code];
         }
@@ -203,7 +265,6 @@ class Response extends BaseMessage
 
     /**
      * Filter HTTP status code.
-     *
      * @param  int $status HTTP status code.
      * @return int
      * @throws \InvalidArgumentException If an invalid HTTP status code is provided.
@@ -220,15 +281,23 @@ class Response extends BaseMessage
     /**
      * @return int
      */
-    public function getStatusCode(): int
+    public function getStatus()
     {
-        return $this->statusCode ?: 200;
+        return $this->status ?: 200;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->status ?: 200;
     }
 
     /**
      * @return string
      */
-    public function getReasonPhrase(): string
+    public function getReasonPhrase()
     {
         return $this->reasonPhrase;
     }
@@ -240,7 +309,6 @@ class Response extends BaseMessage
     {
         return self::$messages;
     }
-
 
     /**
      * @param string $content
@@ -256,5 +324,4 @@ class Response extends BaseMessage
 
         return $this;
     }
-
 }

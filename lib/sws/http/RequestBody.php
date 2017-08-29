@@ -17,13 +17,18 @@ class RequestBody extends Body
 {
     /**
      * Create a new RequestBody.
+     * @param null|string $content
      */
-    public function __construct()
+    public function __construct($content = null)
     {
         $stream = fopen('php://temp', 'wb+');
         stream_copy_to_stream(fopen('php://input', 'rb'), $stream);
         rewind($stream);
 
         parent::__construct($stream);
+
+        if ($content) {
+            $this->write($content);
+        }
     }
 }

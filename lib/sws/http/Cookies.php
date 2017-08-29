@@ -25,7 +25,7 @@ class Cookies extends SimpleCollection
      *  'name' => [ options ...]
      * ]
      */
-    protected $data = [];
+    // protected $data = [];
 
     /**
      * Default cookie properties

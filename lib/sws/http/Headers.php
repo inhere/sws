@@ -47,9 +47,8 @@ class Headers extends SimpleCollection
      */
     public function all()
     {
-        $all = parent::all();
         $out = [];
-        foreach ($all as $key => $props) {
+        foreach (parent::all() as $key => $props) {
             $out[$props['originalKey']] = $props['value'];
         }
 
@@ -66,12 +65,8 @@ class Headers extends SimpleCollection
      */
     public function set($key, $value)
     {
-        if (!is_array($value)) {
-            $value = [$value];
-        }
-
         return parent::set($this->normalizeKey($key), [
-            'value' => $value,
+            'value' => (array)$value,
             'originalKey' => $key
         ]);
     }

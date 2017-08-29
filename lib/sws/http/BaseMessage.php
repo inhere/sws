@@ -9,6 +9,8 @@
 namespace sws\http;
 
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Class BaseRequestResponse
@@ -19,10 +21,10 @@ use inhere\library\traits\PropertyAccessByGetterSetterTrait;
  *
  * @property Headers $headers
  * @property Cookies $cookies
+ * @property StreamInterface $body
  *
- * @property string $body
  */
-abstract class BaseMessage
+class BaseMessage implements MessageInterface
 {
     use PropertyAccessByGetterSetterTrait;
 
@@ -48,19 +50,16 @@ abstract class BaseMessage
     protected $headers;
 
     /**
-     * @var Cookies
-     */
-    protected $cookies;
-
-    /**
-     * @var array
-     */
-    private $files = [];
-
-    /**
-     * @var string
+     * Body object
+     *
+     * @var \Psr\Http\Message\StreamInterface
      */
     protected $body;
+
+    /**
+     * @var Cookies
+     */
+    private $cookies;
 
     /**
      * A map of valid protocol versions
@@ -72,35 +71,24 @@ abstract class BaseMessage
         '2.0' => true,
     ];
 
-    public function __construct(string $protocol = 'HTTP', string $protocolVersion = '1.1', array $headers = [], array $cookies = [], string $body = '')
+    /**
+     * BaseMessage constructor.
+     * @param string $protocol
+     * @param string $protocolVersion
+     * @param array $headers
+     * @param array $cookies
+     */
+    public function __construct(string $protocol = 'HTTP', string $protocolVersion = '1.1', array $headers = [], array $cookies = [])
     {
         $this->protocol = $protocol ?: 'HTTP';
         $this->protocolVersion = $protocolVersion ?: '1.1';
         $this->headers = new Headers($headers);
         $this->cookies = new Cookies($cookies);
-
-
-        $this->body = $body ?: '';
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toString();
-    }
-
-    /**
-     * @return string
-     */
-    abstract protected function buildFirstLine();
-
-    /**
-     * build response data
-     * @return string
-     */
-    abstract public function toString();
+    /*******************************************************************************
+     * Protocol
+     ******************************************************************************/
 
     /**
      * @return string
@@ -146,7 +134,7 @@ abstract class BaseMessage
      * @param $version
      * @return static
      */
-    public function withProtocolVersion(string $version)
+    public function withProtocolVersion($version)
     {
         if (!isset(self::$validProtocolVersions[$version])) {
             throw new \InvalidArgumentException(
@@ -161,11 +149,24 @@ abstract class BaseMessage
         return $clone;
     }
 
+    /*******************************************************************************
+     * Headers
+     ******************************************************************************/
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasHeader($name)
+    {
+        return $this->headers->has($name);
+    }
+
     /**
      * @param string $name
      * @return \string[]
      */
-    public function getHeader(string $name)
+    public function getHeader($name)
     {
         return $this->headers->get($name, []);
     }
@@ -192,9 +193,50 @@ abstract class BaseMessage
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function withHeader($name, $value)
+    {
+        $clone = clone $this;
+        $clone->headers->set($name, $value);
+
+        return $clone;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withoutHeader($name)
+    {
+        $clone = clone $this;
+        $clone->headers->remove($name);
+
+        return $clone;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withAddedHeader($name, $value)
+    {
+        $clone = clone $this;
+        $clone->headers->add($name, $value);
+
+        return $clone;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers->all();
+    }
+
+    /**
      * @return Headers
      */
-    public function getHeaders(): Headers
+    public function getHeadersObject()
     {
         return $this->headers;
     }
@@ -208,26 +250,6 @@ abstract class BaseMessage
         $this->headers->sets($headers);
 
         return $this;
-    }
-
-    /*******************************************************************************
-     * Files
-     ******************************************************************************/
-
-    /**
-     * @return array
-     */
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    /**
-     * @param array $files
-     */
-    public function setFiles(array $files)
-    {
-        $this->files = $files;
     }
 
     /*******************************************************************************
@@ -269,19 +291,38 @@ abstract class BaseMessage
         return $this;
     }
 
+    /*******************************************************************************
+     * Body
+     ******************************************************************************/
+
     /**
      * @return string
      */
-    public function getBody(): string
+    public function getBody()
     {
         return $this->body;
     }
 
     /**
-     * @param string $body
+     * @param StreamInterface $body
+     * @return $this
      */
-    public function setBody(string $body)
+    public function setBody(StreamInterface $body)
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withBody(StreamInterface $body)
+    {
+        // TODO: Test for invalid body?
+        $clone = clone $this;
+        $clone->body = $body;
+
+        return $clone;
     }
 }

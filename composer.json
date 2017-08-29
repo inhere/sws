@@ -19,6 +19,7 @@
     "require": {
         "php": ">=7.0.0",
         "symfony/yaml": "^3.0",
+        "guzzlehttp/promises": "^1.3",
         "inhere/console": "dev-master",
         "inhere/http": "dev-master",
         "inhere/library": "dev-master",
@@ -32,6 +33,7 @@
         "inhere/sroute": "dev-master",
         "psr/log": "~1.0",
         "psr/http-message": "^1.0",
+        "psr/container": "^1.0",
         "overtrue/pinyin": "^3.0"
     },
     "require-dev": {

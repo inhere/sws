@@ -11,6 +11,8 @@ namespace sws\server;
 use inhere\library\traits\EventTrait;
 use inhere\server\servers\HttpServer;
 
+use sws\components\HttpHelper;
+use sws\http\Headers;
 use sws\http\Request;
 use sws\http\Response;
 
@@ -93,34 +95,6 @@ class WebSocketServer extends HttpServer
     }
 
     /**
-     * @param SwRequest $swRequest
-     * @return Request
-     */
-    protected function createRequest(SwRequest $swRequest)
-    {
-        $method = $swRequest->server['request_method'];
-        $uriStr = $swRequest->server['request_uri'];
-
-        $request = new Request($method, Uri::createFromString($uriStr));
-        $request->setQueryParams($swRequest->get ?: []);
-        $request->setParsedBody($swRequest->post ?: []);
-        $request->setHeaders($swRequest->header ?: []);
-        $request->setFiles($swRequest->files ?: []);
-        $request->setCookies($swRequest->cookie ?? []);
-        $serverData = array_change_key_case($swRequest->server, CASE_UPPER);
-
-        // 将HTTP头信息赋值给 $_SERVER 超全局变量
-        foreach ((array)$swRequest->header as $key => $value) {
-            $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-            $serverData[$_key] = $value;
-        }
-
-        $request->setServerData($serverData);
-
-        return $request;
-    }
-
-    /**
      * webSocket 建立连接后进行握手。WebSocket服务器已经内置了handshake，
      * 如果用户希望自己进行握手处理，可以设置 onHandShake 事件回调函数。
      *
@@ -148,12 +122,10 @@ class WebSocketServer extends HttpServer
         $this->connections[$cid] = $meta = new Connection($metaAry);
 
         // begin start handshake
-        $request = $this->createRequest($swRequest);
+        $secKey = $swRequest->header['sec-websocket-key'];
+        $request = HttpHelper::createRequest($swRequest);
 
         $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
-
-        $response = new Response();
-        $secKey = $swRequest->header['sec-websocket-key'];
 
         // sec-websocket-key 错误
         if ($this->isInvalidSecWSKey($secKey)) {
@@ -167,22 +139,14 @@ class WebSocketServer extends HttpServer
             return false;
         }
 
+        $response = HttpHelper::createResponse();
+
         // 触发 handshake 事件回调，如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
         // 就停止继续处理。并返回信息给客户端
         if (self::HANDSHAKE_FAIL === $this->fire(self::EVT_HANDSHAKE_REQUEST, [$request, $response, $cid])) {
             $this->log("The #$cid client handshake's callback return false, will close the connection");
 
-            $swResponse->status($response->getStatusCode());
-
-            foreach ($response->getHeaders()->getLines() as $name => $value) {
-                $swResponse->header($name, $value);
-            }
-
-            if ($body = $response->getBody()) {
-                $swResponse->write($body);
-            }
-
-            $swResponse->end();
+            HttpHelper::paddingSwooleResponse($response, $swResponse)->end();
             $this->delConnection($cid);
 
             return false;
@@ -200,10 +164,7 @@ class WebSocketServer extends HttpServer
         $this->debug("Handshake: response info:\n" . $response->toString());
 
         // 响应握手成功
-        $swResponse->status($response->getStatusCode());
-        foreach ($response->getHeaders()->getLines() as $name => $value) {
-            $swResponse->header($name, $value);
-        }
+        HttpHelper::paddingSwooleResponse($response, $swResponse);
 
         // 标记已经握手 更新路由 path
         $meta->handshake($request);
@@ -266,32 +227,18 @@ class WebSocketServer extends HttpServer
     public function onClose($server, $fd)
     {
         /*
-        返回数据：
-        "websocket_status":0, // 此状态可以判断是否为WebSocket客户端。
-        "server_port":9501,
-        "server_fd":4,
-        "socket_type":1,
-        "remote_port":56554,
-        "remote_ip":"127.0.0.1",
-        "from_id":2,
-        "connect_time":1487940465,
-        "last_time":1487940465,
-        "close_errno":0
-
         WEBSOCKET_STATUS_CONNECTION = 1，连接进入等待握手
         WEBSOCKET_STATUS_HANDSHAKE = 2，正在握手
         WEBSOCKET_STATUS_FRAME = 3，已握手成功等待浏览器发送数据帧
         */
-        $fdInfo = $server->connection_info($fd);
+        $fdInfo = $this->getClientInfo($fd);
 
-        // is web socket request
+        // is web socket request(websocket_status = 2)
         if ($fdInfo['websocket_status'] > 0) {
             $meta = $this->delConnection($fd);
 
             // call on close callback
-//            if ($freeEvent) {
-                $this->fire(self::EVT_WS_CLOSE, [$this, $fd, $meta]);
-//            }
+            $this->fire(self::EVT_WS_CLOSE, [$this, $fd, $meta]);
 
             $this->log("onClose: The #$fd client connection has been closed! From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
             $this->log("onClose: Client #{$fd} is closed", $fdInfo);

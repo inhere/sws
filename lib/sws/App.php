@@ -10,6 +10,7 @@ namespace sws;
 
 use inhere\library\di\Container;
 
+use inhere\sroute\ORouter;
 use Swoole\Server;
 use sws\http\Request;
 use sws\http\Response;
@@ -71,35 +72,29 @@ class App extends WebSocketServer implements WsServerInterface
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      * @return array
+     * @throws \Throwable
      */
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
         //
         $method = $swRequest->server['request_method'];
-        $uriStr = $swRequest->server['request_uri'];
-
-        $request = new Request($method, Uri::createFromString($uriStr));
-        $request->setQueryParams($swRequest->get ?: []);
-        $request->setParsedBody($swRequest->post ?: []);
-        $request->setHeaders($swRequest->header ?: []);
-        $request->setCookies($swRequest->cookie ?: []);
-        $serverData = array_change_key_case($swRequest->server, CASE_UPPER);
-
-        // 将HTTP头信息赋值给 $_SERVER 超全局变量
-        foreach ((array)$swRequest->header as $key => $value) {
-            $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-            $serverData[$_key] = $value;
-        }
-
-        $request->setServerData($serverData);
+        $uri = $swRequest->server['request_uri'];
+        $request = self::createRequest($swRequest);
 
         $content = '';
-        $resp = $this->di['router']->dispatch();
+        /** @var ORouter $router */
+        $router = $this->di->get('router');
 
-        if ($resp instanceof Response) {
-            $content = $resp->getBody();
-        } elseif ($resp) {
-            $content = (string)$resp;
+        try {
+            $resp = $router->dispatch(null, parse_url($uri), $method);
+
+            if ($resp instanceof Response) {
+                $content = $resp->getBody();
+            } elseif ($resp) {
+                $content = (string)$resp;
+            }
+        } catch (\Throwable $e) {
+            throw $e;
         }
 
         return [200, [], $content];
@@ -111,16 +106,26 @@ class App extends WebSocketServer implements WsServerInterface
      */
     public function handleWsRequest($server, Frame $frame)
     {
-        $meta = $this->getConnection($frame->fd);
+        $cid = $frame->fd;
+        $meta = $this->getConnection($cid);
+
+        if (!$meta) {
+            $this->log("The connection #{$cid} has lost.");
+            $this->close($cid);
+
+            return;
+        }
 
         // dispatch command
 
         // $path = $ws->getClient($cid)['path'];
-        $result = $this->getModule($meta['path'])->dispatch($frame->data, $frame->fd);
+        $result = $this->getModule($meta['path'])->dispatch($frame->data, $cid);
 
         if ($result && is_string($result)) {
             $this->send($result);
         }
+
+//        return;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

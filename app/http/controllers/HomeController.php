@@ -16,5 +16,11 @@ use app\components\BaseController;
  */
 class HomeController extends BaseController
 {
-
+    /**
+     * test action
+     */
+    public function indexAction()
+    {
+        return __METHOD__;
+    }
 }

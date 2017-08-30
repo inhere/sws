@@ -8,13 +8,14 @@
 
 namespace sws;
 
+use inhere\console\utils\Show;
 use inhere\library\di\Container;
 
 use inhere\sroute\ORouter;
 use Swoole\Server;
+use sws\components\HttpHelper;
 use sws\http\Request;
 use sws\http\Response;
-use sws\http\Uri;
 use sws\http\WSResponse;
 use sws\module\ModuleInterface;
 use sws\module\RootModule;
@@ -71,33 +72,39 @@ class App extends WebSocketServer implements WsServerInterface
     /**
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
-     * @return array
+     * @return SwResponse
      * @throws \Throwable
      */
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
-        //
-        $method = $swRequest->server['request_method'];
-        $uri = $swRequest->server['request_uri'];
-        $request = self::createRequest($swRequest);
+        /** @var Request $request */
+        $request = HttpHelper::createRequest($swRequest);
+        $response = HttpHelper::createResponse();
 
-        $content = '';
         /** @var ORouter $router */
         $router = $this->di->get('router');
 
         try {
-            $resp = $router->dispatch(null, parse_url($uri), $method);
+            $method = $swRequest->server['request_method'];
+            $uri = $swRequest->server['request_uri'];
+            $resp = $router->dispatch(null, parse_url($uri, PHP_URL_PATH), $method);
 
-            if ($resp instanceof Response) {
-                $content = $resp->getBody();
-            } elseif ($resp) {
-                $content = (string)$resp;
+            if (!$resp instanceof Response) {
+                $response->getBody()->write((string)$resp);
             }
+
+            HttpHelper::paddingSwooleResponse($response, $swResponse);
         } catch (\Throwable $e) {
             throw $e;
         }
 
-        return [200, [], $content];
+        Show::write([
+            "Response Status: <info>{$response->getStatusCode()}</info>"
+        ]);
+        Show::aList($response->getHeaders(), 'Response Headers');
+        Show::aList($_SESSION ?: [],'server sessions');
+
+        return $swResponse;
     }
 
     /**

@@ -18,6 +18,8 @@ use Psr\Http\Message\UriInterface;
  * @property string $method
  * @property Uri $uri
  * @property-read string $origin
+ *
+ * @method Body getBody()
  */
 class Request extends BaseMessage implements ServerRequestInterface
 {
@@ -521,9 +523,9 @@ class Request extends BaseMessage implements ServerRequestInterface
                     $this->method = $overrideMethod;
                 }
 
-//                if ($this->getBody()->eof()) {
-//                    $this->getBody()->rewind();
-//                }
+                if ($this->getBody()->eof()) {
+                    $this->getBody()->rewind();
+                }
             }
         }
 

@@ -30,7 +30,9 @@ $di->set('config', function () {
 });
 
 $di->set('app', function ($di) {
-    $app = new \sws\App();
+    $config = require BASE_PATH . '/config/server.php';
+
+    $app = new \sws\App($config);
     $app->setDi($di);
     \Sws::$app = $app;
 
@@ -40,6 +42,7 @@ $di->set('app', function ($di) {
 $di->set('routeDispatcher', function () {
     return new \inhere\sroute\Dispatcher([
         'filterFavicon' => true,
+        'dynamicAction' => true,
     ]);
 });
 
@@ -57,6 +60,7 @@ $di->set('router', function (Container $di) {
     return $router;
 });
 
+// some settings
 error_reporting(E_ALL);
 define('RUNTIME_ENV', $di['config']->get('env'));
 define('APP_DEBUG', $di['config']->get('debug'));

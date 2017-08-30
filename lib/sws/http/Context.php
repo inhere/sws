@@ -8,15 +8,89 @@
 
 namespace sws\http;
 
+use Swoole\Http\Request as SwRequest;
+use Swoole\Http\Response as SwResponse;
+
 /**
  * Class Context
  * @package sws\http
  */
 class Context
 {
+    /**
+     * @var string
+     */
+    private $rid;
 
-    public function getRid()
+    /**
+     * @var array
+     */
+    private $args = [];
+
+    public static function make(SwRequest $swRequest, SwResponse $swResponse)
     {
 
+    }
+
+    public function __construct(SwRequest $swRequest, SwResponse $swResponse)
+    {
+
+    }
+
+    public function getRequest()
+    {
+
+    }
+
+    public function getResponse()
+    {
+
+    }
+
+    public function getSwRequest()
+    {
+
+    }
+
+    public function getSwResponse()
+    {
+
+    }
+
+    public function getLogger()
+    {
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getRid(): string
+    {
+        return $this->rid;
+    }
+
+    /**
+     * @param string $rid
+     */
+    public function setRid(string $rid)
+    {
+        $this->rid = $rid;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgs(): array
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param array $args
+     */
+    public function setArgs(array $args)
+    {
+        $this->args = $args;
     }
 }

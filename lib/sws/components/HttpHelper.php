@@ -30,17 +30,35 @@ class HttpHelper
     {
         $uri = $swRequest->server['request_uri'];
         $method = $swRequest->server['request_method'];
-
         $request = new Request($method, Uri::createFromString($uri));
-        $request->setQueryParams($swRequest->get ?: []);
-        $request->setParsedBody($swRequest->post ?: []);
-        $request->setHeaders($swRequest->header ?: []);
-        $request->setCookies($swRequest->cookie ?? []);
-        $request->setUploadedFiles(UploadedFile::parseUploadedFiles($swRequest->files ?: []));
 
+        // GET data
+        if (isset($swRequest->get)) {
+            $request->setParsedBody($swRequest->get);
+        }
+
+        // POST data
+        if (isset($swRequest->post)) {
+            $request->setParsedBody($swRequest->post);
+        }
+
+        // cookie data
+        if (isset($swRequest->cookie)) {
+            $request->setCookies($swRequest->cookie);
+        }
+
+        // FILES data
+        if (isset($swRequest->files)) {
+            $request->setUploadedFiles(UploadedFile::parseUploadedFiles($swRequest->files));
+        }
+
+        // SERVER data
         $serverData = array_change_key_case($swRequest->server, CASE_UPPER);
 
         if ($swRequest->header) {
+            // headers
+            $request->setHeaders($swRequest->header);
+
             // 将 HTTP 头信息赋值给 $serverData
             foreach ((array)$swRequest->header as $key => $value) {
                 $_key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
@@ -84,7 +102,7 @@ class HttpHelper
         }
 
         // write content
-        if ($body = $response->getBody()) {
+        if ($body = (string)$response->getBody()) {
             $swResponse->write($body);
         }
 

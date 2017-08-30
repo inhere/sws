@@ -296,7 +296,7 @@ class BaseMessage implements MessageInterface
      ******************************************************************************/
 
     /**
-     * @return string
+     * @return StreamInterface
      */
     public function getBody()
     {

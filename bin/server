@@ -7,9 +7,7 @@ session_start();
 
 require BASE_PATH . '/boot/web.php';
 
-$config = require BASE_PATH . '/config/server.php';
-
-$mgr = new \sws\App($config);
+$mgr = $di->get('app');
 //$mgr = new \sws\server\WebSocketServer($config);
 //$mgr = new \inhere\server\BoxServer($config);
 

@@ -19,8 +19,8 @@ class HomeController extends BaseController
     /**
      * test action
      */
-    public function indexAction()
+    public function indexAction($ctx)
     {
-        return __METHOD__;
+        return var_export($ctx, 1);
     }
 }

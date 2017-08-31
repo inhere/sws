@@ -10,21 +10,21 @@ namespace Sws;
 
 use inhere\console\utils\Show;
 use inhere\library\di\Container;
-
-use inhere\sroute\ORouter;
+use Swoole\Coroutine;
+use Swoole\Http\Request as SwRequest;
+use Swoole\Http\Response as SwResponse;
 use Swoole\Server;
+use Swoole\Websocket\Frame;
 use Sws\Components\HttpHelper;
-use Sws\Http\Request;
+use Sws\Context\ContextManager;
+use Sws\Context\HttpContext;
 use Sws\Http\Response;
 use Sws\Http\WSResponse;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 use Sws\Server\WebSocketServer;
 use Sws\Server\WsServerInterface;
-
-use Swoole\Websocket\Frame;
-use Swoole\Http\Request as SwRequest;
-use Swoole\Http\Response as SwResponse;
+use Sws\Web\RouteDispatcher;
 
 /**
  * Class Application
@@ -70,6 +70,14 @@ class Application extends WebSocketServer implements WsServerInterface
     }
 
     /**
+     * before Server Start
+     */
+    public function beforeServerStart()
+    {
+
+    }
+
+    /**
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      * @return SwResponse
@@ -77,23 +85,23 @@ class Application extends WebSocketServer implements WsServerInterface
      */
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
-        /** @var Request $request */
-        $request = HttpHelper::createRequest($swRequest);
-        $response = HttpHelper::createResponse();
-
-        /** @var ORouter $router */
-        $router = $this->di->get('router');
-
         try {
-            $method = $swRequest->server['request_method'];
+            /** @var RouteDispatcher $dispatcher */
+            $dispatcher = $this->di->get('routeDispatcher');
+            $context = HttpContext::make($swRequest, $swResponse);
+
             $uri = $swRequest->server['request_uri'];
-            $resp = $router->dispatch(null, parse_url($uri, PHP_URL_PATH), $method);
+            $method = $swRequest->server['request_method'];
+            $this->log("begin dispatch URI: $uri, METHOD: $method, FD: {$swRequest->fd}, ID: {$context->getId()}, COID: " . Coroutine::getuid());
+            $resp = $dispatcher->setContext($context)->dispatch(parse_url($uri, PHP_URL_PATH), $method);
+//            $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method);
 
             if (!$resp instanceof Response) {
+                $response = HttpHelper::createResponse();
                 $response->getBody()->write((string)$resp);
+            } else {
+                $response = $resp;
             }
-
-            HttpHelper::paddingSwooleResponse($response, $swResponse);
         } catch (\Throwable $e) {
             throw $e;
         }
@@ -104,7 +112,15 @@ class Application extends WebSocketServer implements WsServerInterface
         Show::aList($response->getHeaders(), 'Response Headers');
         Show::aList($_SESSION ?: [],'server sessions');
 
-        return $swResponse;
+        return HttpHelper::paddingSwResponse($response, $swResponse);
+    }
+
+    public function afterRequest(SwRequest $request, SwResponse $response)
+    {
+        $id = ContextManager::genId($request->fd);
+        ContextManager::delContext($id);
+
+        $this->log("The request end. ID: $id, FD: {$request->fd}, COID: " . Coroutine::getuid());
     }
 
     /**

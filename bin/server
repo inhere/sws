@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Sws\Application;
+
 define('BASE_PATH', dirname(__DIR__) );
 
 session_start();
@@ -16,5 +18,8 @@ $mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
     'port' => '9762',
 ]));
 
-// do run
+/**
+ * do run
+ * @var Application $mgr
+ */
 $mgr->run();

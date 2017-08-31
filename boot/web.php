@@ -8,7 +8,7 @@
 
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
-use inhere\sroute\Dispatcher;
+use Sws\Web\RouteDispatcher;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 require __DIR__ . '/di.php';
@@ -37,27 +37,35 @@ $di->set('app', function ($di) {
     return $app;
 });
 
-$di->set('routeDispatcher', function () {
-    return new Dispatcher([
-        'filterFavicon' => true,
-        'dynamicAction' => true,
-        Dispatcher::ON_NOT_FOUND => '/404'
-    ]);
-});
-
-$di->set('router', function (Container $di) {
+$di->set('router', function () {
     $router = new \inhere\sroute\ORouter([
         'ignoreLastSep' => true,
         'tmpCacheNumber' => 200,
     ]);
-
-    $router->setDispatcher($di->get('routeDispatcher'));
 
     // register routes
     require BASE_PATH . '/app/http/routes.php';
 
     return $router;
 });
+
+$di->set('routeDispatcher', function (Container $di) {
+    $dispatcher = new RouteDispatcher([
+        'filterFavicon' => true,
+        'dynamicAction' => true,
+        RouteDispatcher::ON_NOT_FOUND => '/404'
+    ]);
+
+    $router = $di->get('router');
+
+    $dispatcher->setMatcher(function ($path, $method) use($router) {
+        return $router->match($path, $method);
+    });
+
+    return $dispatcher;
+}, [
+    'activity' => 1
+]);
 
 // some settings
 error_reporting(E_ALL);

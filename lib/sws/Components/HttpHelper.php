@@ -6,7 +6,7 @@
  * Time: 15:25
  */
 
-namespace Sws\components;
+namespace Sws\Components;
 
 use Sws\Http\Request;
 use Sws\Http\Response;
@@ -18,7 +18,7 @@ use Swoole\Http\Request as SwRequest;
 
 /**
  * Class HttpHelper
- * @package Sws\components
+ * @package Sws\Components
  */
 class HttpHelper
 {
@@ -86,7 +86,7 @@ class HttpHelper
      * @param SwResponse $swResponse
      * @return SwResponse
      */
-    public static function paddingSwooleResponse(Response $response, SwResponse $swResponse)
+    public static function paddingSwResponse(Response $response, SwResponse $swResponse)
     {
         // set http status
         $swResponse->status($response->getStatus());

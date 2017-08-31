@@ -9,7 +9,7 @@
 namespace Sws\Web;
 
 use inhere\sroute\Dispatcher;
-use Sws\Http\Context;
+use Sws\Context\HttpContext;
 
 /**
  * Class RouteDispatcher
@@ -25,24 +25,21 @@ class RouteDispatcher extends Dispatcher
      * - response 响应对象
      * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
      * - args 路由的参数信息
-     * @var Context
+     * @var HttpContext
      */
     private $context;
 
     /**
-     * @param string $path
-     * @param callable $handler
-     * @param array $args
-     * @return mixed
+     * @inheritdoc
      */
-    protected function executeRouteHandler($path, $handler, array $args = [])
+    protected function executeRouteHandler($path, $method, $handler, array $args = [])
     {
         if ($context = $this->context) {
             $context->setArgs($args);
             $args = [$context];
         }
 
-        $result = parent::executeRouteHandler($path, $handler, $args);
+        $result = parent::executeRouteHandler($path, $method, $handler, $args);
 
         // restore
         $this->context = null;
@@ -54,7 +51,7 @@ class RouteDispatcher extends Dispatcher
      * @param $context
      * @return $this
      */
-    public function send(Context $context)
+    public function send( $context)
     {
         $this->context = $context;
 
@@ -62,18 +59,21 @@ class RouteDispatcher extends Dispatcher
     }
 
     /**
-     * @return Context
+     * @return HttpContext
      */
-    public function getContext(): Context
+    public function getContext(): HttpContext
     {
         return $this->context;
     }
 
     /**
-     * @param Context $context
+     * @param HttpContext $context
+     * @return $this
      */
-    public function setContext(Context $context)
+    public function setContext(HttpContext $context)
     {
         $this->context = $context;
+
+        return $this;
     }
 }

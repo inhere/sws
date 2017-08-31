@@ -8,6 +8,7 @@
 
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
+use inhere\sroute\Dispatcher;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 require __DIR__ . '/di.php';
@@ -37,9 +38,10 @@ $di->set('app', function ($di) {
 });
 
 $di->set('routeDispatcher', function () {
-    return new \inhere\sroute\Dispatcher([
+    return new Dispatcher([
         'filterFavicon' => true,
         'dynamicAction' => true,
+        Dispatcher::ON_NOT_FOUND => '/404'
     ]);
 });
 

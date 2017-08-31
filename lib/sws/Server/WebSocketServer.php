@@ -11,16 +11,16 @@ namespace Sws\Server;
 use inhere\library\traits\EventTrait;
 use inhere\server\servers\HttpServer;
 
-use Sws\components\HttpHelper;
-use Sws\http\Headers;
-use Sws\http\Request;
-use Sws\http\Response;
+use Sws\Components\HttpHelper;
+use Sws\Http\Headers;
+use Sws\Http\Request;
+use Sws\Http\Response;
 
 use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Websocket\Server;
 use Swoole\Websocket\Frame;
-use Sws\http\Uri;
+use Sws\Http\Uri;
 
 /**
  * Class WebSocketServer

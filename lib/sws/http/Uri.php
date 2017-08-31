@@ -8,13 +8,13 @@
  * @from Slim-Http
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use InvalidArgumentException;
 
 /**
  * Class Uri
- * @package Sws\http
+ * @package Sws\Http
  */
 class Uri
 {
@@ -204,7 +204,7 @@ class Uri
     protected static $validScheme = [
         '' => true,
         'https' => true,
-        'http' => true,
+        'Http' => true,
         'ws' => true,
         'wss' => true,
     ];
@@ -226,7 +226,7 @@ class Uri
 
         $scheme = str_replace('://', '', strtolower((string)$scheme));
         if (!isset(static::$validScheme[$scheme])) {
-            throw new InvalidArgumentException('Uri scheme must be one of: "", "https", "http"');
+            throw new InvalidArgumentException('Uri scheme must be one of: "", "https", "Http"');
         }
 
         return $scheme;
@@ -395,7 +395,7 @@ class Uri
      */
     protected function hasStandardPort()
     {
-        return ($this->scheme === 'http' && $this->port === 80) || ($this->scheme === 'https' && $this->port === 443);
+        return ($this->scheme === 'Http' && $this->port === 80) || ($this->scheme === 'https' && $this->port === 443);
     }
 
     /**

@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2011-2017 Josh Lockhart
  * @license   https://github.com/slimphp/Slim/blob/3.x/LICENSE.md (MIT License)
  */
-namespace Sws\http;
+namespace Sws\Http;
 
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;

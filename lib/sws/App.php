@@ -13,12 +13,12 @@ use inhere\library\di\Container;
 
 use inhere\sroute\ORouter;
 use Swoole\Server;
-use Sws\components\HttpHelper;
-use Sws\http\Request;
-use Sws\http\Response;
-use Sws\http\WSResponse;
-use Sws\module\ModuleInterface;
-use Sws\module\RootModule;
+use Sws\Components\HttpHelper;
+use Sws\Http\Request;
+use Sws\Http\Response;
+use Sws\Http\WSResponse;
+use Sws\Module\ModuleInterface;
+use Sws\Module\RootModule;
 use Sws\Server\WebSocketServer;
 use Sws\Server\WsServerInterface;
 

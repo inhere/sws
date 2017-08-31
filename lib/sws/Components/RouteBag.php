@@ -8,7 +8,7 @@
 
 namespace Sws\components;
 
-use Sws\module\ModuleInterface;
+use Sws\Module\ModuleInterface;
 
 /**
  * Class RouteBag

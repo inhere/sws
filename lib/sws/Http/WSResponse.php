@@ -6,7 +6,7 @@
  * Time: 21:32
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use inhere\library\traits\ArrayAccessByPropertyTrait;
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
@@ -15,7 +15,7 @@ use Sws\Server\WsServerInterface;
 /**
  * Class WSResponse
  * webSocket message response
- * @package Sws\parts
+ * @package Sws\Http
  */
 class WSResponse implements \ArrayAccess
 {

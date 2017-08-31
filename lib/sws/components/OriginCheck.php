@@ -8,7 +8,7 @@
 
 namespace Sws\components;
 
-use Sws\http\Request;
+use Sws\Http\Request;
 
 /**
  * Class OriginCheck

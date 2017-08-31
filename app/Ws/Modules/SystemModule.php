@@ -6,13 +6,13 @@
  * Time: 9:26
  */
 
-namespace App\ws\modules;
+namespace App\Ws\Modules;
 
 use inhere\webSocket\module\ModuleAbstracter;
 
 /**
  * Class SystemModule
- * @package App\ws\modules
+ * @package App\Ws\Modules
  */
 class SystemModule extends ModuleAbstracter
 {

@@ -6,11 +6,11 @@
  * Time: 18:01
  */
 
-namespace App\components;
+namespace App\Components;
 
 /**
  * Class BaseController
- * @package App\components
+ * @package App\Components
  */
 abstract class BaseController
 {

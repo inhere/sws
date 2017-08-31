@@ -9,7 +9,7 @@
 namespace Sws\Web;
 
 use inhere\sroute\Dispatcher;
-use Sws\http\Context;
+use Sws\Http\Context;
 
 /**
  * Class RouteDispatcher

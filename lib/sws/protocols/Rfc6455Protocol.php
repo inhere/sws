@@ -1,6 +1,6 @@
 <?php
 
-namespace Sws\protocols;
+namespace Sws\Protocols;
 
 /**
  * This is the version of websockets used by Chrome versions 17 through 19.
@@ -18,6 +18,8 @@ class Rfc6455Protocol extends Protocol
 
     /**
      * This is our most recent protocol class
+     * @param $version
+     * @return bool
      */
     public function acceptsVersion($version)
     {

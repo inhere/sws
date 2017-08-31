@@ -6,7 +6,7 @@
  * Time: 13:12
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
 use Psr\Http\Message\MessageInterface;

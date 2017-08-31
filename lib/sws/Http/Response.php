@@ -7,7 +7,7 @@
  * @from Slim 3
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -15,7 +15,7 @@ use Psr\Http\Message\StreamInterface;
 /**
  * Class Response
  * response for handshake
- * @package Sws\http
+ * @package Sws\Http
  * @property int $status
  * @property string $statusMsg
  * @property array $body

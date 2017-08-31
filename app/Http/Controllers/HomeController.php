@@ -6,13 +6,13 @@
  * Time: 18:00
  */
 
-namespace App\http\controllers;
+namespace App\Http\Controllers;
 
 use App\components\BaseController;
 
 /**
  * Class HomeController
- * @package App\http\controllers
+ * @package App\Http\Controllers
  */
 class HomeController extends BaseController
 {

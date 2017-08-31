@@ -6,11 +6,11 @@
  * Time: 9:31
  */
 
-namespace App\ws\modules\system;
+namespace App\Ws\Modules\System;
 
 /**
  * Class InfoHandler
- * @package App\ws\modules\system
+ * @package App\Ws\Modules\System
  */
 class InfoHandler
 {

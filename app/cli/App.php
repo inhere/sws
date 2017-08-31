@@ -6,13 +6,13 @@
  * Time: 17:42
  */
 
-namespace App\cli;
+namespace App\Cli;
 
 use inhere\library\di\Container;
 
 /**
  * Class App
- * @package App\cli
+ * @package App\Cli
  */
 class App extends \inhere\console\App
 {

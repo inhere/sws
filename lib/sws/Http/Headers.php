@@ -6,13 +6,13 @@
  * Time: 19:02
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use inhere\library\collections\SimpleCollection;
 
 /**
  * Class Headers
- * @package Sws\http
+ * @package Sws\Http
  */
 class Headers extends SimpleCollection
 {
@@ -138,7 +138,7 @@ class Headers extends SimpleCollection
     {
         $key = str_replace('_', '-', strtolower($key));
 
-        if (strpos($key, 'http-') === 0) {
+        if (strpos($key, 'Http-') === 0) {
             $key = substr($key, 5);
         }
 

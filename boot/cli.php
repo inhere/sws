@@ -20,7 +20,7 @@ $di->set('config', function () {
 });
 
 $di->set('app', function ($di) {
-    $app = new \app\cli\App();
+    $app = new \app\Cli\App();
     $app->setDi($di);
 
     // register commands

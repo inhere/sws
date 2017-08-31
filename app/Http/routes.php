@@ -5,7 +5,7 @@
  * @var $router  \inhere\sroute\ORouter
  */
 
-use App\http\controllers\HomeController;
+use App\Http\controllers\HomeController;
 
 $router->get('/', function () {
    return 'xxx';

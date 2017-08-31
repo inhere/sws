@@ -10,7 +10,7 @@ namespace Sws\Server;
 
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
-use Sws\http\Request;
+use Sws\Http\Request;
 use Traversable;
 
 /**

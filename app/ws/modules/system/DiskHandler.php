@@ -6,11 +6,11 @@
  * Time: 9:30
  */
 
-namespace App\ws\modules\system;
+namespace App\Ws\Modules\System;
 
 /**
  * Class DiskHandler
- * @package App\ws\modules\system
+ * @package App\Ws\Modules\System
  */
 class DiskHandler
 {

@@ -6,11 +6,11 @@
  * Time: 17:58
  */
 
-namespace App\ws\modules;
+namespace App\Ws\Modules;
 
 /**
  * Class ChatModule
- * @package App\ws\modules
+ * @package App\Ws\Modules
  */
 class ChatModule extends \inhere\webSocket\module\ChatModule
 {

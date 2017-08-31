@@ -10,7 +10,7 @@ namespace App\Rpc;
 
 /**
  * Class TestService
- * @package App\rpc
+ * @package App\Rpc
  */
 class TestService
 {

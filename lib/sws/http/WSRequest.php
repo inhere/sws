@@ -10,7 +10,7 @@ namespace Sws\Server;
 
 /**
  * Class WSRequest
- * @package Sws\Server
+ * @package Sws\Http
  */
 class WSRequest
 {

@@ -5,13 +5,14 @@
  * Date: 2017-08-22
  * Time: 17:00
  *
- * @var $app Application
+ * @var $app App
  */
 
-use inhere\webSocket\Application;
-use inhere\webSocket\module\ModuleInterface;
+use Sws\App;
+use Sws\Module\ModuleInterface;
+use Sws\Module\RootModule;
 
-$rootModule = $app->module('/', new \inhere\webSocket\module\RootModule());
+$rootModule = $app->module('/', new RootModule());
 
 // commands
 $rootModule->add('test', function ($data, $index, ModuleInterface $module) {
@@ -41,7 +42,7 @@ $rootModule->add('login', function ($data, $cid, ModuleInterface $handler) {
     $handler->respond("welcome new friend: $name join us.");
 });
 
-$rootModule->add('logout', function ($data, $id, Application $app) {
+$rootModule->add('logout', function ($data, $id, App $app) {
     $user = $app->getUser($id);
 
     return $app->respond("goodbye, {$user['name']}");

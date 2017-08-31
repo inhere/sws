@@ -6,7 +6,7 @@
  * Time: 17:58
  */
 
-namespace Sws\http;
+namespace Sws\Http;
 
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;

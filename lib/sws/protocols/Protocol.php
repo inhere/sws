@@ -1,6 +1,6 @@
 <?php
 
-namespace Sws\protocols;
+namespace Sws\Protocols;
 
 use Exception;
 use InvalidArgumentException;

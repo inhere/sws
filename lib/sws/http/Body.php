@@ -5,7 +5,7 @@
  * Date: 2017/3/26 0026
  * Time: 18:02
  */
-namespace Sws\http;
+namespace Sws\Http;
 
 /**
  * Body

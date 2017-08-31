@@ -8,10 +8,10 @@
 
 namespace Sws\components;
 
-use Sws\http\Request;
-use Sws\http\Response;
-use Sws\http\UploadedFile;
-use Sws\http\Uri;
+use Sws\Http\Request;
+use Sws\Http\Response;
+use Sws\Http\UploadedFile;
+use Sws\Http\Uri;
 
 use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;

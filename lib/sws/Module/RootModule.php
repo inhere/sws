@@ -6,17 +6,17 @@
  * Time: 15:34
  */
 
-namespace Sws\module;
+namespace Sws\Module;
 
-use Sws\http\Request;
-use Sws\http\Response;
+use Sws\Http\Request;
+use Sws\Http\Response;
 
 /**
  * Class RootHandler
  *
  * handle the root '/' webSocket request
  *
- * @package Sws\module
+ * @package Sws\Module
  */
 class RootModule extends ModuleAbstracter
 {

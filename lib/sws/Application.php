@@ -115,12 +115,16 @@ class Application extends WebSocketServer implements WsServerInterface
         return HttpHelper::paddingSwResponse($response, $swResponse);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
-        $id = ContextManager::genId($request->fd);
-        ContextManager::delContext($id);
+        $coId = Coroutine::getuid();
+        $ctxId = HttpContext::genRequestId($coId);
+        ContextManager::delContext($ctxId);
 
-        $this->log("The request end. ID: $id, FD: {$request->fd}, COID: " . Coroutine::getuid());
+        $this->log("The request end. coId: $coId, FD: {$request->fd}, ctxId: $ctxId, context count:" . ContextManager::count());
     }
 
     /**

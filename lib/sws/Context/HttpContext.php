@@ -8,10 +8,10 @@
 
 namespace Sws\Context;
 
+use Swoole\Coroutine;
 use Sws\Http\Request;
 use Sws\Http\Response;
 
-use inhere\server\helpers\ServerHelper;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 
@@ -59,13 +59,24 @@ class HttpContext extends Context
     }
 
     /**
-     * Context constructor.
+     * @param SwRequest $swRequest
+     * @return int
+     */
+    public static function getUniqueKey(SwRequest $swRequest)
+    {
+        return Coroutine::getuid();
+    }
+
+    /**
+     * object constructor.
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      */
     public function __construct(SwRequest $swRequest, SwResponse $swResponse)
     {
-        parent::__construct(ServerHelper::genRequestId($swRequest->fd));
+        $id = self::genRequestId(static::getUniqueKey($swRequest));
+
+        parent::__construct($id);
 
         $this->request = HttpHelper::createRequest($swRequest);
         $this->response = HttpHelper::createResponse();

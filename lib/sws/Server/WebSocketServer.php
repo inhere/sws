@@ -9,7 +9,6 @@
 namespace Sws\Server;
 
 use inhere\library\traits\EventTrait;
-use inhere\server\helpers\ServerHelper;
 use inhere\server\servers\HttpServer;
 
 use Sws\Components\HttpHelper;
@@ -175,13 +174,13 @@ class WebSocketServer extends HttpServer
         $meta->handshake($request);
         $this->clientNumber++;
 
-        $this->log("Handshake: The #$cid client connection handshake successful! context ID: {$context->getId()},Meta:", $meta->all());
+        $this->log("Handshake: The #{$cid} client handshake successful! ctxId: {$context->getId()},Meta:\n" . var_export($meta->all(), 1));
         $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
 
         // 握手成功 触发 open 事件
-        $this->server->defer(function () use ($swRequest) {
-            $this->onOpen($this->server, $swRequest);
-        });
+//        $this->server->defer(function () use ($swRequest) {
+//            $this->onOpen($this->server, $swRequest);
+//        });
 
         return true;
     }
@@ -194,13 +193,13 @@ class WebSocketServer extends HttpServer
     public function onOpen($server, SwRequest $request)
     {
         $cid = $request->fd;
-        $ctxId = ServerHelper::genRequestId($cid);
+        $ctxId = WsContext::genRequestId($cid);
+        $conn = $this->connections[$cid];
 
-        $this->log("onOpen: The Client #{$cid} connection open successful! context ID: $ctxId, Meta:", $this->connections[$cid]->all());
+        $this->log("onOpen: The Client #{$cid} open successful! ctxId: $ctxId, Meta:\n" . var_export($conn->all(), 1));
 
         $this->fire(self::EVT_WS_OPEN, [$this, $request, $cid]);
 
-        // var_dump($cid, $request->get, $request->server);
         $server->push($cid, "hello, welcome\n");
     }
 
@@ -211,13 +210,16 @@ class WebSocketServer extends HttpServer
      */
     public function onMessage($server, Frame $frame)
     {
-        $this->log("onMessage: The Client #{$frame->fd} send message: {$frame->data}");
+        $fd = $frame->fd;
+        $ctxId = WsContext::genRequestId($fd);
+
+        $this->log("onMessage: The Client #{$fd}(ctxId:{$ctxId}) send message: {$frame->data}");
 
         // send message to all
         // $this->broadcast($server, $frame->data);
 
         // send message to fd.
-        $server->push($frame->fd, "server: {$frame->data}");
+        $server->push($fd, "server: {$frame->data}");
     }
 
     public function handleWsRequest($server, Frame $frame)
@@ -240,14 +242,16 @@ class WebSocketServer extends HttpServer
 
         // is web socket request(websocket_status = 2)
         if ($fdInfo['websocket_status'] > 0) {
-            ContextManager::delContext(ServerHelper::genRequestId($fd));
+            $ctxId = WsContext::genRequestId($fd);
+            ContextManager::delContext($ctxId);
+
             $meta = $this->delConnection($fd);
 
             // call on close callback
             $this->fire(self::EVT_WS_CLOSE, [$this, $fd, $meta]);
 
-            $this->log("onClose: The #$fd client connection has been closed! From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
-            $this->log("onClose: Client #{$fd} is closed", $fdInfo);
+            $this->log("onClose: The #$fd(ctxId:{$ctxId}) client has been closed! From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
+            $this->log("onClose: Client #{$fd} is closed.client-info:\n" . var_export($fdInfo, 1));
         }
     }
 
@@ -506,14 +510,11 @@ class WebSocketServer extends HttpServer
      * response data to client by socket connection
      * @param int $fd
      * @param string $data
-     * @param int $length
+     * param int $length
      * @return int   Return error number code. gt 0 on failure, eq 0 on success
      */
-    public function writeTo($fd, string $data, int $length = 0)
+    public function writeTo($fd, string $data)
     {
-//        $finish = true;
-//        $opcode = 1;
-        // return $this->server->push($fd, $data, $opcode, $finish) ? 0 : 1;
         return $this->server->send($fd, $data) ? 0 : 1;
     }
 

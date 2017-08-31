@@ -24,6 +24,15 @@ abstract class Context implements ContextInterface
     private $id;
 
     /**
+     * @param int $uniqueKey from `request->fd` OR `\Swoole\Coroutine::getuid()`
+     * @return string
+     */
+    public static function genRequestId($uniqueKey)
+    {
+        return md5($uniqueKey);
+    }
+
+    /**
      * Context constructor.
      * @param null $id
      * @param bool $addToManager

@@ -33,15 +33,6 @@ class ContextManager
     }
 
     /**
-     * @param $fd
-     * @return string
-     */
-    public static function genId($fd)
-    {
-        return ServerHelper::genRequestId($fd);
-    }
-
-    /**
      * @param string $id
      * @return bool
      */

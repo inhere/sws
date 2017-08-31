@@ -9,18 +9,17 @@
 namespace Sws\Server;
 
 use inhere\library\traits\EventTrait;
+use inhere\server\helpers\ServerHelper;
 use inhere\server\servers\HttpServer;
 
 use Sws\Components\HttpHelper;
-use Sws\Http\Headers;
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Sws\Context\ContextManager;
+use Sws\Context\WsContext;
 
 use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Websocket\Server;
 use Swoole\Websocket\Frame;
-use Sws\Http\Uri;
 
 /**
  * Class WebSocketServer
@@ -85,13 +84,15 @@ class WebSocketServer extends HttpServer
      */
     public function onConnect($server, $fd, $fromId)
     {
-        $info = $this->getClientInfo($fd);
-        $this->log("onConnect: PID {$server->master_pid}, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
-
-        $cid = $this->resourceId($fd);
+//        $info = $this->getClientInfo($fd);
+//        $ctxId = ServerHelper::genRequestId($fd);
+//
+//        $this->log("onConnect: context ID: $ctxId, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
+//
+//        $cid = $this->resourceId($fd);
 
         // 触发 connect 事件回调
-        $this->fire(self::EVT_WS_CONNECT, [$this, $cid]);
+        $this->fire(self::EVT_WS_CONNECT, [$this, $fd]);
     }
 
     /**
@@ -107,7 +108,7 @@ class WebSocketServer extends HttpServer
         $cid = $swRequest->fd;
         $info = $this->getClientInfo($cid);
 
-        $this->log("onHandShake: Client [fd: {$swRequest->fd}] send handShake request, info: " . var_export($info, 1));
+        $this->log("onHandShake: Client #{$swRequest->fd} send handShake request, info: " . var_export($info, 1));
 
         $metaAry = [
             'ip' => $info['remote_ip'],
@@ -120,10 +121,11 @@ class WebSocketServer extends HttpServer
 
         // 初始化客户端信息
         $this->connections[$cid] = $meta = new Connection($metaAry);
+        $context = WsContext::make($swRequest, $swResponse);
 
         // begin start handshake
         $secKey = $swRequest->header['sec-websocket-key'];
-        $request = HttpHelper::createRequest($swRequest);
+        $request = $context->getRequest();
 
         $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
 
@@ -135,19 +137,22 @@ class WebSocketServer extends HttpServer
             $swResponse->write('<b>400 Bad Request</b><br>[Sec-WebSocket-Key] not found in request header.');
             $swResponse->end();
 
+            $context->destroy();
             $this->delConnection($cid);
             return false;
         }
 
-        $response = HttpHelper::createResponse();
+        $response = $context->getResponse();
 
         // 触发 handshake 事件回调，如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
         // 就停止继续处理。并返回信息给客户端
         if (self::HANDSHAKE_FAIL === $this->fire(self::EVT_HANDSHAKE_REQUEST, [$request, $response, $cid])) {
             $this->log("The #$cid client handshake's callback return false, will close the connection");
 
-            HttpHelper::paddingSwooleResponse($response, $swResponse)->end();
+            HttpHelper::paddingSwResponse($response, $swResponse)->end();
+
             $this->delConnection($cid);
+            $context->destroy();
 
             return false;
         }
@@ -164,13 +169,13 @@ class WebSocketServer extends HttpServer
         $this->debug("Handshake: response info:\n" . $response->toString());
 
         // 响应握手成功
-        HttpHelper::paddingSwooleResponse($response, $swResponse);
+        HttpHelper::paddingSwResponse($response, $swResponse);
 
         // 标记已经握手 更新路由 path
         $meta->handshake($request);
         $this->clientNumber++;
 
-        $this->log("Handshake: The #$cid client connection handshake successful! Meta:", $meta->all());
+        $this->log("Handshake: The #$cid client connection handshake successful! context ID: {$context->getId()},Meta:", $meta->all());
         $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
 
         // 握手成功 触发 open 事件
@@ -189,9 +194,9 @@ class WebSocketServer extends HttpServer
     public function onOpen($server, SwRequest $request)
     {
         $cid = $request->fd;
-        $this->rid = base_convert(str_replace('.', '', microtime(1)), 10, 16) . "0{$cid}";
+        $ctxId = ServerHelper::genRequestId($cid);
 
-        $this->log("onOpen: The Client #{$cid} connection open successful! Meta:", $this->connections[$cid]->all());
+        $this->log("onOpen: The Client #{$cid} connection open successful! context ID: $ctxId, Meta:", $this->connections[$cid]->all());
 
         $this->fire(self::EVT_WS_OPEN, [$this, $request, $cid]);
 
@@ -235,6 +240,7 @@ class WebSocketServer extends HttpServer
 
         // is web socket request(websocket_status = 2)
         if ($fdInfo['websocket_status'] > 0) {
+            ContextManager::delContext(ServerHelper::genRequestId($fd));
             $meta = $this->delConnection($fd);
 
             // call on close callback

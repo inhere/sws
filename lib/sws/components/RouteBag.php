@@ -6,13 +6,13 @@
  * Time: 9:29
  */
 
-namespace Sws\components;
+namespace Sws\Components;
 
 use Sws\Module\ModuleInterface;
 
 /**
  * Class RouteBag
- * @package Sws\components
+ * @package Sws\Components
  */
 class RouteBag
 {

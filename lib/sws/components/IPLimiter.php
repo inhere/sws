@@ -6,11 +6,11 @@
  * Time: 9:07
  */
 
-namespace Sws\components;
+namespace Sws\Components;
 
 /**
  * Class IPLimiter
- * @package Sws\components
+ * @package Sws\Components
  */
 class IPLimiter
 {

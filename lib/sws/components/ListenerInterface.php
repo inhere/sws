@@ -1,6 +1,6 @@
 <?php
 
-namespace Sws\components;
+namespace Sws\Components;
 
 use Sws\Application;
 

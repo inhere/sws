@@ -6,13 +6,13 @@
  * Time: 11:30
  */
 
-namespace Sws\components;
+namespace Sws\Components;
 
 use Sws\Http\Request;
 
 /**
  * Class OriginCheck
- * @package Sws\components
+ * @package Sws\Components
  */
 class OriginCheck
 {

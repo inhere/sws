@@ -9,7 +9,7 @@
 namespace Sws\Module;
 
 use inhere\library\traits\OptionsTrait;
-use Sws\App;
+use Sws\Application;
 use Sws\Server\Connection;
 use Sws\DataParser\ComplexDataParser;
 use Sws\DataParser\DataParserInterface;
@@ -32,7 +32,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     const ERROR_HANDLER = 3;
 
     /**
-     * @var App
+     * @var Application
      */
     private $app;
 
@@ -119,7 +119,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @inheritdoc
      */
-    public function onError(App $app, string $msg)
+    public function onError(Application $app, string $msg)
     {
         $this->log('Accepts a connection on a socket error, when request : ' . $msg, 'error');
     }
@@ -369,17 +369,17 @@ abstract class ModuleAbstracter implements ModuleInterface
     }
 
     /**
-     * @return App
+     * @return Application
      */
-    public function getApp(): App
+    public function getApp(): Application
     {
         return $this->app;
     }
 
     /**
-     * @param App $app
+     * @param Application $app
      */
-    public function setApp(App $app)
+    public function setApp(Application $app)
     {
         $this->app = $app;
     }

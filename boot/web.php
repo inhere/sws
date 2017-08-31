@@ -29,7 +29,7 @@ $di->set('config', function () {
 $di->set('app', function ($di) {
     $config = require BASE_PATH . '/config/server.php';
 
-    $app = new \Sws\App($config);
+    $app = new \Sws\Application($config);
     $app->setDi($di);
     \Sws::$app = $app;
 

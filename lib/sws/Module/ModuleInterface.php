@@ -8,7 +8,7 @@
 
 namespace Sws\Module;
 
-use Sws\App;
+use Sws\Application;
 use Sws\Http\Request;
 use Sws\Http\Response;
 use Sws\Http\WSResponse;
@@ -46,10 +46,10 @@ interface ModuleInterface
     public function onClose(int $id, Connection $client);
 
     /**
-     * @param App $app
+     * @param Application $app
      * @param string $msg
      */
-    public function onError(App $app, string $msg);
+    public function onError(Application $app, string $msg);
 
     public function checkIsAllowedOrigin(string $from);
 
@@ -88,14 +88,14 @@ interface ModuleInterface
     public function getOption(string $key, $default = null);
 
     /**
-     * @param App $app
+     * @param Application $app
      */
-    public function setApp(App $app);
+    public function setApp(Application $app);
 
     /**
-     * @return App
+     * @return Application
      */
-    public function getApp(): App;
+    public function getApp(): Application;
 
     /**
      * @return Request

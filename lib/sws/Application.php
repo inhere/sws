@@ -27,10 +27,10 @@ use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 
 /**
- * Class App
+ * Class Application
  * @package Sws
  */
-class App extends WebSocketServer implements WsServerInterface
+class Application extends WebSocketServer implements WsServerInterface
 {
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';

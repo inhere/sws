@@ -4,11 +4,10 @@
  * User: inhere
  * Date: 2017-08-22
  * Time: 17:00
- *
- * @var $app App
+ * @var $app Application
  */
 
-use Sws\App;
+use Sws\Application;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 
@@ -42,7 +41,7 @@ $rootModule->add('login', function ($data, $cid, ModuleInterface $handler) {
     $handler->respond("welcome new friend: $name join us.");
 });
 
-$rootModule->add('logout', function ($data, $id, App $app) {
+$rootModule->add('logout', function ($data, $id, Application $app) {
     $user = $app->getUser($id);
 
     return $app->respond("goodbye, {$user['name']}");

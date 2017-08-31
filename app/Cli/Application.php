@@ -8,13 +8,14 @@
 
 namespace App\Cli;
 
+use inhere\console\App;
 use inhere\library\di\Container;
 
 /**
- * Class App
+ * Class Application
  * @package App\Cli
  */
-class App extends \inhere\console\App
+class Application extends App
 {
     /**
      * @var Container

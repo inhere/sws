@@ -19,8 +19,8 @@ use Sws\http\Response;
 use Sws\http\WSResponse;
 use Sws\module\ModuleInterface;
 use Sws\module\RootModule;
-use Sws\server\WebSocketServer;
-use Sws\server\WsServerInterface;
+use Sws\Server\WebSocketServer;
+use Sws\Server\WsServerInterface;
 
 use Swoole\Websocket\Frame;
 use Swoole\Http\Request as SwRequest;

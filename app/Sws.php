@@ -14,12 +14,12 @@ use Sws\BaseSws;
 class Sws extends BaseSws
 {
     /**
-     * @var \app\cli\App|\Sws\App
+     * @var \App\cli\App|\Sws\App
      */
     public static $app;
 
     /**
-     * @return \app\cli\App|\Sws\App
+     * @return \App\cli\App|\Sws\App
      */
     public static function app()
     {

@@ -4,6 +4,7 @@
  * User: inhere
  * Date: 2017-08-31
  * Time: 10:54
+ * usage: php bin/changeDirName.php dir=app
  */
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -17,7 +18,6 @@ $basePath = dirname(__DIR__);
 
 $dir = $in->get('dir');
 $path = $basePath . "/$dir";
-//$dirs = new DirectoryIterator();
 
 changeDirName($path);
 

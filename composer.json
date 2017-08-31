@@ -34,8 +34,8 @@
     "autoload": {
         "classmap": ["app/Sws.php"],
         "psr-4": {
-            "app\\": "app/",
-            "sws\\": "lib/sws/"
+            "App\\": "app/",
+            "Sws\\": "lib/sws/"
         }
     },
     "scripts": {

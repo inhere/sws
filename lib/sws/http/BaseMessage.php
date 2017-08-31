@@ -6,7 +6,7 @@
  * Time: 13:12
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
 use Psr\Http\Message\MessageInterface;
@@ -14,7 +14,7 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Class BaseRequestResponse
- * @package sws\parts
+ * @package Sws\parts
  *
  * @property string $protocol
  * @property string $protocolVersion

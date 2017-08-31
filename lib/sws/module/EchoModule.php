@@ -6,17 +6,17 @@
  * Time: 15:34
  */
 
-namespace sws\module;
+namespace Sws\module;
 
-use sws\http\Request;
-use sws\http\Response;
+use Sws\http\Request;
+use Sws\http\Response;
 
 /**
  * Class EchoModule
  *
  * handle the root '/echo' webSocket request
  *
- * @package sws\module
+ * @package Sws\module
  */
 class EchoModule extends ModuleAbstracter
 {

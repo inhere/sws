@@ -6,14 +6,14 @@
  * Time: 11:38
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 
 /**
  * Class Context
- * @package sws\http
+ * @package Sws\http
  */
 class Context
 {

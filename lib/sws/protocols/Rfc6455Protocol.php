@@ -1,6 +1,6 @@
 <?php
 
-namespace sws\protocols;
+namespace Sws\protocols;
 
 /**
  * This is the version of websockets used by Chrome versions 17 through 19.

@@ -6,15 +6,15 @@
  * Time: 17:31
  */
 
-namespace sws\web;
+namespace Sws\web;
 
 use inhere\sroute\Dispatcher;
-use sws\http\Context;
+use Sws\http\Context;
 
 /**
  * Class RouteDispatcher
  * - 为swoole的http请求做了一些处理，将上下文对象 `$context` 作为 action 的唯一参数传入要执行的action 方法
- * @package sws\web
+ * @package Sws\web
  */
 class RouteDispatcher extends Dispatcher
 {

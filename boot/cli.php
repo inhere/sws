@@ -2,24 +2,20 @@
 
 use inhere\library\collections\Collection;
 
-require BASE_PATH . '/vendor/autoload.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 require __DIR__ . '/di.php';
 
-
 $di->set('config', function () {
-    $locFile = BASE_PATH . '/.local';
+    $basePath = dirname(__DIR__);
+    $locFile = $basePath . '/.local';
     $local = is_file($locFile) ? Collection::parseIni($locFile) : [
         'env' => 'pdt',
-        'rootPath' => BASE_PATH
+        'rootPath' => $basePath
     ];
 
     // load config
-    return Collection::make(
-        BASE_PATH . '/config/console.php',
-        'php',
-        'console'
-    )
-        ->loadArray(BASE_PATH . "/config/cli/{$local['env']}.php")
+    return Collection::make($basePath . '/config/cli.php','php','console')
+        ->loadArray($basePath . "/config/cli/{$local['env']}.php")
         ->loadArray($local);
 });
 
@@ -28,8 +24,7 @@ $di->set('app', function ($di) {
     $app->setDi($di);
 
     // register commands
-    require BASE_PATH . '/app/cli/routes.php';
-
+    require dirname(__DIR__) . '/app/cli/routes.php';
     return $app;
 });
 

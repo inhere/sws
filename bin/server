@@ -5,10 +5,10 @@ define('BASE_PATH', dirname(__DIR__) );
 
 session_start();
 
-require BASE_PATH . '/boot/web.php';
+require dirname(__DIR__) . '/boot/web.php';
 
 $mgr = $di->get('app');
-//$mgr = new \sws\server\WebSocketServer($config);
+//$mgr = new \Sws\server\WebSocketServer($config);
 //$mgr = new \inhere\server\BoxServer($config);
 
 $mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
@@ -16,4 +16,5 @@ $mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
     'port' => '9762',
 ]));
 
+// do run
 $mgr->run();

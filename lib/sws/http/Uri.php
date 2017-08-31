@@ -8,13 +8,13 @@
  * @from Slim-Http
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use InvalidArgumentException;
 
 /**
  * Class Uri
- * @package sws\http
+ * @package Sws\http
  */
 class Uri
 {

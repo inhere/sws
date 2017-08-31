@@ -1,8 +1,8 @@
 <?php
 
-namespace sws\components;
+namespace Sws\components;
 
-use sws\Application;
+use Sws\Application;
 
 interface ListenerInterface
 {

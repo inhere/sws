@@ -6,25 +6,25 @@
  * Time: 10:53
  */
 
-namespace sws\server;
+namespace Sws\server;
 
 use inhere\library\traits\EventTrait;
 use inhere\server\servers\HttpServer;
 
-use sws\components\HttpHelper;
-use sws\http\Headers;
-use sws\http\Request;
-use sws\http\Response;
+use Sws\components\HttpHelper;
+use Sws\http\Headers;
+use Sws\http\Request;
+use Sws\http\Response;
 
 use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Websocket\Server;
 use Swoole\Websocket\Frame;
-use sws\http\Uri;
+use Sws\http\Uri;
 
 /**
  * Class WebSocketServer
- * @package sws\server
+ * @package Sws\server
  *
  * @property Server $server
  */

@@ -6,16 +6,16 @@
  * Time: 16:18
  */
 
-namespace sws\server;
+namespace Sws\server;
 
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
-use sws\http\Request;
+use Sws\http\Request;
 use Traversable;
 
 /**
  * Class Connection - client connection metadata
- * @package sws\server
+ * @package Sws\server
  */
 class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
 {

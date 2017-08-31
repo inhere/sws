@@ -6,12 +6,12 @@
  * Time: 14:31
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 /**
  * Class RequestBody
  *   Provides a PSR-7 implementation of a reusable raw request body
- * @package sws\http
+ * @package Sws\http
  */
 class RequestBody extends Body
 {

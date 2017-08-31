@@ -6,21 +6,21 @@
  * Time: 9:40
  */
 
-namespace sws;
+namespace Sws;
 
 use inhere\console\utils\Show;
 use inhere\library\di\Container;
 
 use inhere\sroute\ORouter;
 use Swoole\Server;
-use sws\components\HttpHelper;
-use sws\http\Request;
-use sws\http\Response;
-use sws\http\WSResponse;
-use sws\module\ModuleInterface;
-use sws\module\RootModule;
-use sws\server\WebSocketServer;
-use sws\server\WsServerInterface;
+use Sws\components\HttpHelper;
+use Sws\http\Request;
+use Sws\http\Response;
+use Sws\http\WSResponse;
+use Sws\module\ModuleInterface;
+use Sws\module\RootModule;
+use Sws\server\WebSocketServer;
+use Sws\server\WsServerInterface;
 
 use Swoole\Websocket\Frame;
 use Swoole\Http\Request as SwRequest;
@@ -28,7 +28,7 @@ use Swoole\Http\Response as SwResponse;
 
 /**
  * Class App
- * @package sws
+ * @package Sws
  */
 class App extends WebSocketServer implements WsServerInterface
 {

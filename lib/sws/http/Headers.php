@@ -6,13 +6,13 @@
  * Time: 19:02
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use inhere\library\collections\SimpleCollection;
 
 /**
  * Class Headers
- * @package sws\http
+ * @package Sws\http
  */
 class Headers extends SimpleCollection
 {

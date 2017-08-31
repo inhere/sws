@@ -6,7 +6,7 @@
  * Time: 18:02
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use inhere\library\collections\SimpleCollection;
 use Psr\Http\Message\ServerRequestInterface;

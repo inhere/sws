@@ -6,7 +6,7 @@
  * Time: 17:28
  */
 
-use sws\server\WebSocketServer;
+use Sws\server\WebSocketServer;
 
 return [
     'debug' => true,

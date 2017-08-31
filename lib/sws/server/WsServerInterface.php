@@ -6,11 +6,11 @@
  * Time: 13:49
  */
 
-namespace sws\server;
+namespace Sws\server;
 
 /**
  * Interface WsServerInterface
- * @package sws\server
+ * @package Sws\server
  */
 interface WsServerInterface
 {

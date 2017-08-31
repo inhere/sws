@@ -6,20 +6,20 @@
  * Time: 22:51
  */
 
-namespace sws\module;
+namespace Sws\module;
 
 use inhere\library\traits\OptionsTrait;
-use sws\App;
-use sws\server\Connection;
-use sws\dataParser\ComplexDataParser;
-use sws\dataParser\DataParserInterface;
-use sws\http\Request;
-use sws\http\Response;
-use sws\http\WSResponse;
+use Sws\App;
+use Sws\server\Connection;
+use Sws\dataParser\ComplexDataParser;
+use Sws\dataParser\DataParserInterface;
+use Sws\http\Request;
+use Sws\http\Response;
+use Sws\http\WSResponse;
 
 /**
  * Class ARouteHandler
- * @package sws\module
+ * @package Sws\module
  */
 abstract class ModuleAbstracter implements ModuleInterface
 {

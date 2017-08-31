@@ -7,6 +7,7 @@
  * @var \inhere\console\App $app
  */
 
+
 $app->commands([
     'test' => function () {
         echo 'test';

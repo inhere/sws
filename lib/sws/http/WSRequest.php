@@ -6,11 +6,11 @@
  * Time: 11:08
  */
 
-namespace sws\server;
+namespace Sws\server;
 
 /**
  * Class WSRequest
- * @package sws\server
+ * @package Sws\server
  */
 class WSRequest
 {

@@ -6,13 +6,13 @@
  * Time: 15:35
  */
 
-namespace sws\dataParser;
+namespace Sws\dataParser;
 
-use sws\module\ModuleInterface;
+use Sws\module\ModuleInterface;
 
 /**
  * Interface DataParserInterface
- * @package sws\dataParser
+ * @package Sws\dataParser
  *
  */
 interface DataParserInterface

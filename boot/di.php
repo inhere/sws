@@ -8,7 +8,11 @@
  * @var $di \inhere\library\di\Container
  */
 
-use inhere\library\collections\Collection;
+use inhere\library\components\AopProxy;
 use inhere\library\di\ContainerManager;
 
 $di = ContainerManager::make();
+
+$di->set('aop', function () {
+    return new AopProxy();
+});

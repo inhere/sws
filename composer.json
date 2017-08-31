@@ -1,23 +1,15 @@
 {
-    "name": "inhere/mder",
-    "description": "A markdown documents read project.",
-    "keywords": [
-        "chat",
-        "websocket",
-        "router",
-        "swoole"
-    ],
+    "name": "inhere/sws",
+    "description": "a webSocket application by php swoole.",
+    "keywords": [ "chat", "websocket", "router", "swoole" ],
     "homepage": "http://yzone.net",
     "license": "MIT",
     "authors": [
-        {
-            "name": "inhere",
-            "email": "in.798@qq.com",
-            "homepage": "http://yzone.net"
-        }
+        { "name": "inhere", "email": "in.798@qq.com", "homepage": "http://yzone.net" }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": "^7.1",
+        "doctrine/annotations": "^1.5",
         "symfony/yaml": "^3.0",
         "guzzlehttp/promises": "^1.3",
         "inhere/console": "dev-master",

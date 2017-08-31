@@ -9,30 +9,27 @@
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
 
-require BASE_PATH . '/vendor/autoload.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 require __DIR__ . '/di.php';
 
 $di->set('config', function () {
-    $locFile = BASE_PATH . '/.local';
+    $basePath = dirname(__DIR__);
+    $locFile = $basePath . '/.local';
     $local = is_file($locFile) ? Collection::parseIni($locFile) : [
         'env' => 'pdt',
-        'rootPath' => BASE_PATH
+        'rootPath' => $basePath
     ];
 
     // load config
-    return Collection::make(
-        BASE_PATH . '/config/web.php',
-        'php',
-        'console'
-    )
-        ->loadArray(BASE_PATH . "/config/web/{$local['env']}.php")
+    return Collection::make($basePath . '/config/web.php','php','web')
+        ->loadArray("{$basePath}/config/web/{$local['env']}.php")
         ->loadArray($local);
 });
 
 $di->set('app', function ($di) {
     $config = require BASE_PATH . '/config/server.php';
 
-    $app = new \sws\App($config);
+    $app = new \Sws\App($config);
     $app->setDi($di);
     \Sws::$app = $app;
 

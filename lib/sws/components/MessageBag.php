@@ -6,11 +6,11 @@
  * Time: 17:23
  */
 
-namespace sws\components;
+namespace Sws\components;
 
 /**
  * Class MessageBag
- * @package sws\components
+ * @package Sws\components
  */
 class MessageBag
 {

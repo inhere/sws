@@ -6,13 +6,13 @@
  * Time: 9:27
  */
 
-namespace sws\dataParser;
+namespace Sws\dataParser;
 
-use sws\module\ModuleInterface;
+use Sws\module\ModuleInterface;
 
 /**
  * Class ComplexDataParser
- * @package sws\dataParser
+ * @package Sws\dataParser
  */
 class ComplexDataParser implements DataParserInterface
 {

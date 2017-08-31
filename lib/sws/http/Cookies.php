@@ -8,13 +8,13 @@
  * @from slim3
  */
 
-namespace sws\http;
+namespace Sws\http;
 
 use inhere\library\collections\SimpleCollection;
 
 /**
  * Class Cookies
- * @package sws\parts
+ * @package Sws\parts
  */
 class Cookies extends SimpleCollection
 {

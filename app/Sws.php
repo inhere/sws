@@ -6,22 +6,20 @@
  * Time: 9:23
  */
 
-use inhere\library\traits\PathAliasTrait;
+use Sws\BaseSws;
 
 /**
  * Class Sws
  */
-class Sws
+class Sws extends BaseSws
 {
-    use PathAliasTrait;
-
     /**
-     * @var \app\cli\App|\sws\App
+     * @var \app\cli\App|\Sws\App
      */
     public static $app;
 
     /**
-     * @return \app\cli\App|\sws\App
+     * @return \app\cli\App|\Sws\App
      */
     public static function app()
     {

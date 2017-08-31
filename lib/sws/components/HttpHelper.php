@@ -6,19 +6,19 @@
  * Time: 15:25
  */
 
-namespace sws\components;
+namespace Sws\components;
 
-use sws\http\Request;
-use sws\http\Response;
-use sws\http\UploadedFile;
-use sws\http\Uri;
+use Sws\http\Request;
+use Sws\http\Response;
+use Sws\http\UploadedFile;
+use Sws\http\Uri;
 
 use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;
 
 /**
  * Class HttpHelper
- * @package sws\components
+ * @package Sws\components
  */
 class HttpHelper
 {

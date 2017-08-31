@@ -6,17 +6,17 @@
  * Time: 15:35
  */
 
-namespace sws\module;
+namespace Sws\module;
 
-use sws\App;
-use sws\http\Request;
-use sws\http\Response;
-use sws\http\WSResponse;
-use sws\server\Connection;
+use Sws\App;
+use Sws\http\Request;
+use Sws\http\Response;
+use Sws\http\WSResponse;
+use Sws\server\Connection;
 
 /**
  * Interface ModuleInterface
- * @package sws\module
+ * @package Sws\module
  */
 interface ModuleInterface
 {

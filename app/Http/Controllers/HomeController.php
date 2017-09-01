@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\components\BaseController;
+use Sws\Context\HttpContext;
 
 /**
  * Class HomeController
@@ -18,9 +19,13 @@ class HomeController extends BaseController
 {
     /**
      * test action
+     * @param HttpContext $ctx
+     * @return string
      */
     public function indexAction($ctx)
     {
-        return var_export($ctx, 1);
+        $text = var_export($ctx, 1);
+
+        return "<pre>$text</pre>";
     }
 }

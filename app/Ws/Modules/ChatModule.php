@@ -12,7 +12,7 @@ namespace App\Ws\Modules;
  * Class ChatModule
  * @package App\Ws\Modules
  */
-class ChatModule extends \inhere\webSocket\module\ChatModule
+class ChatModule extends \Sws\Module\ChatModule
 {
     public function loginCommand()
     {

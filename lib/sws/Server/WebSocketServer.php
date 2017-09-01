@@ -10,20 +10,15 @@ namespace Sws\Server;
 
 use inhere\library\traits\EventTrait;
 use inhere\server\servers\HttpServer;
-
-use Sws\Components\HttpHelper;
-use Sws\Context\ContextManager;
-use Sws\Context\WsContext;
-
-use Swoole\Http\Response as SwResponse;
 use Swoole\Http\Request as SwRequest;
-use Swoole\Websocket\Server;
+use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
+use Swoole\Websocket\Server;
+use Sws\Components\HttpHelper;
 
 /**
  * Class WebSocketServer
  * @package Sws\Server
- *
  * @property Server $server
  */
 class WebSocketServer extends HttpServer
@@ -43,7 +38,7 @@ class WebSocketServer extends HttpServer
     const EVT_PARSE_ERROR = 'parseError';
 
     const WS_VERSION = 13;
-    const WS_KEY_PATTEN  = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+    const WS_KEY_PATTEN = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
     const SIGN_KEY = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
     const HANDSHAKE_OK = 0;
@@ -84,11 +79,8 @@ class WebSocketServer extends HttpServer
     public function onConnect($server, $fd, $fromId)
     {
 //        $info = $this->getClientInfo($fd);
-//        $ctxId = ServerHelper::genRequestId($fd);
-//
-//        $this->log("onConnect: context ID: $ctxId, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
-//
-//        $cid = $this->resourceId($fd);
+//        $ctxKey = ServerHelper::genKey($fd);
+//        $this->log("onConnect: context ID: $ctxKey, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
 
         // 触发 connect 事件回调
         $this->fire(self::EVT_WS_CONNECT, [$this, $fd]);
@@ -97,7 +89,6 @@ class WebSocketServer extends HttpServer
     /**
      * webSocket 建立连接后进行握手。WebSocket服务器已经内置了handshake，
      * 如果用户希望自己进行握手处理，可以设置 onHandShake 事件回调函数。
-     *
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      * @return bool
@@ -110,21 +101,22 @@ class WebSocketServer extends HttpServer
         $this->log("onHandShake: Client #{$swRequest->fd} send handShake request, info: " . var_export($info, 1));
 
         $metaAry = [
+            'id' => $cid,
             'ip' => $info['remote_ip'],
             'port' => $info['remote_port'],
             'path' => '/',
             'handshake' => false,
             'connectTime' => $info['connect_time'],
-            'resourceId' => $cid,
         ];
 
         // 初始化客户端信息
-        $this->connections[$cid] = $meta = new Connection($metaAry);
-        $context = WsContext::make($swRequest, $swResponse);
+        $meta = new Connection($metaAry);
+        $meta->initRequestContext($swRequest);
 
         // begin start handshake
-        $secKey = $swRequest->header['sec-websocket-key'];
-        $request = $context->getRequest();
+        $request = $meta->getRequest();
+        $secKey = $request->getHeaderLine('sec-websocket-key');
+//        $request = HttpHelper::createRequest($swRequest);
 
         $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
 
@@ -136,12 +128,13 @@ class WebSocketServer extends HttpServer
             $swResponse->write('<b>400 Bad Request</b><br>[Sec-WebSocket-Key] not found in request header.');
             $swResponse->end();
 
-            $context->destroy();
-            $this->delConnection($cid);
+//            $this->delConnection($cid);
+
             return false;
         }
 
-        $response = $context->getResponse();
+        $response = $meta->getResponse();
+//        $response = HttpHelper::createResponse();
 
         // 触发 handshake 事件回调，如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
         // 就停止继续处理。并返回信息给客户端
@@ -150,8 +143,7 @@ class WebSocketServer extends HttpServer
 
             HttpHelper::paddingSwResponse($response, $swResponse)->end();
 
-            $this->delConnection($cid);
-            $context->destroy();
+//            $this->delConnection($cid);
 
             return false;
         }
@@ -173,14 +165,15 @@ class WebSocketServer extends HttpServer
         // 标记已经握手 更新路由 path
         $meta->handshake($request);
         $this->clientNumber++;
+        $this->connections[$cid] = $meta;
 
-        $this->log("Handshake: The #{$cid} client handshake successful! ctxId: {$context->getId()},Meta:\n" . var_export($meta->all(), 1));
+        $this->log("Handshake: The #{$cid} client handshake successful! ctxKey: {$meta->getKey()}, Meta:\n" . var_export($meta->all(), 1));
         $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
 
         // 握手成功 触发 open 事件
-//        $this->server->defer(function () use ($swRequest) {
-//            $this->onOpen($this->server, $swRequest);
-//        });
+        $this->server->defer(function () use ($swRequest) {
+            $this->onOpen($this->server, $swRequest);
+        });
 
         return true;
     }
@@ -193,10 +186,9 @@ class WebSocketServer extends HttpServer
     public function onOpen($server, SwRequest $request)
     {
         $cid = $request->fd;
-        $ctxId = WsContext::genRequestId($cid);
         $conn = $this->connections[$cid];
 
-        $this->log("onOpen: The Client #{$cid} open successful! ctxId: $ctxId, Meta:\n" . var_export($conn->all(), 1));
+        $this->log("onOpen: The Client #{$cid} open successful! ctxKey: {$conn->getKey()}, Meta:\n" . var_export($conn->all(), 1));
 
         $this->fire(self::EVT_WS_OPEN, [$this, $request, $cid]);
 
@@ -211,9 +203,9 @@ class WebSocketServer extends HttpServer
     public function onMessage($server, Frame $frame)
     {
         $fd = $frame->fd;
-        $ctxId = WsContext::genRequestId($fd);
+        $conn = $this->connections[$fd];
 
-        $this->log("onMessage: The Client #{$fd}(ctxId:{$ctxId}) send message: {$frame->data}");
+        $this->log("onMessage: The #{$fd} client send a message to server, ctxKey: {$conn->getKey()}, data: {$frame->data}");
 
         // send message to all
         // $this->broadcast($server, $frame->data);
@@ -242,16 +234,13 @@ class WebSocketServer extends HttpServer
 
         // is web socket request(websocket_status = 2)
         if ($fdInfo['websocket_status'] > 0) {
-            $ctxId = WsContext::genRequestId($fd);
-            ContextManager::delContext($ctxId);
-
             $meta = $this->delConnection($fd);
 
             // call on close callback
             $this->fire(self::EVT_WS_CLOSE, [$this, $fd, $meta]);
 
-            $this->log("onClose: The #$fd(ctxId:{$ctxId}) client has been closed! From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
-            $this->log("onClose: Client #{$fd} is closed.client-info:\n" . var_export($fdInfo, 1));
+            $this->log("onClose: The #$fd client has been closed! ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
+            $this->log("onClose: Client #{$fd} is closed. client-info:\n" . var_export($fdInfo, 1));
         }
     }
 
@@ -357,6 +346,7 @@ class WebSocketServer extends HttpServer
             $this->clientNumber--;
 
             unset($this->connections[$cid]);
+
             return $meta;
         }
 

@@ -8,6 +8,7 @@
 
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
+use inhere\libraryPlus\web\ViewRenderer;
 use Sws\Web\RouteDispatcher;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -36,6 +37,12 @@ $di->set('app', function ($di) {
 
     return $app;
 });
+
+$di->set('renderer', function () {
+    return new ViewRenderer(dirname(__DIR__) . '/resources/views');
+}, [
+    'activity' => 1
+]);
 
 $di->set('router', function () {
     $router = new \inhere\sroute\ORouter([
@@ -66,6 +73,8 @@ $di->set('routeDispatcher', function (Container $di) {
 }, [
     'activity' => 1
 ]);
+
+//$di->set('ctxManager', []);
 
 // some settings
 error_reporting(E_ALL);

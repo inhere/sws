@@ -7,5 +7,12 @@
  */
 
 return [
-
+    'assets' => [
+        'ext' => [],
+        'map' => [
+            // 'url_match' => 'assets dir',
+            '/assets' => 'web/assets',
+            '/uploads' => 'web/uploads'
+        ]
+    ],
 ];

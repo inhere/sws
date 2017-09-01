@@ -9,10 +9,15 @@
 namespace Sws\Context;
 
 /**
- * Class ContextManager
+ * Class ContextManagerTrait
  * @package Sws\Context
+ * 
+ * @property array $contextMap
+ * [
+ *  id => ContextInterface
+ * ]
  */
-class ContextManager
+trait ContextManagerTrait
 {
     /**
      * @var ContextInterface[]
@@ -20,14 +25,14 @@ class ContextManager
      *  id => Context
      * ]
      */
-    private static $contextMap = [];
+//    protected static $contextMap = [];
 
     /**
      * @return int
      */
     public static function count()
     {
-        return count(self::$contextMap);
+        return count(static::$contextMap);
     }
 
     /**
@@ -36,7 +41,7 @@ class ContextManager
      */
     public static function hasContext($id)
     {
-        return isset(self::$contextMap[$id]);
+        return isset(static::$contextMap[$id]);
     }
 
     /**
@@ -44,7 +49,7 @@ class ContextManager
      */
     public static function addContext(ContextInterface $context)
     {
-        self::$contextMap[$context->getId()] = $context;
+        static::$contextMap[$context->getId()] = $context;
     }
 
     /**
@@ -53,7 +58,7 @@ class ContextManager
      */
     public static function getContext($id)
     {
-        return self::$contextMap[$id] ?? null;
+        return static::$contextMap[$id] ?? null;
     }
 
     /**
@@ -72,8 +77,8 @@ class ContextManager
             $id = $id->getId();
         }
 
-        if ($ctx = self::getContext($id)) {
-            unset(self::$contextMap[$id]);
+        if ($ctx = static::getContext($id)) {
+            unset(static::$contextMap[$id]);
         }
 
         return $ctx;
@@ -84,7 +89,7 @@ class ContextManager
      */
     public static function getContextMap(): array
     {
-        return self::$contextMap;
+        return static::$contextMap;
     }
 
     /**
@@ -92,6 +97,6 @@ class ContextManager
      */
     public static function setContextMap(array $contextMap)
     {
-        self::$contextMap = $contextMap;
+        static::$contextMap = $contextMap;
     }
 }

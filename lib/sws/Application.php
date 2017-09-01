@@ -49,15 +49,15 @@ class Application extends WebSocketServer implements WsServerInterface
      */
     private $modules;
 
-    public function run()
+    protected function beforeRun()
     {
-        return parent::run();
+        $this->options['assets'] = $this->di->get('config')->get('assets');
     }
 
     /**
-     * @inheritdoc
+     * before Server Start
      */
-    public function start($daemon = null)
+    protected function beforeServerStart()
     {
         // if not register route, add a default root path module handler
         if (0 === count($this->modules)) {
@@ -65,16 +65,6 @@ class Application extends WebSocketServer implements WsServerInterface
         }
 
         $this->handleDynamicRequest([$this, 'handleHttpRequest']);
-
-        parent::start($daemon);
-    }
-
-    /**
-     * before Server Start
-     */
-    public function beforeServerStart()
-    {
-
     }
 
     /**
@@ -85,6 +75,9 @@ class Application extends WebSocketServer implements WsServerInterface
      */
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
+        $ctxId = Coroutine::getuid();
+        $ctxKey = HttpContext::genKey($ctxId);
+
         try {
             /** @var RouteDispatcher $dispatcher */
             $dispatcher = $this->di->get('routeDispatcher');
@@ -92,9 +85,9 @@ class Application extends WebSocketServer implements WsServerInterface
 
             $uri = $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
-            $this->log("begin dispatch URI: $uri, METHOD: $method, FD: {$swRequest->fd}, ID: {$context->getId()}, COID: " . Coroutine::getuid());
+            $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: $ctxId, ctxKey: $ctxKey");
+
             $resp = $dispatcher->setContext($context)->dispatch(parse_url($uri, PHP_URL_PATH), $method);
-//            $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method);
 
             if (!$resp instanceof Response) {
                 $response = HttpHelper::createResponse();
@@ -120,11 +113,11 @@ class Application extends WebSocketServer implements WsServerInterface
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
-        $coId = Coroutine::getuid();
-        $ctxId = HttpContext::genRequestId($coId);
-        ContextManager::delContext($ctxId);
+        $ctxId = Coroutine::getuid();
+        $ctxKey = HttpContext::genKey($ctxId);
+        ContextManager::delContext($ctxKey);
 
-        $this->log("The request end. coId: $coId, FD: {$request->fd}, ctxId: $ctxId, context count:" . ContextManager::count());
+        $this->log("The request end. fd: {$request->fd}, ctxId: $ctxId, ctxKey: $ctxKey, context count:" . ContextManager::count());
     }
 
     /**
@@ -134,10 +127,11 @@ class Application extends WebSocketServer implements WsServerInterface
     public function handleWsRequest($server, Frame $frame)
     {
         $cid = $frame->fd;
+        // $ctxKey = WsContext::genRequestId($cid);
         $meta = $this->getConnection($cid);
 
         if (!$meta) {
-            $this->log("The connection #{$cid} has lost.");
+            $this->log("The connection #{$cid} has lost, .");
             $this->close($cid);
 
             return;

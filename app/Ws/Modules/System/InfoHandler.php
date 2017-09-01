@@ -14,5 +14,13 @@ namespace App\Ws\Modules\System;
  */
 class InfoHandler
 {
+    public function indexCommand()
+    {
 
+    }
+
+    public function index2Command()
+    {
+
+    }
 }

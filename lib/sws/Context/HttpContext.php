@@ -59,30 +59,27 @@ class HttpContext extends Context
     }
 
     /**
-     * @param SwRequest $swRequest
-     * @return int
-     */
-    public static function getUniqueKey(SwRequest $swRequest)
-    {
-        return Coroutine::getuid();
-    }
-
-    /**
      * object constructor.
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      */
     public function __construct(SwRequest $swRequest, SwResponse $swResponse)
     {
-        $id = self::genRequestId(static::getUniqueKey($swRequest));
-
-        parent::__construct($id);
-
         $this->request = HttpHelper::createRequest($swRequest);
         $this->response = HttpHelper::createResponse();
 
         $this->swRequest = $swRequest;
         $this->swResponse = $swResponse;
+
+        parent::__construct();
+    }
+
+    protected function init()
+    {
+        $id = Coroutine::getuid();
+
+        $this->setId($id);
+        $this->setKey(static::genKey($id));
     }
 
     public function getLogger()

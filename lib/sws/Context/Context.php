@@ -19,31 +19,41 @@ abstract class Context implements ContextInterface
     use PropertyAccessByGetterSetterTrait;
 
     /**
-     * @var string
+     * it is `request->fd` OR `\Swoole\Coroutine::getuid()`
+     * @var int|string
      */
     private $id;
 
     /**
-     * @param int $uniqueKey from `request->fd` OR `\Swoole\Coroutine::getuid()`
+     * @var string
+     */
+    private $key;
+
+    /**
+     * @param $id
      * @return string
      */
-    public static function genRequestId($uniqueKey)
+    public static function genKey($id)
     {
-        return md5($uniqueKey);
+        return md5($id);
     }
 
     /**
      * Context constructor.
-     * @param null $id
      * @param bool $addToManager
      */
-    public function __construct($id = null, $addToManager = true)
+    public function __construct($addToManager = true)
     {
-        $this->id = $id;
-
         if ($addToManager) {
             ContextManager::addContext($this);
         }
+
+        $this->init();
+    }
+
+    protected function init()
+    {
+        // somethings ...
     }
 
     /**
@@ -63,7 +73,7 @@ abstract class Context implements ContextInterface
     }
 
     /**
-     * @return string
+     * @return int|string
      */
     public function getId()
     {
@@ -71,10 +81,26 @@ abstract class Context implements ContextInterface
     }
 
     /**
-     * @param string $id
+     * @param int|string $id
      */
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * @param string $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
     }
 }

@@ -8,6 +8,7 @@
 
 namespace Sws\Module;
 
+use inhere\library\helpers\PhpHelper;
 use inhere\library\traits\OptionsTrait;
 use Sws\Application;
 use Sws\Server\Connection;
@@ -90,6 +91,12 @@ abstract class ModuleAbstracter implements ModuleInterface
         $this->setOptions($options);
 
         $this->_dataParser = $dataParser;
+
+        $this->init();
+    }
+
+    protected function init()
+    {
     }
 
     /**
@@ -183,7 +190,7 @@ abstract class ModuleAbstracter implements ModuleInterface
         if ($this->isCommandName($command)) {
             $handler = $this->getCmdHandler($command);
 
-            return call_user_func_array($handler, [$data, $cid, $this]);
+            return PhpHelper::call($handler, [$data, $cid, $this]);
         }
 
         $suffix = 'Command';
@@ -288,6 +295,16 @@ abstract class ModuleAbstracter implements ModuleInterface
     public function getCmdHandlers(): array
     {
         return $this->cmdHandlers;
+    }
+
+    /**
+     * @param array $cmdHandlers
+     */
+    public function setCmdHandlers(array $cmdHandlers)
+    {
+        foreach ($cmdHandlers as $name => $handler) {
+            $this->add($name, $handler);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

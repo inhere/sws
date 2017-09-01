@@ -10,8 +10,13 @@ namespace Sws\Server;
 
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
+use Sws\Components\HttpHelper;
 use Sws\Http\Request;
+use Sws\Http\Response;
 use Traversable;
+
+use Swoole\Http\Request as SwRequest;
+//use Swoole\Http\Response as SwResponse;
 
 /**
  * Class Connection - client connection metadata
@@ -22,14 +27,15 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     use ArrayAccessByPropertyTrait;
 
     /**
-     * @var string
+     * it is `request->fd`
+     * @var int
      */
     private $id;
 
     /**
-     * @var int
+     * @var string
      */
-    private $resourceId;
+    private $key;
 
     /**
      * @var string
@@ -67,6 +73,11 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     private $request;
 
     /**
+     * @var Response
+     */
+    private $response;
+
+    /**
      * ClientMetadata constructor.
      * @param array $config
      */
@@ -75,7 +86,6 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
         parent::__construct($config);
 
         $this->connectTime = time();
-        $this->generateId();
     }
 
     /**
@@ -86,13 +96,21 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
         return [
             'id' => $this->id,
             'ip' => $this->ip,
+            'key' => $this->key,
             'port' => $this->port,
             'path' => $this->path,
             'handshake' => $this->handshake,
             'connectTime' => $this->connectTime,
             'handshakeTime' => $this->handshakeTime,
-            'resourceId' => $this->resourceId,
         ];
+    }
+
+    public function initRequestContext(SwRequest $swRequest)
+    {
+        $this->key = HttpHelper::genKey($swRequest->fd);
+
+        $this->request = HttpHelper::createRequest($swRequest);
+        $this->response = HttpHelper::createResponse();
     }
 
     /**
@@ -108,27 +126,19 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * generateClientId
-     */
-    protected function generateId(): void
-    {
-        $this->id = bin2hex(random_bytes(32));
-    }
-
-    /**
      * @return string
      */
-    public function getId(): string
+    public function getKey(): string
     {
-        return $this->id;
+        return $this->key;
     }
 
     /**
-     * @param string $id
+     * @param string $key
      */
-    public function setId(string $id)
+    public function setKey(string $key)
     {
-        $this->id = $id;
+        $this->key = $key;
     }
 
     /**
@@ -142,17 +152,17 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     /**
      * @return int
      */
-    public function getResourceId(): int
+    public function getId(): int
     {
-        return $this->resourceId;
+        return $this->id;
     }
 
     /**
-     * @param int $resourceId
+     * @param int $id
      */
-    public function setResourceId(int $resourceId)
+    public function setId(int $id)
     {
-        $this->resourceId = $resourceId;
+        $this->id = $id;
     }
 
     /**
@@ -249,6 +259,22 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     public function setRequest(Request $request)
     {
         $this->request = $request;
+    }
+
+    /**
+     * @return Response
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param Response $response
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
     }
 
     /**

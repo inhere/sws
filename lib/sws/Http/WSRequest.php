@@ -6,7 +6,7 @@
  * Time: 11:08
  */
 
-namespace Sws\Server;
+namespace Sws\WebSocket;
 
 /**
  * Class WSRequest

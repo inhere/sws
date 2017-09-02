@@ -12,7 +12,7 @@ use Sws\Application;
 use Sws\Http\Request;
 use Sws\Http\Response;
 use Sws\Http\WSResponse;
-use Sws\Server\Connection;
+use Sws\WebSocket\Connection;
 
 /**
  * Interface ModuleInterface
@@ -30,20 +30,28 @@ interface ModuleInterface
     /**
      * @param Request $request
      * @param Response $response
+     * @return bool
+     */
+    public function validateRequest(Request $request, Response $response);
+
+    /**
+     * @param Request $request
+     * @param Response $response
      */
     public function onHandshake(Request $request, Response $response);
 
     /**
      * @param int $id
+     * @param Connection $conn
      */
-    public function onOpen(int $id);
+    public function onOpen(int $id, Connection $conn);
 
     /**
      * @param int $id
-     * @param Connection $client
+     * @param Connection $conn
      * @return
      */
-    public function onClose(int $id, Connection $client);
+    public function onClose(int $id, Connection $conn);
 
     /**
      * @param Application $app
@@ -55,10 +63,10 @@ interface ModuleInterface
 
     /**
      * @param string $data
-     * @param int $id
+     * @param Connection $conn
      * @return mixed
      */
-    public function dispatch(string $data, int $id);
+    public function dispatch(string $data, Connection $conn);
 
     /**
      * @param string $command
@@ -67,7 +75,7 @@ interface ModuleInterface
      */
     public function add(string $command, $handler);
 
-    public function log(string $message, string $type = 'info', array $data = []);
+    public function log(string $message, array $data = [], string $type = 'info');
 
     public function isJsonType();
 
@@ -89,6 +97,7 @@ interface ModuleInterface
 
     /**
      * @param Application $app
+     * @return static
      */
     public function setApp(Application $app);
 
@@ -96,14 +105,4 @@ interface ModuleInterface
      * @return Application
      */
     public function getApp(): Application;
-
-    /**
-     * @return Request
-     */
-    public function getRequest(): Request;
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request);
 }

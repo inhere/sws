@@ -315,6 +315,17 @@ class BaseMessage implements MessageInterface
     }
 
     /**
+     * @param string $content
+     * @return $this
+     */
+    public function setBodyContent($content)
+    {
+        $this->body->write($content);
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function withBody(StreamInterface $body)

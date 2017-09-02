@@ -32,6 +32,9 @@ class HttpHelper
         $method = $swRequest->server['request_method'];
         $request = new Request($method, Uri::createFromString($uri));
 
+        // add attribute data
+        $request->setAttribute('fd', $swRequest->fd);
+
         // GET data
         if (isset($swRequest->get)) {
             $request->setParsedBody($swRequest->get);

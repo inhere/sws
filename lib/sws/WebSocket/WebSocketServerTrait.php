@@ -6,10 +6,8 @@
  * Time: 10:53
  */
 
-namespace Sws\Server;
+namespace Sws\WebSocket;
 
-use inhere\library\traits\EventTrait;
-use inhere\server\servers\HttpServer;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
@@ -18,32 +16,11 @@ use Sws\Components\HttpHelper;
 
 /**
  * Class WebSocketServer
- * @package Sws\Server
+ * @package Sws\WebSocket
  * @property Server $server
  */
-class WebSocketServer extends HttpServer
+trait WebSocketServerTrait
 {
-    use EventTrait;
-
-    // some events
-    const EVT_WS_CONNECT = 'wsConnect';
-    const EVT_WS_OPEN = 'wsOpen';
-    const EVT_WS_DISCONNECT = 'wsDisconnect';
-    const EVT_HANDSHAKE_REQUEST = 'handshakeRequest';
-    const EVT_HANDSHAKE_SUCCESSFUL = 'handshakeSuccessful';
-    const EVT_WS_MESSAGE = 'wsMessage';
-    const EVT_WS_CLOSE = 'wsClose';
-    const EVT_WS_ERROR = 'wsError';
-    const EVT_NO_MODULE = 'noModule';
-    const EVT_PARSE_ERROR = 'parseError';
-
-    const WS_VERSION = 13;
-    const WS_KEY_PATTEN = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
-    const SIGN_KEY = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-
-    const HANDSHAKE_OK = 0;
-    const HANDSHAKE_FAIL = 25;
-
     /**
      * client total number
      * @var int
@@ -83,7 +60,7 @@ class WebSocketServer extends HttpServer
 //        $this->log("onConnect: context ID: $ctxKey, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
 
         // 触发 connect 事件回调
-        $this->fire(self::EVT_WS_CONNECT, [$this, $fd]);
+        $this->fire(self::EVT_WS_CONNECT, [$server, $fd, $fromId]);
     }
 
     /**
@@ -113,37 +90,26 @@ class WebSocketServer extends HttpServer
         $meta = new Connection($metaAry);
         $meta->initRequestContext($swRequest);
 
-        // begin start handshake
         $request = $meta->getRequest();
         $secKey = $request->getHeaderLine('sec-websocket-key');
-//        $request = HttpHelper::createRequest($swRequest);
 
         $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
 
         // sec-websocket-key 错误
-        if ($this->isInvalidSecWSKey($secKey)) {
-            $this->log("handshake failed with client #{$cid}! [Sec-WebSocket-Key] not found OR is error in header. request: \n" . $request->toString(), [], 'error');
-
-            $swResponse->status(404);
-            $swResponse->write('<b>400 Bad Request</b><br>[Sec-WebSocket-Key] not found in request header.');
-            $swResponse->end();
-
-//            $this->delConnection($cid);
-
+        if (!$this->validateHeaders($cid, $secKey, $swResponse)) {
             return false;
         }
 
         $response = $meta->getResponse();
-//        $response = HttpHelper::createResponse();
 
-        // 触发 handshake 事件回调，如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
+        $this->fire(self::EVT_HANDSHAKE_REQUEST, [$request, $response, $cid]);
+
+        // 如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
         // 就停止继续处理。并返回信息给客户端
-        if (self::HANDSHAKE_FAIL === $this->fire(self::EVT_HANDSHAKE_REQUEST, [$request, $response, $cid])) {
+        if (false === $this->handleHandshake($request, $response, $cid)) {
             $this->log("The #$cid client handshake's callback return false, will close the connection");
 
             HttpHelper::paddingSwResponse($response, $swResponse)->end();
-
-//            $this->delConnection($cid);
 
             return false;
         }
@@ -169,6 +135,7 @@ class WebSocketServer extends HttpServer
 
         $this->log("Handshake: The #{$cid} client handshake successful! ctxKey: {$meta->getKey()}, Meta:\n" . var_export($meta->all(), 1));
         $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
+        $this->afterHandshake($meta);
 
         // 握手成功 触发 open 事件
         $this->server->defer(function () use ($swRequest) {
@@ -176,6 +143,21 @@ class WebSocketServer extends HttpServer
         });
 
         return true;
+    }
+
+    /**
+     * @param $request
+     * @param $response
+     * @param $cid
+     * @return bool
+     */
+    protected function handleHandshake($request, $response, $cid)
+    {
+    }
+
+    protected function afterHandshake(Connection $conn)
+    {
+        // ....
     }
 
     /**
@@ -188,11 +170,20 @@ class WebSocketServer extends HttpServer
         $cid = $request->fd;
         $conn = $this->connections[$cid];
 
-        $this->log("onOpen: The Client #{$cid} open successful! ctxKey: {$conn->getKey()}, Meta:\n" . var_export($conn->all(), 1));
+        $this->log("onOpen: The #{$cid} client open successful! ctxKey: {$conn->getKey()}, Meta:\n" . var_export($conn->all(), 1));
 
-        $this->fire(self::EVT_WS_OPEN, [$this, $request, $cid]);
+        $this->fire(self::EVT_WS_OPEN, [$this, $conn]);
 
-        $server->push($cid, "hello, welcome\n");
+        $this->afterOpen($server, $conn);
+    }
+
+    /**
+     * @param Server $server
+     * @param Connection $conn
+     */
+    protected function afterOpen($server, Connection $conn)
+    {
+         $server->push($conn->getId(), "hello, welcome\n");
     }
 
     /**
@@ -211,10 +202,17 @@ class WebSocketServer extends HttpServer
         // $this->broadcast($server, $frame->data);
 
         // send message to fd.
-        $server->push($fd, "server: {$frame->data}");
+        // $server->push($fd, "server: {$frame->data}");
+
+        $this->handleWsMessage($server, $frame, $conn);
     }
 
-    public function handleWsRequest($server, Frame $frame)
+    /**
+     * @param Server $server
+     * @param Frame $frame
+     * @param Connection $conn
+     */
+    protected function handleWsMessage($server, Frame $frame, Connection $conn)
     {
     }
 
@@ -244,9 +242,30 @@ class WebSocketServer extends HttpServer
         }
     }
 
-    protected function resourceId($resource): int
+    /*******************************************************************************
+     * helpers
+     ******************************************************************************/
+
+    /**
+     * @param int $cid
+     * @param string $secKey
+     * @param SwResponse $swResponse
+     * @return bool
+     */
+    protected function validateHeaders($cid, $secKey, SwResponse $swResponse)
     {
-        return (int)$resource;
+        // sec-websocket-key 错误
+        if ($this->isInvalidSecWSKey($secKey)) {
+            $this->log("handshake failed with client #{$cid}! [Sec-WebSocket-Key] not found OR is error in header.", [], 'error');
+
+            $swResponse->status(404);
+            $swResponse->write('<b>400 Bad Request</b><br>[Sec-WebSocket-Key] not found in request header.');
+            $swResponse->end();
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

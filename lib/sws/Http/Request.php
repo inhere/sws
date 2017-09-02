@@ -161,6 +161,7 @@ class Request extends BaseMessage implements ServerRequestInterface
         $this->uri = $uri;
         $this->body = new RequestBody();
         $this->uploadedFiles = $uploadedFiles;
+        $this->attributes = new SimpleCollection();
 
         if (!$this->headers->has('Host') || $this->uri->getHost() !== '') {
             $this->headers->set('Host', $this->uri->getHost());
@@ -634,7 +635,7 @@ class Request extends BaseMessage implements ServerRequestInterface
      */
     public function getOrigin()
     {
-        return $this->headers->get('Origin', '');
+        return $this->getHeaderLine('Origin');
     }
 
     /*******************************************************************************
@@ -712,6 +713,18 @@ class Request extends BaseMessage implements ServerRequestInterface
     }
 
     /**
+     * @param string $name
+     * @param mixed $value
+     * @return $this
+     */
+    public function setAttribute($name, $value)
+    {
+        $this->attributes->set($name, $value);
+
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function withAttributes(array $attributes)
@@ -720,6 +733,17 @@ class Request extends BaseMessage implements ServerRequestInterface
         $clone->attributes = new SimpleCollection($attributes);
 
         return $clone;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function delAttribute($name)
+    {
+        $this->attributes->remove($name);
+
+        return $this;
     }
 
     /**

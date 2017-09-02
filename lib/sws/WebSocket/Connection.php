@@ -6,7 +6,7 @@
  * Time: 16:18
  */
 
-namespace Sws\Server;
+namespace Sws\WebSocket;
 
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
@@ -20,7 +20,7 @@ use Swoole\Http\Request as SwRequest;
 
 /**
  * Class Connection - client connection metadata
- * @package Sws\Server
+ * @package Sws\WebSocket
  */
 class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
 {

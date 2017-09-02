@@ -10,6 +10,8 @@ namespace Sws;
 
 use inhere\console\utils\Show;
 use inhere\library\di\Container;
+use inhere\library\traits\EventTrait;
+use inhere\server\servers\HttpServer;
 use Swoole\Coroutine;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
@@ -18,20 +20,25 @@ use Swoole\Websocket\Frame;
 use Sws\Components\HttpHelper;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
+use Sws\Http\Request;
 use Sws\Http\Response;
 use Sws\Http\WSResponse;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
-use Sws\Server\WebSocketServer;
-use Sws\Server\WsServerInterface;
+use Sws\WebSocket\Connection;
+use Sws\WebSocket\WebSocketServerTrait;
+use Sws\WebSocket\WsServerInterface;
 use Sws\Web\RouteDispatcher;
 
 /**
  * Class Application
  * @package Sws
  */
-class Application extends WebSocketServer implements WsServerInterface
+class Application extends HttpServer implements WsServerInterface
 {
+    use EventTrait;
+    use WebSocketServerTrait;
+
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
 
@@ -51,7 +58,7 @@ class Application extends WebSocketServer implements WsServerInterface
 
     protected function beforeRun()
     {
-        $this->options['assets'] = $this->di->get('config')->get('assets');
+        $this->options['assets'] = $this->get('config')->get('assets', []);
     }
 
     /**
@@ -121,17 +128,54 @@ class Application extends WebSocketServer implements WsServerInterface
     }
 
     /**
-     * @param Server $server
-     * @param Frame $frame
+     * webSocket 只会在连接握手时会有 request, response
+     * @param Request $request
+     * @param Response $response
+     * @param int $cid
+     * @return bool
      */
-    public function handleWsRequest($server, Frame $frame)
+    public function handleHandshake(Request $request, Response $response, int $cid)
+    {
+        $path = $request->getPath();
+
+        // check module. if not exists, response 404 error
+        if (!$module = $this->getModule($path, false)) {
+            $this->log("The #$cid request's path [$path] route handler not exists.", 'error');
+
+            $this->fire(self::EVT_NO_MODULE, [$cid, $path, $this]);
+
+            $response
+                ->setStatus(404)
+                ->setHeaders(['Connection' => 'close'])
+                ->setBodyContent("You request route path [$path] not found!");
+
+            return false;
+        }
+
+        // check request
+        if (!$module->validateRequest($request, $response)) {
+            return false;
+        }
+
+        // application/json
+        // text/plain
+        $response->setHeader('Server', $this->config['name'] . '-websocket-server');
+        // $response->setHeader('Access-Control-Allow-Origin', '*');
+
+        $module->setApp($this)->onHandshake($request, $response);
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function handleWsMessage($server, Frame $frame, Connection $conn)
     {
         $cid = $frame->fd;
-        // $ctxKey = WsContext::genRequestId($cid);
-        $meta = $this->getConnection($cid);
 
-        if (!$meta) {
-            $this->log("The connection #{$cid} has lost, .");
+        if (!$conn) {
+            $this->log("The connection #{$cid} has lost, meta: \n" . var_export($conn->all(), 1));
             $this->close($cid);
 
             return;
@@ -139,8 +183,7 @@ class Application extends WebSocketServer implements WsServerInterface
 
         // dispatch command
 
-        // $path = $ws->getClient($cid)['path'];
-        $result = $this->getModule($meta['path'])->dispatch($frame->data, $cid);
+        $result = $this->getModule($conn->getPath())->dispatch($frame->data, $conn);
 
         if ($result && is_string($result)) {
             $this->send($result);
@@ -150,7 +193,7 @@ class Application extends WebSocketServer implements WsServerInterface
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    /// handle request route module
+    /// handle ws request route module
     /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -384,6 +427,15 @@ class Application extends WebSocketServer implements WsServerInterface
     /////////////////////////////////////////////////////////////////////////////////////////
     /// helper method
     /////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function get($id)
+    {
+        return $this->di->get($id);
+    }
 
     /**
      * @return bool

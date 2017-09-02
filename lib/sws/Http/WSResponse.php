@@ -10,7 +10,7 @@ namespace Sws\Http;
 
 use inhere\library\traits\ArrayAccessByPropertyTrait;
 use inhere\library\traits\PropertyAccessByGetterSetterTrait;
-use Sws\Server\WsServerInterface;
+use Sws\WebSocket\WsServerInterface;
 
 /**
  * Class WSResponse

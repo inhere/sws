@@ -49,9 +49,7 @@ class ComplexDataParser implements DataParserInterface
             // parse error
             if (json_last_error() > 0) {
                 $errMsg = json_last_error_msg();
-
-                $module->log("Request data parse to json failed! Error: {$errMsg}, Data: {$realData}", 'error');
-
+                $module->log("Request data parse to json failed! Error: {$errMsg}, Data: {$realData}", [],'error');
                 return false;
             }
         }

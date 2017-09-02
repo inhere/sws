@@ -11,7 +11,7 @@ namespace Sws\Module;
 use inhere\library\helpers\PhpHelper;
 use inhere\library\traits\OptionsTrait;
 use Sws\Application;
-use Sws\Server\Connection;
+use Sws\WebSocket\Connection;
 use Sws\DataParser\ComplexDataParser;
 use Sws\DataParser\DataParserInterface;
 use Sws\Http\Request;
@@ -31,6 +31,12 @@ abstract class ModuleAbstracter implements ModuleInterface
     const MESSAGE_HANDLER = 1;
     const CLOSE_HANDLER = 2;
     const ERROR_HANDLER = 3;
+
+    /**
+     * the module name
+     * @var string
+     */
+    private $name;
 
     /**
      * @var Application
@@ -83,14 +89,16 @@ abstract class ModuleAbstracter implements ModuleInterface
 
     /**
      * ARouteHandler constructor.
+     * @param string $name
      * @param array $options
      * @param DataParserInterface|null $dataParser
      */
-    public function __construct(array $options = [], DataParserInterface $dataParser = null)
+    public function __construct($name = null, array $options = [], DataParserInterface $dataParser = null)
     {
         $this->setOptions($options);
 
         $this->_dataParser = $dataParser;
+        $this->name = $name ?: $this->parseName();
 
         $this->init();
     }
@@ -104,23 +112,35 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function onHandshake(Request $request, Response $response)
     {
-        $this->log('A new user connection. join the path(route): ' . $request->getPath());
+        $this->log(sprintf(
+            'A new user connection. join the path(route): %s, module: %s',
+            $request->getPath(),
+            $this->name
+        ));
     }
 
     /**
      * @inheritdoc
      */
-    public function onOpen(int $cid)
+    public function onOpen(int $cid, Connection $conn)
     {
-        $this->log('A new user open connection. route path: ' . $this->request->getPath());
+        $this->log(sprintf(
+            'A new user open connection. route path: %s, module: %s',
+            $conn->getPath(),
+            $this->name
+        ));
     }
 
     /**
      * @inheritdoc
      */
-    public function onClose(int $cid, Connection $client)
+    public function onClose(int $cid, Connection $conn)
     {
-        $this->log('A user has been disconnected. Path: ' . $client['path']);
+        $this->log(sprintf(
+            'A user has been disconnected. Path: %s, module: %s',
+            $conn->getPath(),
+            $this->name
+        ));
     }
 
     /**
@@ -128,12 +148,38 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function onError(Application $app, string $msg)
     {
-        $this->log('Accepts a connection on a socket error, when request : ' . $msg, 'error');
+        $this->log('Accepts a connection on a socket error, when request : ' . $msg, [],'error');
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /// handle request command
-    /////////////////////////////////////////////////////////////////////////////////////////
+    /*******************************************************************************
+     * handler http request
+     ******************************************************************************/
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return bool
+     */
+    public function validateRequest(Request $request, Response $response)
+    {
+        $cid = $request->getAttribute('fd');
+        $origin = $request->getOrigin();
+
+        // check `Origin`
+        // Access-Control-Allow-Origin: *
+        if (!$this->checkIsAllowedOrigin($origin)) {
+            $this->log("The #$cid Origin [$origin] is not in the 'allowedOrigins' list.", 'error');
+
+            $response
+                ->setStatus(403)
+                ->setHeaders(['Connection' => 'close'])
+                ->setBodyContent('Deny Access!');
+
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * check client is allowed origin
@@ -164,24 +210,30 @@ abstract class ModuleAbstracter implements ModuleInterface
         return true;
     }
 
+    /*******************************************************************************
+     * handler message request
+     ******************************************************************************/
+
     /**
-     * parse and dispatch command
+     * parse and dispatch message command
      * @param string $data
-     * @param int $cid
+     * @param Connection $conn
      * @return mixed
      */
-    public function dispatch(string $data, int $cid)
+    public function dispatch(string $data, Connection $conn)
     {
-        $route = $this->request->getPath();
+        $name = $this->name;
+        $cid = $conn->getId();
+        $route = $conn->getPath();
 
         // parse: get command and real data
         if ($results = $this->getDataParser()->parse($data, $cid, $this)) {
             list($command, $data) = $results;
             $command = $command ?: $this->getOption('defaultCmd') ?? self::DEFAULT_CMD;
-            $this->log("The #{$cid} request command is: $command, in route: $route, handler: " . static::class);
+            $this->log("The #{$cid} request command is: $command, in route: $route, module: $name, handler: " . static::class);
         } else {
             $command = self::PARSE_ERROR;
-            $this->log("The #{$cid} request data parse failed in route: $route. Data: $data", 'error');
+            $this->log("The #{$cid} request data parse failed in route: $route, module: $name. Data: $data", [], 'error');
         }
 
         // dispatch command
@@ -190,7 +242,7 @@ abstract class ModuleAbstracter implements ModuleInterface
         if ($this->isCommandName($command)) {
             $handler = $this->getCmdHandler($command);
 
-            return PhpHelper::call($handler, [$data, $cid, $this]);
+            return PhpHelper::call($handler, [$data, $cid, $conn]);
         }
 
         $suffix = 'Command';
@@ -198,11 +250,11 @@ abstract class ModuleAbstracter implements ModuleInterface
 
         // not found
         if (!method_exists($this, $method)) {
-            $this->log("The #{$cid} request command: $command not found, run 'notFound' command", 'notice');
+            $this->log("The #{$cid} request command: $command not found, module: $name, run 'notFound' command", [],'notice');
             $method = self::NOT_FOUND . $suffix;
         }
 
-        return $this->$method($data, $cid);
+        return $this->$method($data, $cid, $conn);
     }
 
     /**
@@ -215,6 +267,12 @@ abstract class ModuleAbstracter implements ModuleInterface
     {
         return $this->add($command, $handler);
     }
+
+    /**
+     * @param string $command
+     * @param $handler
+     * @return $this
+     */
     public function add(string $command, $handler)
     {
         if ($command && preg_match('/^[a-z][\w-]+$/', $command)) {
@@ -250,11 +308,12 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @param string $command
      * @param int $cid
+     * @param Connection $conn
      * @return int
      */
-    public function notFoundCommand(string $command, int $cid)
+    public function notFoundCommand(string $command, int $cid, Connection $conn)
     {
-        $msg = "You request command [$command] not found in the route [{$this->request->getPath()}].";
+        $msg = "You request command [$command] not found in the route [{$conn->getPath()}].";
 
         return $this->respond('', $msg, -404, false)->to($cid)->send();
     }
@@ -312,6 +371,26 @@ abstract class ModuleAbstracter implements ModuleInterface
     /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * @return string
+     */
+    protected function parseName()
+    {
+        $className = $fullClass = trim(static::class, '\\');
+
+        if (strpos($fullClass, '\\')) {
+            $className = basename(str_replace('\\', '/', $fullClass));
+        }
+
+        $name = $className;
+
+        if (strpos($name, 'Module')) {
+            $name = substr($className, 0, -4) ?: $className;
+        }
+
+        return $name;
+    }
+
+    /**
      * @param $data
      * @param string $msg
      * @param int $code
@@ -343,9 +422,9 @@ abstract class ModuleAbstracter implements ModuleInterface
         return $this->app->sendText($data, $afterMakeMR, $reset);
     }
 
-    public function log(string $message, string $type = 'info', array $data = [])
+    public function log(string $message, array $data = [], string $type = 'info')
     {
-        $this->app->log($message, $type, $data);
+        $this->app->log($message, $data, $type);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -395,25 +474,28 @@ abstract class ModuleAbstracter implements ModuleInterface
 
     /**
      * @param Application $app
+     * @return $this|static
      */
     public function setApp(Application $app)
     {
         $this->app = $app;
+
+        return $this;
     }
 
     /**
-     * @return Request
+     * @return string
      */
-    public function getRequest(): Request
+    public function getName(): string
     {
-        return $this->request;
+        return $this->name;
     }
 
     /**
-     * @param Request $request
+     * @param string $name
      */
-    public function setRequest(Request $request)
+    public function setName(string $name)
     {
-        $this->request = $request;
+        $this->name = $name;
     }
 }

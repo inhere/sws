@@ -33,13 +33,14 @@ interface WsServerInterface
     const HANDSHAKE_OK = 0;
     const HANDSHAKE_FAIL = 25;
 
+
     /**
-     * @param $data
-     * @param string $msg
-     * @param int $code
-     * @param \Closure|null $afterMakeMR
-     * @param bool $reset
+     * send message to client(s)
+     * @param string $data
+     * @param int|array $receivers
+     * @param int|array $expected
+     * @param int $sender
      * @return int
      */
-    public function send($data, string $msg = '', int $code = 0, \Closure $afterMakeMR = null, bool $reset = true): int;
+    public function send(string $data, $receivers = 0, $expected = 0, int $sender = 0): int;
 }

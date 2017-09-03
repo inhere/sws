@@ -13,16 +13,4 @@ use Sws\BaseSws;
  */
 class Sws extends BaseSws
 {
-    /**
-     * @var \App\Cli\Application|\Sws\Application
-     */
-    public static $app;
-
-    /**
-     * @return \App\Cli\Application|\Sws\Application
-     */
-    public static function app()
-    {
-        return self::$app;
-    }
 }

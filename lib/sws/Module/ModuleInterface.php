@@ -11,8 +11,8 @@ namespace Sws\Module;
 use Sws\Application;
 use Sws\Http\Request;
 use Sws\Http\Response;
-use Sws\Http\WSResponse;
 use Sws\WebSocket\Connection;
+use Sws\WebSocket\Message;
 
 /**
  * Interface ModuleInterface
@@ -84,7 +84,7 @@ interface ModuleInterface
      * @param string $msg
      * @param int $code
      * @param bool $doSend
-     * @return int|WSResponse
+     * @return int|Message
      */
     public function respond($data, string $msg = 'success', int $code = 0, bool $doSend = true);
 

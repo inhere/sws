@@ -16,7 +16,7 @@ use Sws\DataParser\ComplexDataParser;
 use Sws\DataParser\DataParserInterface;
 use Sws\Http\Request;
 use Sws\Http\Response;
-use Sws\Http\WSResponse;
+use Sws\WebSocket\Message;
 
 /**
  * Class ARouteHandler
@@ -42,11 +42,6 @@ abstract class ModuleAbstracter implements ModuleInterface
      * @var Application
      */
     private $app;
-
-    /**
-     * @var Request
-     */
-    private $request;
 
     /**
      * @var DataParserInterface
@@ -97,8 +92,8 @@ abstract class ModuleAbstracter implements ModuleInterface
     {
         $this->setOptions($options);
 
-        $this->_dataParser = $dataParser;
         $this->name = $name ?: $this->parseName();
+        $this->_dataParser = $dataParser ?: new ComplexDataParser();
 
         $this->init();
     }
@@ -184,7 +179,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * check client is allowed origin
      * `Origin: http://foo.example`
-     * @param string $from \
+     * @param string $from e.g. `http://foo.example`
      * @return bool
      */
     public function checkIsAllowedOrigin(string $from)
@@ -205,9 +200,7 @@ abstract class ModuleAbstracter implements ModuleInterface
             return false;
         }
 
-        $allowed = (array)$allowed;
-
-        return true;
+        return in_array($from, (array)$allowed, true);
     }
 
     /*******************************************************************************
@@ -384,7 +377,7 @@ abstract class ModuleAbstracter implements ModuleInterface
         $name = $className;
 
         if (strpos($name, 'Module')) {
-            $name = substr($className, 0, -4) ?: $className;
+            $name = substr($className, 0, -6) ?: $className;
         }
 
         return $name;
@@ -395,7 +388,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      * @param string $msg
      * @param int $code
      * @param bool $doSend
-     * @return int|WSResponse
+     * @return int|Message
      */
     public function respond($data, string $msg = 'success', int $code = 0, bool $doSend = true)
     {
@@ -405,21 +398,21 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @param $data
      * @param bool $doSend
-     * @return WSResponse|int
+     * @return Message|int
      */
     public function respondText($data, bool $doSend = true)
     {
         return $this->app->respondText($data, $doSend);
     }
 
-    public function send($data, string $msg = '', int $code = 0, \Closure $afterMakeMR = null, bool $reset = true): int
+    public function send(string $data, $receivers = 0, $expected = 0, int $sender = 0): int
     {
-        return $this->app->send($data, $msg, $code, $afterMakeMR, $reset);
+        return $this->app->send($data, $receivers, $expected, $sender);
     }
 
-    public function sendText($data, \Closure $afterMakeMR = null, bool $reset = true)
+    public function sendText($data)
     {
-        return $this->app->sendText($data, $afterMakeMR, $reset);
+        return $this->app->sendText($data);
     }
 
     public function log(string $message, array $data = [], string $type = 'info')

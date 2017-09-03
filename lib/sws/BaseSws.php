@@ -33,4 +33,39 @@ abstract class BaseSws
         '@config' => BASE_PATH . '/config',
         '@tmp' => BASE_PATH . '/tmp',
     ];
+
+    /**
+     * @var \Sws\ApplicationInterface
+     */
+    public static $app;
+
+    /**
+     * @return \Sws\ApplicationInterface
+     */
+    public static function app()
+    {
+        return self::$app;
+    }
+
+    /**
+     * @param null|string $id
+     * @return \Psr\Container\ContainerInterface
+     */
+    public static function di($id = null)
+    {
+        if ($id) {
+            return self::$app->get($id);
+        }
+
+        return self::$app->getDi();
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public static function get($id)
+    {
+        return self::$app->get($id);
+    }
 }

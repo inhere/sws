@@ -12,20 +12,21 @@ use inhere\console\utils\Show;
 use inhere\library\di\Container;
 use inhere\library\traits\EventTrait;
 use inhere\server\servers\HttpServer;
+use Psr\Container\ContainerInterface;
 use Swoole\Coroutine;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
-use Swoole\Server;
+//use Swoole\Server;
 use Swoole\Websocket\Frame;
 use Sws\Components\HttpHelper;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
 use Sws\Http\Request;
 use Sws\Http\Response;
-use Sws\Http\WSResponse;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 use Sws\WebSocket\Connection;
+use Sws\WebSocket\Message;
 use Sws\WebSocket\WebSocketServerTrait;
 use Sws\WebSocket\WsServerInterface;
 use Sws\Web\RouteDispatcher;
@@ -34,7 +35,7 @@ use Sws\Web\RouteDispatcher;
  * Class Application
  * @package Sws
  */
-class Application extends HttpServer implements WsServerInterface
+class Application extends HttpServer implements WsServerInterface, ApplicationInterface
 {
     use EventTrait;
     use WebSocketServerTrait;
@@ -304,7 +305,7 @@ class Application extends HttpServer implements WsServerInterface
      * @param int $code
      * @return string
      */
-    public function buildMessage($data, string $msg = 'success', int $code = 0)
+    public function formatMessage($data, string $msg = 'success', int $code = 0)
     {
         // json
         if ($this->isJsonType()) {
@@ -323,16 +324,28 @@ class Application extends HttpServer implements WsServerInterface
     }
 
     /**
+     * @param string $data
+     * @param int $sender
+     * @param array $receivers
+     * @param array $excepted
+     * @return Message
+     */
+    public function createMessage(string $data = '', int $sender = 0, array $receivers = [], array $excepted = [])
+    {
+        return Message::make($data, $sender, $receivers, $excepted)->setWs($this);
+    }
+
+    /**
      * response data to client, will auto build formatted message by 'data_type'
      * @param mixed $data
      * @param string $msg
      * @param int $code
      * @param bool $doSend
-     * @return int|WSResponse
+     * @return int|Message
      */
     public function wsRespond($data, string $msg = '', int $code = 0, bool $doSend = true)
     {
-        $data = $this->buildMessage($data, $msg, $code);
+        $data = $this->formatMessage($data, $msg, $code);
 
         return $this->respondText($data, $doSend);
     }
@@ -341,7 +354,7 @@ class Application extends HttpServer implements WsServerInterface
      * response text data to client
      * @param $data
      * @param bool $doSend
-     * @return int|WSResponse
+     * @return int|Message
      */
     public function respondText($data, bool $doSend = true)
     {
@@ -349,7 +362,7 @@ class Application extends HttpServer implements WsServerInterface
             $data = implode('', $data);
         }
 
-        $wrs = WSResponse::make($data)->setWs($this);
+        $wrs = Message::make($data)->setWs($this);
 
         if ($doSend) {
             $wrs->send();
@@ -359,45 +372,30 @@ class Application extends HttpServer implements WsServerInterface
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @param string $msg
      * @param int $code
-     * @param \Closure|null $afterMakeMR
-     * @param bool $reset
-     * @return int
+     * @return Message
      */
-    public function send($data, string $msg = '', int $code = 0, \Closure $afterMakeMR = null, bool $reset = true): int
+    public function sendFormatted($data, string $msg = '', int $code = 0)
     {
-        $data = $this->buildMessage($data, $msg, $code);
+        $response = $this->formatMessage($data, $msg, $code);
 
-        return $this->sendText($data, $afterMakeMR, $reset);
+        return Message::make($response)->setWs($this);
     }
 
     /**
      * response text data to client
      * @param $data
-     * @param \Closure|null $onAfterMake
-     * @param bool $reset
-     * @return int
+     * @return Message
      */
-    public function sendText($data, \Closure $onAfterMake = null, bool $reset = true)
+    public function sendText($data)
     {
         if (is_array($data)) {
             $data = implode('', $data);
         }
 
-        $wrs = WSResponse::make($data)->setWs($this);
-
-        if ($onAfterMake) {
-            $status = $onAfterMake($wrs);
-
-            // If the message have been sent
-            if (is_int($status)) {
-                return $status;
-            }
-        }
-
-        return $wrs->send($reset);
+        return $this->createMessage($data);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -454,17 +452,17 @@ class Application extends HttpServer implements WsServerInterface
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
-    public function getDi(): Container
+    public function getDi()
     {
         return $this->di;
     }
 
     /**
-     * @param Container $di
+     * @param ContainerInterface $di
      */
-    public function setDi(Container $di)
+    public function setDi(ContainerInterface $di)
     {
         $this->di = $di;
     }

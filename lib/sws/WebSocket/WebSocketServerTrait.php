@@ -45,6 +45,8 @@ trait WebSocketServerTrait
      */
     private $connections = [];
 
+    protected $messageParsers = [];
+
 ////////////////////// WS Server event //////////////////////
 
     /**
@@ -146,15 +148,17 @@ trait WebSocketServerTrait
     }
 
     /**
+     * custom handshake check.
      * @param $request
      * @param $response
      * @param $cid
      * @return bool
      */
-    protected function handleHandshake($request, $response, $cid)
-    {
-    }
+    abstract protected function handleHandshake($request, $response, $cid);
 
+    /**
+     * @param Connection $conn
+     */
     protected function afterHandshake(Connection $conn)
     {
         // ....
@@ -375,6 +379,40 @@ trait WebSocketServerTrait
 ////////////////////////////////////////////////////////////////////////
 /// message send methods
 ////////////////////////////////////////////////////////////////////////
+
+    /**
+     * send message to client(s)
+     * @param string $data
+     * @param int|array $receivers
+     * @param int|array $expected
+     * @param int $sender
+     * @return int
+     */
+    public function send(string $data, $receivers = 0, $expected = 0, int $sender = 0): int
+    {
+        if (!$data) {
+            return 0;
+        }
+
+        $receivers = (array)$receivers;
+        $expected = (array)$expected;
+
+        // only one receiver
+        if (1 === count($receivers)) {
+            return $this->sendTo(array_shift($receivers), $data, $sender);
+        }
+
+        // to all
+        if (!$expected && !$receivers) {
+            $this->sendToAll($data, $sender);
+
+            // to some
+        } else {
+            $this->sendToSome($data, $receivers, $expected, $sender);
+        }
+
+        return $this->getErrorNo();
+    }
 
     /**
      * Send a message to the specified user 发送消息给指定的用户

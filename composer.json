@@ -32,7 +32,12 @@
         "inhere/simple-print-tool": "dev-master"
     },
     "autoload": {
-        "classmap": ["app/Sws.php"],
+        "files": [
+            "lib/sws/functions.php"
+        ],
+        "classmap": [
+            "app/Sws.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Sws\\": "lib/sws/"

@@ -15,4 +15,13 @@ return [
             '/uploads' => 'web/uploads'
         ]
     ],
+
+    'language' => [
+        'language' => 'zh-CN',
+        'languages' => ['en', 'zh-CN'],
+        'files' => [
+          'default.php',
+          'user.php',
+        ],
+    ],
 ];

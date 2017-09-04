@@ -9,7 +9,7 @@
 return [
     'assets' => [
         'ext' => [],
-        'map' => [
+        'dirMap' => [
             // 'url_match' => 'assets dir',
             '/assets' => 'web/assets',
             '/uploads' => 'web/uploads'

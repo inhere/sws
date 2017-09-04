@@ -5,8 +5,6 @@ use Sws\Application;
 
 define('BASE_PATH', dirname(__DIR__) );
 
-session_start();
-
 require dirname(__DIR__) . '/boot/web.php';
 
 $mgr = $di->get('app');

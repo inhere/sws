@@ -1,10 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>WebSocket Testing</title>
+
+  <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap/bootstrap.min.css"/>
+  <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap-vue/bootstrap-vue.css"/>
+  <style type="text/css">
+    .page-footer {
+      background-color: #f8f8f8;
+      padding: 30px 0;
+    }
+    .message-list {
+      overflow-y: auto;
+      height: 350px;
+      border: 1px solid rgba(20,20,20,.1);
+      border-radius: 3px;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h1>hello</h1>
+
+<div id="app">
+  <header>
+    <b-navbar toggleable type="light" variant="light">
+      <div class="container">
+        <b-nav-toggle target="nav_text_collapse"></b-nav-toggle>
+        <b-navbar-brand>WebSocket Testing</b-navbar-brand>
+        <b-collapse is-nav id="nav_text_collapse">
+          <b-nav is-nav-bar>
+            <b-nav-text>a online WebSocket Testing tool</b-nav-text>
+          </b-nav>
+        </b-collapse>
+      </div>
+    </b-navbar>
+  </header>
+
+  <b-container>
+    <b-row style="padding: 15px 0;">
+      <b-col lg="6">
+        <b-input-group>
+          <!-- Add-ons -->
+          <b-input-group-addon>
+            Address
+          </b-input-group-addon>
+
+          <!-- Main form input -->
+          <b-form-input v-model="wsUrl"
+                        placeholder="Enter webSocket url. e.g ws://127.0.0.1:9501"
+          ></b-form-input>
+
+          <!-- Attach Right button Group via slot -->
+          <b-input-group-button slot="right">
+            <b-btn variant="success" @click="connect" :disabled="disabled.connect">连接</b-btn>
+            <b-btn variant="outline-warning" @click="disconnect" :disabled="disabled.disconnect">断开</b-btn>
+          </b-input-group-button>
+
+        </b-input-group>
+        <b-form-text>Notice: 连接格式为 <code>ws://IP:PORT</code>（示例 <code>ws://127.0.0.1:9501</code>）测试只需要输入内网地址</b-form-text>
+
+        <b-alert variant="danger"
+                 dismissible
+                 :show="showAlert"
+                 @dismissed="showAlert=false">
+          {{ error }}
+        </b-alert>
+
+        <b-card
+                header-tag="header"
+                footer-tag="footer"
+                style="margin: 15px 0;"
+        >
+          <h6 slot="header" class="mb-0">消息窗口</h6>
+          <div slot="footer">
+            <div>
+              Message
+            </div>
+            <b-form-textarea id="message"
+                             @keyup.ctrl.enter="send"
+                             v-model="message"
+                             placeholder="Enter something"
+                             :rows="3"
+                             :max-rows="6"
+                             style="margin: 10px 0;"
+            >
+            </b-form-textarea>
+
+            <div style="float: right;">
+              <b-button variant="link" :disabled="disabled.clear">清空消息</b-button>
+              <b-button variant="success" @click="send" :disabled="disabled.send">发送(Ctrl+Enter)</b-button>
+            </div>
+          </div>
+
+          <div class="message-list">
+            message list ... ...
+          </div>
+          <!--<p class="card-text">Header and footers using slots.</p>-->
+          <!--<b-button href="#" variant="primary">Go somewhere</b-button>-->
+
+        </b-card>
+      </b-col>
+      <b-col lg="6">
+        运行日志：
+
+      </b-col>
+    </b-row>
+  </b-container>
+
+  <footer class="page-footer">
+    <div class="container">
+      <div>
+        <b-nav>
+          <b-nav-item href="http://yzone.net" target="_blank">Yzone.net</b-nav-item>
+          <b-nav-item>Link</b-nav-item>
+          <b-nav-item>Another Link</b-nav-item>
+          <b-nav-item disabled>Disabled</b-nav-item>
+        </b-nav>
+      </div>
+
+    </div>
+  </footer>
+</div>
+
+<script src="/assets/lib/vue/vue.min.js"></script>
+<!-- Add this after vue.js -->
+<script src="/assets/lib/polyfill.min.js"></script>
+<script src="/assets/lib/bootstrap-vue/bootstrap-vue.js"></script>
+<script>
+  const sws = {
+    ws: null,
+    error: null,
+    handlers: {},
+    //
+    create(host, port) {
+      const url = 'ws://' + host + (port ? ':' + port : '')
+
+      return this.createByUrl(url)
+    },
+    // e.g `ws://domain.com/chat`
+    createByUrl(url) {
+      const ws = new WebSocket(url)
+
+      ws.addEventListener('open', this.onOpen)
+      ws.addEventListener('close', this.onClose)
+      ws.addEventListener('error', this.onError)
+      ws.addEventListener('message', this.onMessage.bind(null, this))
+      // ws.onmessage = this.onMessage.bind(null, this)
+      // ws.onerror = this.onError
+
+      this.ws = ws
+      return this
+    },
+    close () {
+      if () {
+
+      }
+
+      this.ws.close()
+    },
+    onMessage: function (self, evt) {
+      let data = JSON.parse(evt.data);
+
+      console.log(data, self)
+    },
+    onOpen: function (evt) {
+      console.info("连接服务器成功", evt)
+
+      this.isConnect = true
+    },
+    onClose: function (evt) {
+      this.isConnect = false
+
+      console.log("Disconnected", evt);
+    },
+    onError: function (evt) {
+      this.error = evt.data
+
+      console.error('Error occurs: ' + evt.data)
+    },
+    sendJson(text) {
+      let data = {
+        type: "message",
+        text: text,
+        id:   'clientID',
+        date: Date.now()
+      }
+
+      this.ws.send(JSON.stringify(data))
+    },
+    send: function (data, cmd) {
+      this.emit(data, cmd)
+    },
+    emit: function (data, cmd) {
+      if (!this.isConnect) {
+        this.error = 'connect is lost'
+        console.error(this.error);
+        return
+      }
+
+      if (cmd) {
+        this.ws.send('[@' + cmd + ']' + data)
+      } else {
+        this.ws.send(data)
+      }
+    },
+    route: function (route, cb) {
+      this.handlers[route] = cb
+    }
+  }
+
+  const vm = new Vue({
+    el: '#app',
+    data: function () {
+      return {
+        connections: {
+          main: null
+        },
+        disabled: {
+          connect: false,
+          disconnect: true,
+          send: true,
+          clear: true
+        },
+        error: null,
+        showAlert: false,
+        message: '',
+        wsUrl: 'ws://127.0.0.1:9501',
+        messages: []
+      }
+    },
+    methods: {
+      connect() {
+        if (!this.wsUrl) {
+          this.error = 'Please input a ws server address'
+          this.showAlert = true
+          return
+        }
+
+        this.connections.main = sws.createByUrl(this.wsUrl)
+      },
+      disconnect () {
+        if (!this.connections.main) {
+          this.error = 'The connection has lost.'
+          this.showAlert = true
+          return
+        }
+
+        this.connections.main.close()
+      },
+      send() {
+        if (!this.connections.main) {
+          this.error = 'Please connect to ws server before send message.'
+          this.showAlert = true
+          return
+        }
+
+        console.log('send msg:' + this.message)
+      }
+    }
+  })
+
+
+</script>
 </body>
 </html>

@@ -11,6 +11,7 @@ namespace Sws;
 use inhere\console\utils\Show;
 use inhere\library\di\Container;
 use inhere\library\traits\EventTrait;
+use inhere\server\helpers\StaticAccessHandler;
 use inhere\server\servers\HttpServer;
 use Psr\Container\ContainerInterface;
 use Swoole\Coroutine;
@@ -62,6 +63,17 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         $this->options['assets'] = $this->get('config')->get('assets', []);
     }
 
+    public function preLoading()
+    {
+        // collect routes
+
+        // model class
+
+        // controller class
+
+        // rpc service class
+    }
+
     /**
      * before Server Start
      */
@@ -73,15 +85,21 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         }
 
         $this->handleDynamicRequest([$this, 'handleHttpRequest']);
+
+        $config = $this->options['assets'];
+
+        // static handle
+        $this->staticAccessHandler = new StaticAccessHandler(BASE_PATH, $config['ext'], $config['dirMap']);
     }
 
     /**
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
+     * @param string|null $uri
      * @return SwResponse
      * @throws \Throwable
      */
-    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
+    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse, $uri = null)
     {
         $ctxId = Coroutine::getuid();
         $ctxKey = HttpContext::genKey($ctxId);
@@ -91,7 +109,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
             $dispatcher = $this->di->get('routeDispatcher');
             $context = HttpContext::make($swRequest, $swResponse);
 
-            $uri = $swRequest->server['request_uri'];
+            $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
             $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: $ctxId, ctxKey: $ctxKey");
 
@@ -111,7 +129,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
             "Response Status: <info>{$response->getStatusCode()}</info>"
         ]);
         Show::aList($response->getHeaders(), 'Response Headers');
-        Show::aList($_SESSION ?: [],'server sessions');
+//        Show::aList($_SESSION ?: [],'server sessions');
 
         return HttpHelper::paddingSwResponse($response, $swResponse);
     }

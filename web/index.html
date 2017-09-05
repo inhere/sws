@@ -290,19 +290,26 @@
     }
   }
 
-  let wsRoutes = {
-    '/': function (data, app) {
-      console.log(data, app)
-    },
-    '/index': function (data, app) {
-      console.log(data, app)
-    },
-    '/chat': function (data, app) {
-      console.log(data, app)
+  /*
 
+   function heartbeat() {
+   this.isAlive = true;
+   }
 
-    }
-  }
+   wss.on('connection', function connection(ws) {
+   ws.isAlive = true;
+   ws.on('pong', heartbeat);
+   });
+
+   const interval = setInterval(function ping() {
+   wss.clients.forEach(function each(ws) {
+   if (ws.isAlive === false) return ws.terminate();
+
+   ws.isAlive = false;
+   ws.ping('', false, true);
+   });
+   }, 30000);
+   */
 
   const vm = new Vue({
     el: '#app',
@@ -339,9 +346,6 @@
           return
         }
 
-        // register routes
-        app.addRoutes(wsRoutes)
-
         this.connections.main = app
 
         // do something
@@ -375,6 +379,8 @@
           this.showMsg('Please connect to ws server before send message.', 'danger')
           return
         }
+//        time = new Date(msg.date);
+//        var timeStr = time.toLocaleTimeString();
 
         console.log('send msg:' + this.message)
         this.connections.main.sendJson(this.message)

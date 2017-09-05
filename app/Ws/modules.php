@@ -44,5 +44,5 @@ $rootModule->add('login', function ($data, $cid, ModuleInterface $handler) {
 $rootModule->add('logout', function ($data, $id, Application $app) {
     $user = $app->getUser($id);
 
-    return $app->respond("goodbye, {$user['name']}");
+    return $app->respondText("goodbye, {$user['name']}");
 });

@@ -1,0 +1,3 @@
+#!/usr/bin/sh
+
+php -S 127.0.0.1:5566 -t web

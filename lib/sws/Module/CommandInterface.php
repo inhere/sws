@@ -8,8 +8,11 @@
 
 namespace Sws\Module;
 
-
+/**
+ * Interface CommandInterface
+ * @package Sws\Module
+ */
 interface CommandInterface
 {
-
+    public function __invoke();
 }

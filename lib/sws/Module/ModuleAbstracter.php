@@ -11,9 +11,9 @@ namespace Sws\Module;
 use inhere\library\helpers\PhpHelper;
 use inhere\library\traits\OptionsTrait;
 use Sws\Application;
-use Sws\WebSocket\Connection;
-use Sws\DataParser\ComplexDataParser;
+use Sws\DataParser\JsonDataParser;
 use Sws\DataParser\DataParserInterface;
+use Sws\WebSocket\Connection;
 use Sws\Http\Request;
 use Sws\Http\Response;
 use Sws\WebSocket\Message;
@@ -56,6 +56,14 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     protected $cmdHandlers = [];
 
+    /**
+     * @var array
+     * [
+     *   path => callback,
+     * ]
+     */
+    protected $routes = [];
+
     // default command name, if request data not define command name.
     const DEFAULT_CMD = 'index';
     const DEFAULT_CMD_SUFFIX = 'Command';
@@ -93,7 +101,7 @@ abstract class ModuleAbstracter implements ModuleInterface
         $this->setOptions($options);
 
         $this->name = $name ?: $this->parseName();
-        $this->_dataParser = $dataParser ?: new ComplexDataParser();
+        $this->_dataParser = $dataParser ?: new JsonDataParser();
 
         $this->init();
     }
@@ -248,6 +256,20 @@ abstract class ModuleAbstracter implements ModuleInterface
         }
 
         return $this->$method($data, $cid, $conn);
+    }
+
+    /**
+     * register a command handler
+     * @param string $path
+     * @param callable $handler
+     * @return ModuleInterface
+     */
+    public function route(string $path, $handler)
+    {
+        $path = '/' . trim($path, '/');
+        $this->routes[$path] = $handler;
+
+        return $this;
     }
 
     /**
@@ -446,7 +468,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     public function getDataParser(): DataParserInterface
     {
         // if not set, use default parser.
-        return $this->_dataParser ?: new ComplexDataParser();
+        return $this->_dataParser;
     }
 
     /**

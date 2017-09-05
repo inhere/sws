@@ -14,5 +14,5 @@ namespace Sws\Module;
  */
 interface HandlerInterface
 {
-
+    public function run(string $command);
 }

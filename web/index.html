@@ -6,6 +6,7 @@
 
   <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap/bootstrap.min.css"/>
   <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap-vue/bootstrap-vue.css"/>
+  <link type="text/css" rel="stylesheet" href="/assets/lib/open-iconic/css/open-iconic-bootstrap.min.css"/>
   <style type="text/css">
     .page-footer {
       background-color: #f8f8f8;
@@ -40,6 +41,14 @@
   <b-container>
     <b-row style="padding: 15px 0;">
       <b-col lg="6">
+
+        <b-alert :variant="alertType"
+                 :show="showAlert"
+                 @dismissed="showAlert=false; alertMsg=null"
+                 dismissible>
+          {{ alertMsg }}
+        </b-alert>
+
         <b-input-group>
           <!-- Add-ons -->
           <b-input-group-addon>
@@ -53,30 +62,25 @@
 
           <!-- Attach Right button Group via slot -->
           <b-input-group-button slot="right">
-            <b-btn variant="success" @click="connect" :disabled="disabled.connect">连接</b-btn>
-            <b-btn variant="outline-warning" @click="disconnect" :disabled="disabled.disconnect">断开</b-btn>
+            <b-btn variant="success" @click="connect" :disabled="disabled.connect"><span class="oi oi-link-intact"></span> 连接</b-btn>
+            <b-btn variant="outline-warning" @click="disconnect" :disabled="disabled.disconnect"><span class="oi oi-link-broken"></span> 断开</b-btn>
           </b-input-group-button>
 
         </b-input-group>
         <b-form-text>Notice: 连接格式为 <code>ws://IP:PORT</code>（示例 <code>ws://127.0.0.1:9501</code>）测试只需要输入内网地址</b-form-text>
-
-        <b-alert variant="danger"
-                 dismissible
-                 :show="showAlert"
-                 @dismissed="showAlert=false">
-          {{ error }}
-        </b-alert>
 
         <b-card
                 header-tag="header"
                 footer-tag="footer"
                 style="margin: 15px 0;"
         >
-          <h6 slot="header" class="mb-0">消息窗口</h6>
+          <h6 slot="header" class="mb-0"><span class="oi oi-grid-three-up"></span> 消息窗口</h6>
           <div slot="footer">
-            <div>
-              Message
+
+            <div class="message-tool">
+              <b-button size="sm" variant="" :disabled="disabled.clear" @click="clear" title="清空消息"><span class="oi oi-trash"></span></b-button>
             </div>
+
             <b-form-textarea id="message"
                              @keyup.ctrl.enter="send"
                              v-model="message"
@@ -88,8 +92,10 @@
             </b-form-textarea>
 
             <div style="float: right;">
-              <b-button variant="link" :disabled="disabled.clear">清空消息</b-button>
-              <b-button variant="success" @click="send" :disabled="disabled.send">发送(Ctrl+Enter)</b-button>
+              <b-button variant="success" @click="send" :disabled="disabled.send">
+                <span class="oi oi-location"></span>
+                发送(Ctrl+Enter)
+              </b-button>
             </div>
           </div>
 
@@ -128,62 +134,128 @@
 <script src="/assets/lib/polyfill.min.js"></script>
 <script src="/assets/lib/bootstrap-vue/bootstrap-vue.js"></script>
 <script>
-  const sws = {
+  const application = {
     ws: null,
+    url: null,
     error: null,
-    handlers: {},
+    isConnected: false,
+    events: {
+      open: null,
+      msg: function (data) {
+        console.log('Received data: ',data)
+      },
+      close: null,
+      error: function (err) {
+        console.error('Error occurs: ' + err)
+      },
+      notFound: function (data) {
+        console.log('notFound', data)
+      },
+      dataError: function (data) {
+        console.log('dataError', data)
+      },
+    },
+
+    // message handlers
+    defaultRoute: null,
+    noFoundRoute: null,
+    routes: {},
     //
-    create(host, port) {
-      const url = 'ws://' + host + (port ? ':' + port : '')
+    create(host, port, protocol = 'ws') {
+      const url = protocol + '://' + host + (port ? ':' + port : '')
 
       return this.createByUrl(url)
     },
     // e.g `ws://domain.com/chat`
     createByUrl(url) {
-      const ws = new WebSocket(url)
+      const self = this
 
-      ws.addEventListener('open', this.onOpen)
-      ws.addEventListener('close', this.onClose)
-      ws.addEventListener('error', this.onError)
-      ws.addEventListener('message', this.onMessage.bind(null, this))
-      // ws.onmessage = this.onMessage.bind(null, this)
-      // ws.onerror = this.onError
+      this.url = url
+      this.isConnected = false
 
-      this.ws = ws
+      try {
+        const ws = new WebSocket(url)
+
+        ws.addEventListener('open', function (evt) {
+          console.info("OPEN: 连接服务器成功", evt)
+
+          self.isConnected = true
+          self.fireEvent('open')
+        })
+        ws.addEventListener('close', function (evt) {
+          console.log("CLOSE", evt);
+          self.isConnected = false
+          self.fireEvent('close')
+
+        })
+        ws.addEventListener('error', function (evt) {
+          console.error('ERROR: ' + evt.data)
+          this.error = evt.data
+          self.fireEvent('error', evt.data)
+
+        })
+        ws.addEventListener('message', this.onMessage.bind(null, this))
+
+        this.ws = ws
+      } catch (ex) {
+        console.log(ex)
+      }
+
       return this
     },
     close () {
-      if () {
-
+      if (!this.isConnected) {
+        this.error = 'the ws server is not connecting'
+        return
       }
 
       this.ws.close()
     },
+    addListener (name, handler) {
+      this.events[name] = handler
+    },
+    fireEvent (name, ...args) {
+      if (this.events[name]) {
+        let cb = this.events[name]
+        cb(...args)
+      }
+    },
     onMessage: function (self, evt) {
-      let data = JSON.parse(evt.data);
+      let rawData = evt.data
+      let data = evt.data
 
-      console.log(data, self)
-    },
-    onOpen: function (evt) {
-      console.info("连接服务器成功", evt)
+      self.fireEvent('message', data)
 
-      this.isConnect = true
-    },
-    onClose: function (evt) {
-      this.isConnect = false
+      try {
+        data = JSON.parse(evt.data)
+      } catch (err) {
+        self.fireEvent('dataError', rawData)
+      }
 
-      console.log("Disconnected", evt);
-    },
-    onError: function (evt) {
-      this.error = evt.data
+      try {
+        let cmd = data.cmd || self.defaultRoute
 
-      console.error('Error occurs: ' + evt.data)
+        if (cmd) {
+          if (self.routes[cmd]) {
+            let handler = self.routes[cmd]
+            handler(data, self)
+          } else {
+            self.fireEvent('notFound', cmd)
+          }
+        } else {
+          self.fireEvent('dataError', rawData)
+        }
+      } catch (err) {
+        console.log(err)
+        this.error = err.message
+        self.fireEvent('error', err.message)
+      }
     },
     sendJson(text) {
       let data = {
-        type: "message",
+        '_cmd': '/chat',
         text: text,
-        id:   'clientID',
+        id: 'clientID',
         date: Date.now()
       }
 
@@ -195,18 +267,40 @@
     emit: function (data, cmd) {
       if (!this.isConnect) {
         this.error = 'connect is lost'
-        console.error(this.error);
+        self.fireEvent('error', this.error)
         return
       }
 
       if (cmd) {
-        this.ws.send('[@' + cmd + ']' + data)
-      } else {
-        this.ws.send(data)
+//        this.ws.send('[@' + cmd + ']' + data)
+        data['_cmd'] = cmd
       }
+
+      this.ws.send(data)
     },
-    route: function (route, cb) {
-      this.handlers[route] = cb
+    addRoute: function (route, cb) {
+      this.routes[route] = cb
+    },
+    addRoutes: function (routes) {
+      const app = this
+
+      Object.keys(routes).forEach(function (route) {
+        app.routes[route] = routes[route]
+      })
+    }
+  }
+
+  let wsRoutes = {
+    '/': function (data, app) {
+      console.log(data, app)
+    },
+    '/index': function (data, app) {
+      console.log(data, app)
+    },
+    '/chat': function (data, app) {
+      console.log(data, app)
+
+
     }
   }
 
@@ -223,7 +317,8 @@
           send: true,
           clear: true
         },
-        error: null,
+        alertMsg: null,
+        alertType: 'info',
         showAlert: false,
         message: '',
         wsUrl: 'ws://127.0.0.1:9501',
@@ -233,34 +328,78 @@
     methods: {
       connect() {
         if (!this.wsUrl) {
-          this.error = 'Please input a ws server address'
-          this.showAlert = true
+          this.showMsg('Please input a ws server address')
           return
         }
 
-        this.connections.main = sws.createByUrl(this.wsUrl)
+        let app = application.createByUrl(this.wsUrl)
+
+        if (app.error) {
+          this.showMsg(app.error, 'danger')
+          return
+        }
+
+        // register routes
+        app.addRoutes(wsRoutes)
+
+        this.connections.main = app
+
+        // do something
+        this.showMsg('Success connect to the server ' + this.wsUrl, 'success')
+        this.disabled = {
+          connect: true,
+          disconnect: false,
+          send: false,
+          clear: false
+        }
       },
       disconnect () {
         if (!this.connections.main) {
-          this.error = 'The connection has lost.'
-          this.showAlert = true
+          this.showMsg('The connection has lost.', 'danger')
           return
         }
 
         this.connections.main.close()
+
+        // do something
+        this.showMsg('Connection has been closed.')
+        this.disabled = {
+          connect: false,
+          disconnect: true,
+          send: true,
+          clear: true
+        }
       },
       send() {
         if (!this.connections.main) {
-          this.error = 'Please connect to ws server before send message.'
-          this.showAlert = true
+          this.showMsg('Please connect to ws server before send message.', 'danger')
           return
         }
 
         console.log('send msg:' + this.message)
+        this.connections.main.sendJson(this.message)
+        this.message = null
+      },
+      clear () {
+        this.messages = []
+      },
+      /**
+       *
+       * @param msg
+       * @param type allow info, success, warning or danger
+       */
+      showMsg (msg, type = 'info') {
+        if (msg) {
+          this.alertMsg = msg
+          this.alertType = type
+          this.showAlert = true
+        } else {
+          this.alertMsg = null
+          this.showAlert = false
+        }
       }
     }
   })
-
 
 </script>
 </body>

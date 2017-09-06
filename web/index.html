@@ -8,14 +8,92 @@
   <link type="text/css" rel="stylesheet" href="/assets/lib/bootstrap-vue/bootstrap-vue.css"/>
   <link type="text/css" rel="stylesheet" href="/assets/lib/open-iconic/css/open-iconic-bootstrap.min.css"/>
   <style type="text/css">
+    .page-wrapper {
+      /*position: relative;*/
+    }
+
+    .d-none {
+      display: none !important;
+    }
+
+    .bd-sidebar {
+      -ms-flex-order: 0;
+      order: 0;
+      border-bottom: 1px solid rgba(0, 0, 0, .1)
+    }
+
+    @media (min-width: 768px) {
+      .bd-sidebar {
+        border-right: 1px solid rgba(0, 0, 0, .1)
+      }
+
+      @supports ((position: -webkit-sticky) or (position:sticky)) {
+        .bd-sidebar {
+          position: -webkit-sticky;
+          position: sticky;
+          top: 4rem;
+          z-index: 1000;
+          max-height: calc(100vh - 4rem)
+        }
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .bd-sidebar {
+        max-width: 320px
+      }
+
+      .d-xl-block {
+        display: block !important;
+      }
+    }
+
+    .bd-toc {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 4rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+
+    .bd-toc {
+      -ms-flex-order: 2;
+      -webkit-box-ordinal-group: 3;
+      order: 2;
+      padding-top: 24px;
+      padding-top: 1.5rem;
+      padding-bottom: 24px;
+      padding-bottom: 1.5rem;
+      font-size: 14px;
+      font-size: .875rem;
+    }
+
+    .bd-content {
+      -ms-flex-order: 1;
+      -webkit-box-ordinal-group: 2;
+      order: 1;
+    }
+
+    @media (min-width: 768px) {
+      .pl-md-5, .px-md-5 {
+        padding-left: 3rem !important;
+      }
+
+      .py-md-3 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+      }
+    }
+
     .page-footer {
-      background-color: #f8f8f8;
+      /*background-color: #f8f8f8;*/
       padding: 30px 0;
     }
+
     .message-list {
       overflow-y: auto;
       height: 350px;
-      border: 1px solid rgba(20,20,20,.1);
+      border: 1px solid rgba(20, 20, 20, .1);
       border-radius: 3px;
       padding: 5px;
     }
@@ -25,7 +103,7 @@
 
 <div id="app">
   <header>
-    <b-navbar toggleable type="light" variant="light">
+    <b-navbar fixed="top" toggleable type="light" variant="light">
       <div class="container">
         <b-nav-toggle target="nav_text_collapse"></b-nav-toggle>
         <b-navbar-brand>WebSocket Testing</b-navbar-brand>
@@ -38,95 +116,140 @@
     </b-navbar>
   </header>
 
-  <b-container>
-    <b-row style="padding: 15px 0;">
-      <b-col lg="6">
+  <b-container fluid>
+    <b-row class="page-wrapper">
+      <b-col cols="12" md="3" xl="2" class="bd-sidebar">
+        <b-list-group>
+          <b-list-group-item active>
+            WebSocket Testing
+          </b-list-group-item>
+          <b-list-group-item href="#">
+            Chat Room
+          </b-list-group-item>
+          <b-list-group-item>
+            This is a text only item
+          </b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <div class="d-none d-xl-block col-xl-1 bd-toc"></div>
+      <b-col cols="12" md="9" xl="9" class="py-md-3 pl-md-5 bd-content" style="margin-top: 4rem;">
 
         <b-alert :variant="alertType"
                  :show="showAlert"
                  @dismissed="showAlert=false; alertMsg=null"
+                 style="margin-top: 15px;"
                  dismissible>
           {{ alertMsg }}
         </b-alert>
 
-        <b-input-group>
-          <!-- Add-ons -->
-          <b-input-group-addon>
-            Address
-          </b-input-group-addon>
+        <b-container>
+          <b-row>
+            <b-col lg="7">
+              <b-input-group>
+                <!-- Add-ons -->
+                <b-input-group-addon>
+                  Address
+                </b-input-group-addon>
 
-          <!-- Main form input -->
-          <b-form-input v-model="wsUrl"
-                        placeholder="Enter webSocket url. e.g ws://127.0.0.1:9501"
-          ></b-form-input>
+                <!-- Main form input -->
+                <b-form-input v-model="wsUrl"
+                              placeholder="Enter webSocket url. e.g ws://127.0.0.1:9501"
+                ></b-form-input>
 
-          <!-- Attach Right button Group via slot -->
-          <b-input-group-button slot="right">
-            <b-btn variant="success" @click="connect" :disabled="disabled.connect"><span class="oi oi-link-intact"></span> 连接</b-btn>
-            <b-btn variant="outline-warning" @click="disconnect" :disabled="disabled.disconnect"><span class="oi oi-link-broken"></span> 断开</b-btn>
-          </b-input-group-button>
+                <!-- Attach Right button Group via slot -->
+                <b-input-group-button slot="right">
+                  <b-btn variant="success" @click="connect" :disabled="disabled.connect"><span
+                    class="oi oi-link-intact"></span> 连接
+                  </b-btn>
+                  <b-btn variant="outline-warning" @click="disconnect" :disabled="disabled.disconnect"><span
+                    class="oi oi-link-broken"></span> 断开
+                  </b-btn>
+                </b-input-group-button>
 
-        </b-input-group>
-        <b-form-text>Notice: 连接格式为 <code>ws://IP:PORT</code>（示例 <code>ws://127.0.0.1:9501</code>）测试只需要输入内网地址</b-form-text>
+              </b-input-group>
+              <b-form-text>Notice: 连接格式为 <code>ws://IP:PORT</code>（示例 <code>ws://127.0.0.1:9501</code>）测试只需要输入内网地址
+              </b-form-text>
 
-        <b-card
+              <b-card
                 header-tag="header"
                 footer-tag="footer"
                 style="margin: 15px 0;"
-        >
-          <h6 slot="header" class="mb-0"><span class="oi oi-grid-three-up"></span> 消息窗口</h6>
-          <div slot="footer">
+              >
+                <h6 slot="header" class="mb-0"><span class="oi oi-grid-three-up"></span> 消息窗口</h6>
+                <div slot="footer">
 
-            <div class="message-tool">
-              <b-button size="sm" variant="" :disabled="disabled.clear" @click="clear" title="清空消息"><span class="oi oi-trash"></span></b-button>
+                  <div class="message-tool">
+                    <b-button size="sm" variant="info" :disabled="disabled.clear" @click="clear" title="清空消息"><span
+                      class="oi oi-trash"></span></b-button>
+                  </div>
+
+                  <b-form-textarea id="message"
+                                   @keyup.ctrl.enter="send"
+                                   v-model="message"
+                                   placeholder="Enter something"
+                                   :rows="3"
+                                   :max-rows="6"
+                                   style="margin: 10px 0;"
+                  >
+                  </b-form-textarea>
+
+                  <div style="float: right;">
+                    <b-button variant="success" @click="send" :disabled="disabled.send">
+                      <span class="oi oi-location"></span>
+                      发送(Ctrl+Enter)
+                    </b-button>
+                  </div>
+                </div>
+
+                <div class="message-list">
+                  message list ... ...
+                </div>
+                <!--<p class="card-text">Header and footers using slots.</p>-->
+                <!--<b-button href="#" variant="primary">Go somewhere</b-button>-->
+
+              </b-card>
+
+            </b-col>
+
+            <b-col lg="5">
+              <b-card
+                header-tag="header"
+                footer-tag="footer"
+                style="margin: 15px 0;"
+              >
+                <h6 slot="header" class="mb-0"><span class="oi oi-grid-three-up"></span> 运行日志</h6>
+
+                <div id="log-box">
+                  log ...
+                </div>
+
+
+                <div slot="footer">
+                  <b-button size="sm" variant="info" :disabled="disabled.clear" @click="clearLog" title="清空日志"><span
+                    class="oi oi-trash"></span></b-button>
+                </div>
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-container>
+
+        <footer class="page-footer">
+          <div class="container">
+            <div>
+              <b-nav>
+                <b-nav-item href="http://yzone.net" target="_blank">Yzone.net</b-nav-item>
+                <b-nav-item>Link</b-nav-item>
+                <b-nav-item>Another Link</b-nav-item>
+                <b-nav-item disabled>Disabled</b-nav-item>
+              </b-nav>
             </div>
 
-            <b-form-textarea id="message"
-                             @keyup.ctrl.enter="send"
-                             v-model="message"
-                             placeholder="Enter something"
-                             :rows="3"
-                             :max-rows="6"
-                             style="margin: 10px 0;"
-            >
-            </b-form-textarea>
-
-            <div style="float: right;">
-              <b-button variant="success" @click="send" :disabled="disabled.send">
-                <span class="oi oi-location"></span>
-                发送(Ctrl+Enter)
-              </b-button>
-            </div>
           </div>
-
-          <div class="message-list">
-            message list ... ...
-          </div>
-          <!--<p class="card-text">Header and footers using slots.</p>-->
-          <!--<b-button href="#" variant="primary">Go somewhere</b-button>-->
-
-        </b-card>
-      </b-col>
-      <b-col lg="6">
-        运行日志：
+        </footer>
 
       </b-col>
     </b-row>
   </b-container>
-
-  <footer class="page-footer">
-    <div class="container">
-      <div>
-        <b-nav>
-          <b-nav-item href="http://yzone.net" target="_blank">Yzone.net</b-nav-item>
-          <b-nav-item>Link</b-nav-item>
-          <b-nav-item>Another Link</b-nav-item>
-          <b-nav-item disabled>Disabled</b-nav-item>
-        </b-nav>
-      </div>
-
-    </div>
-  </footer>
 </div>
 
 <script src="/assets/lib/vue/vue.min.js"></script>
@@ -134,15 +257,28 @@
 <script src="/assets/lib/polyfill.min.js"></script>
 <script src="/assets/lib/bootstrap-vue/bootstrap-vue.js"></script>
 <script>
-  const application = {
+  function swsocket(url) {
+    this.url = url
+    console.log(url)
+  }
+
+  swsocket.prototype.send = function () {
+
+  }
+
+</script>
+<script>
+  // swsApp
+  // sws
+  const sws = {
     ws: null,
     url: null,
     error: null,
     isConnected: false,
     events: {
       open: null,
-      msg: function (data) {
-        console.log('Received data: ',data)
+      message: function (data) {
+        console.log('Received data: ', data)
       },
       close: null,
       error: function (err) {
@@ -182,19 +318,23 @@
           self.isConnected = true
           self.fireEvent('open')
         })
+
         ws.addEventListener('close', function (evt) {
-          console.log("CLOSE", evt);
+          console.log("CLOSE", evt)
           self.isConnected = false
           self.fireEvent('close')
-
         })
+
         ws.addEventListener('error', function (evt) {
           console.error('ERROR: ' + evt.data)
           this.error = evt.data
           self.fireEvent('error', evt.data)
-
         })
-        ws.addEventListener('message', this.onMessage.bind(null, this))
+
+        ws.addEventListener('message', function (evt) {
+          console.log("DATA", evt)
+          self.fireEvent('message', evt.data, self)
+        })
 
         this.ws = ws
       } catch (ex) {
@@ -259,34 +399,45 @@
         date: Date.now()
       }
 
-      this.ws.send(JSON.stringify(data))
+      this.send(JSON.stringify(data))
     },
-    send: function (data, cmd) {
-      this.emit(data, cmd)
-    },
-    emit: function (data, cmd) {
-      if (!this.isConnect) {
-        this.error = 'connect is lost'
-        self.fireEvent('error', this.error)
+    send: function (data) {
+      if (!this.isConnected) {
+        this.error = 'please connect to server before send message.'
+        this.fireEvent('error', this.error)
         return
       }
 
-      if (cmd) {
-//        this.ws.send('[@' + cmd + ']' + data)
-        data['_cmd'] = cmd
+      if (this.ws.readyState === this.ws.CLOSED) {
+        this.error = 'connect is closed'
+        this.fireEvent('error', this.error)
+        return
       }
 
       this.ws.send(data)
     },
-    addRoute: function (route, cb) {
+    command: function (route, cb) {
       this.routes[route] = cb
     },
-    addRoutes: function (routes) {
+    commands: function (routes) {
       const app = this
 
       Object.keys(routes).forEach(function (route) {
         app.routes[route] = routes[route]
       })
+    },
+    readImage: function (evt) {
+      let reader = new FileReader()
+
+      reader.onload = function(event) {
+        let contents = event.target.result
+        let a = new Image()
+        a.src = contents
+
+        document.body.appendChild(a)
+      }
+
+      reader.readAsDataURL(evt.data)
     }
   }
 
@@ -315,9 +466,7 @@
     el: '#app',
     data: function () {
       return {
-        connections: {
-          main: null
-        },
+        connection: null,
         disabled: {
           connect: false,
           disconnect: true,
@@ -339,14 +488,16 @@
           return
         }
 
-        let app = application.createByUrl(this.wsUrl)
+        let app = sws.createByUrl(this.wsUrl)
 
         if (app.error) {
           this.showMsg(app.error, 'danger')
           return
         }
 
-        this.connections.main = app
+        app.addListener('message', this.onMessage)
+
+        this.connection = app
 
         // do something
         this.showMsg('Success connect to the server ' + this.wsUrl, 'success')
@@ -358,12 +509,12 @@
         }
       },
       disconnect () {
-        if (!this.connections.main) {
+        if (!this.connection) {
           this.showMsg('The connection has lost.', 'danger')
           return
         }
 
-        this.connections.main.close()
+        this.connection.close()
 
         // do something
         this.showMsg('Connection has been closed.')
@@ -374,20 +525,39 @@
           clear: true
         }
       },
+      onMessage() {
+
+      },
       send() {
-        if (!this.connections.main) {
+        if (!this.connection) {
           this.showMsg('Please connect to ws server before send message.', 'danger')
           return
         }
+
+        if (!this.message) {
+          this.showMsg('Please input a message want to send.', 'warning')
+          return
+        }
+
+        let msg = this.message.trim()
+
+        if (!msg) {
+          this.showMsg('Cannot send a empty message.', 'warning')
+          return
+        }
+
 //        time = new Date(msg.date);
 //        var timeStr = time.toLocaleTimeString();
 
-        console.log('send msg:' + this.message)
-        this.connections.main.sendJson(this.message)
+        console.log('send msg:' + msg)
+        this.connection.sendJson(msg)
         this.message = null
       },
       clear () {
         this.messages = []
+      },
+      clearLog () {
+
       },
       /**
        *

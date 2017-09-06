@@ -58,6 +58,27 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     private $modules;
 
+    /**
+     * @var array
+     */
+    protected $options = [
+        'debug' => false,
+
+        // request and response data type: json text
+        'dataType' => 'json',
+
+        // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
+        'allowedOrigins' => '*',
+
+        // 日志配置
+        'log_service' => [
+            'name' => 'ws_app_log',
+            'basePath' => './tmp/logs/app',
+            'logConsole' => false,
+            'logThreshold' => 0,
+        ],
+    ];
+
     protected function beforeRun()
     {
         $this->options['assets'] = $this->get('config')->get('assets', []);
@@ -313,7 +334,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
             'data' => $data,
             'msg' => $msg,
             'code' => $code,
-            'time' => time(),
+            'time' => microtime(true),
         ]);
     }
 
@@ -458,7 +479,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function isJsonType(): bool
     {
-        return $this->getOption('data_type') === self::DATA_JSON;
+        return $this->options['dataType'] === self::DATA_JSON;
     }
 
     /**
@@ -466,7 +487,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function getDataType(): string
     {
-        return $this->getOption('data_type');
+        return $this->getOption('dataType');
     }
 
     /**

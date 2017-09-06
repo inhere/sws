@@ -253,6 +253,8 @@ abstract class ModuleAbstracter implements ModuleInterface
         if (!method_exists($this, $method)) {
             $this->log("The #{$cid} request command: $command not found, module: $name, run 'notFound' command", [],'notice');
             $method = self::NOT_FOUND . $suffix;
+
+            return $this->$method($data, $command, $cid, $conn);
         }
 
         return $this->$method($data, $cid, $conn);
@@ -302,7 +304,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      * @param int $cid
      * @return int
      */
-    public function pingCommand(string $data, int $cid)
+    public function pingCommand($data, int $cid)
     {
         return $this->respondText($data . '+PONG', false)->to($cid)->send();
     }
@@ -312,7 +314,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      * @param int $cid
      * @return int
      */
-    public function errorCommand(string $data, int $cid)
+    public function errorCommand($data, int $cid)
     {
         return $this
             ->respond($data, 'you send data format is error!', -200, false)
@@ -321,16 +323,17 @@ abstract class ModuleAbstracter implements ModuleInterface
     }
 
     /**
+     * @param mixed $data
      * @param string $command
      * @param int $cid
      * @param Connection $conn
      * @return int
      */
-    public function notFoundCommand(string $command, int $cid, Connection $conn)
+    public function notFoundCommand($data, string $command, int $cid, Connection $conn)
     {
         $msg = "You request command [$command] not found in the route [{$conn->getPath()}].";
 
-        return $this->respond('', $msg, -404, false)->to($cid)->send();
+        return $this->respond($data, $msg, -404, false)->to($cid)->send();
     }
 
     /**

@@ -40,6 +40,11 @@ abstract class BaseSws
     public static $app;
 
     /**
+     * @var array
+     */
+    private static $pool;
+
+    /**
      * @return \Sws\ApplicationInterface
      */
     public static function app()

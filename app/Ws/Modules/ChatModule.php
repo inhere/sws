@@ -14,6 +14,23 @@ namespace App\Ws\Modules;
  */
 class ChatModule extends \Sws\Module\ChatModule
 {
+    protected function init()
+    {
+        parent::init();
+
+        $this->setName('chatRoom');
+    }
+
+    public function joinCommand($data)
+    {
+
+    }
+
+    public function logoutCommand()
+    {
+
+    }
+
     public function loginCommand()
     {
 

@@ -100,10 +100,14 @@ abstract class ModuleAbstracter implements ModuleInterface
     {
         $this->setOptions($options);
 
-        $this->name = $name ?: $this->parseName();
+        if ($name) {
+            $this->name = $name;
+        }
+
         $this->_dataParser = $dataParser ?: new JsonDataParser();
 
         $this->init();
+        $this->getName();
     }
 
     protected function init()
@@ -391,7 +395,7 @@ abstract class ModuleAbstracter implements ModuleInterface
     /**
      * @return string
      */
-    protected function parseName()
+    protected function parseClassName()
     {
         $className = $fullClass = trim(static::class, '\\');
 
@@ -506,6 +510,10 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function getName(): string
     {
+        if (!$this->name) {
+            $this->name = $this->parseClassName();
+        }
+
         return $this->name;
     }
 

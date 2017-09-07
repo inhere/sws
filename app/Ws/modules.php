@@ -8,8 +8,12 @@
  */
 
 use Sws\Application;
+use Sws\DataParser\TextDataParser;
+use Sws\Module\EchoModule;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
+
+$echoModule = $app->module('/echo', new EchoModule(['dataType' => 'text'], null, new TextDataParser()));
 
 $rootModule = $app->module('/', new RootModule());
 

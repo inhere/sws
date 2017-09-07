@@ -180,7 +180,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         // check module. if not exists, response 404 error
         if (!$module = $this->getModule($path, false)) {
-            $this->log("The #$cid request's path [$path] route handler not exists.", 'error');
+            $this->log("The #$cid request's path [$path] route handler not exists.", [],'error');
 
             $this->fire(self::EVT_NO_MODULE, [$cid, $path, $this]);
 
@@ -252,13 +252,15 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         $path = trim($path) ?: '/';
         $pattern = '/^\/[a-zA-Z][\w-]+$/';
 
-        if ($path !== '/' && preg_match($pattern, $path)) {
-            throw new \InvalidArgumentException("The route path format must be match: $pattern");
+        if ($path !== '/' && 1 !== preg_match($pattern, $path)) {
+            throw new \InvalidArgumentException("The route path[$path] format must be match: $pattern");
         }
 
         if (!$replace && $this->hasModule($path)) {
-            throw new \InvalidArgumentException("The route path [$path] have been registered!");
+            throw new \InvalidArgumentException("The route path[$path] have been registered!");
         }
+
+        $this->log("register the ws module for path: $path, module: {$module->getName()}, class: " . get_class($module));
 
         $this->modules[$path] = $module;
 
@@ -279,7 +281,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      * @param bool $throwError
      * @return ModuleInterface
      */
-    public function getModule(string $path = '/', $throwError = true): ModuleInterface
+    public function getModule(string $path = '/', $throwError = true): ?ModuleInterface
     {
         if (!$this->hasModule($path)) {
             if ($throwError) {

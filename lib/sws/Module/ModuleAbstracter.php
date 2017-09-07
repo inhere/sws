@@ -91,12 +91,12 @@ abstract class ModuleAbstracter implements ModuleInterface
     ];
 
     /**
-     * ARouteHandler constructor.
-     * @param string $name
+     * the constructor.
      * @param array $options
+     * @param string $name
      * @param DataParserInterface|null $dataParser
      */
-    public function __construct($name = null, array $options = [], DataParserInterface $dataParser = null)
+    public function __construct(array $options = [], $name = null, DataParserInterface $dataParser = null)
     {
         $this->setOptions($options);
 
@@ -230,7 +230,7 @@ abstract class ModuleAbstracter implements ModuleInterface
         // parse: get command and real data
         if ($results = $this->getDataParser()->parse($data, $cid, $this)) {
             list($command, $data) = $results;
-            $command = $command ?: $this->getOption('defaultCmd') ?? self::DEFAULT_CMD;
+            $command = $command ?: $this->options['defaultCmd'] ?: self::DEFAULT_CMD;
             $this->log("The #{$cid} request command is: $command, in route: $route, module: $name, handler: " . static::class);
         } else {
             $command = self::PARSE_ERROR;
@@ -405,7 +405,7 @@ abstract class ModuleAbstracter implements ModuleInterface
             $name = substr($className, 0, -6) ?: $className;
         }
 
-        return $name;
+        return lcfirst($name);
     }
 
     /**

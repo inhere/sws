@@ -48,7 +48,7 @@ class JsonDataParser implements DataParserInterface
         if (json_last_error() > 0) {
             $errMsg = json_last_error_msg();
 
-            $module->log("The #{$index} request data parse to json failed! MSG: {$errMsg}, Data: {$temp}", 'error');
+            $module->log("The #{$index} request data parse to json failed! MSG: {$errMsg}, Data: {$temp}", [], 'error');
 
             return false;
         }

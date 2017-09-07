@@ -105,4 +105,6 @@ interface ModuleInterface
      * @return Application
      */
     public function getApp(): Application;
+
+    public function getName(): string;
 }

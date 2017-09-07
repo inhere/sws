@@ -35,9 +35,10 @@ class EchoModule extends ModuleAbstracter
     /**
      * index command
      * the default command
+     * @param $data
      */
-    public function indexCommand()
+    public function indexCommand($data)
     {
-        $this->respond('hello, welcome to here!');
+        $this->respondText('you input: ' . $data);
     }
 }

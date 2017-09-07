@@ -220,10 +220,6 @@
       padding: 0;
     }
 
-    .message-wrapper .card-footer {
-      padding: .5rem 1.25rem;
-    }
-
     .message-list {
       overflow-y: auto;
       height: 350px;
@@ -248,19 +244,6 @@
       border: 1px solid #e9ecef;
       border-radius: 3px;
       background-color: #f1f1f1;
-    }
-
-    #message {
-      margin: 5px 0 10px;
-    }
-
-    .message-tool {
-
-    }
-
-    .log-list {
-      max-height: 500px;
-      overflow: auto;
     }
   </style>
 </head>
@@ -363,7 +346,7 @@
                 <div slot="footer">
 
                   <div class="message-tool">
-                    <b-button size="sm" variant="light" :disabled="!messages.length" @click="clear" title="清空消息"><span
+                    <b-button size="sm" variant="info" :disabled="disabled.clear" @click="clear" title="清空消息"><span
                       class="oi oi-trash"></span></b-button>
                   </div>
 
@@ -373,6 +356,7 @@
                                    placeholder="Enter something"
                                    :rows="3"
                                    :max-rows="6"
+                                   style="margin: 10px 0;"
                   >
                   </b-form-textarea>
 
@@ -396,7 +380,7 @@
               >
                 <h6 slot="header" class="mb-0"><span class="oi oi-grid-three-up"></span> 运行日志</h6>
 
-                <div class="log-list">
+                <div id="log-box">
                   <div v-for="log in logs">
                     <span class="text-secondary">({{ log.time }})</span> <code>{{ log.msg }}</code>
                   </div>
@@ -404,7 +388,7 @@
 
 
                 <div slot="footer">
-                  <b-button size="sm" variant="light" :disabled="!logs.length" @click="clearLog" title="清空日志"><span
+                  <b-button size="sm" variant="info" :disabled="disabled.clear" @click="clearLog" title="清空日志"><span
                     class="oi oi-trash"></span></b-button>
                 </div>
               </b-card>
@@ -417,8 +401,8 @@
             <div>
               <b-nav>
                 <b-nav-item href="http://yzone.net" target="_blank">Yzone.net</b-nav-item>
-                <b-nav-item href="https://github.com/inhere" target="_blank">Github</b-nav-item>
                 <b-nav-item>Link</b-nav-item>
+                <b-nav-item>Another Link</b-nav-item>
                 <b-nav-item disabled>Disabled</b-nav-item>
               </b-nav>
             </div>
@@ -580,7 +564,8 @@
         disabled: {
           connect: false,
           disconnect: true,
-          send: true
+          send: true,
+          clear: true
         },
         alertMsg: null,
         alertType: 'info',
@@ -615,7 +600,7 @@
         this.connection = app
 
         // do something
-        this.printLog('connect', 'Success connect to the server ' + this.wsUrl)
+        this.showMsg('Success connect to the server ' + this.wsUrl, 'success')
         this.disabled = {
           connect: true,
           disconnect: false,
@@ -631,13 +616,11 @@
 
         this.connection.close()
 
-        // do something
-        // this.showMsg('Connection has been closed.')
-        this.printLog('disconnect', 'disconnect from the server ' + this.wsUrl)
         this.disabled = {
           connect: false,
           disconnect: true,
-          send: true
+          send: true,
+          clear: true
         }
       },
       onMessage(data, app) {

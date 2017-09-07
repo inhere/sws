@@ -47,29 +47,46 @@ EventEmitter.prototype.clearEvents = function () {
  **********************************************************/
 
 /*******************基础部分*********************/
+
+/**
+ * SwSocket
+ * @param options
+ * @constructor
+ */
 function SwSocket(options) {
   /**
-   *
-   * @type {*}
+   * 选项
+   * @type {object}
    */
-  this.options = options || {}
+  this.options = Object.assign({
+    defaultRoute: null,
+    noFoundRoute: null,
+    reconnect: true
+  }, options)
 
   /**
+   * server 地址
    * @type {string}
    */
   this.url = null
 
   /**
-   *
+   * WS 连接
    * @type {WebSocket}
    */
   this.ws = null
 
-  //所在房间
+  // 所在房间
   this.room = ""
 
-  //接收文件时用于暂存接收文件
+  // 接收文件时用于暂存接收文件
   this.fileData = {}
+
+  /**
+   * routes map
+   * @type {Object}
+   */
+  this.routes = {}
 }
 
 //继承自事件处理器，提供绑定事件和触发事件的功能
@@ -77,29 +94,41 @@ SwSocket.prototype = new EventEmitter()
 
 /*************************服务器连接部分***************************/
 
+/**
+ *
+ * @param {string} host
+ * @param {int}    port
+ * @param {string} protocol
+ */
 SwSocket.prototype.connect = function (host, port, protocol = 'ws') {
   this.connectByUrl(protocol + '://' + host + (port ? ':' + port : ''))
 }
 
+// e.g `ws://domain.com/chat`
+SwSocket.prototype.reconnect = function () {
+  if (this.url) {
+    this.createByUrl(this.url)
+  }
+}
+
 SwSocket.prototype.connectByUrl = function (url, room) {
-  let ws,
-    that = this
-  room = room || ""
+  let ws, that = this
 
   this.url = url
   ws = this.ws = new WebSocket(url)
-  
+  room = this.room = room || ""
+
   ws.onopen = function (event) {
     debug("OPEN: 连接服务器成功", event)
 
-    ws.send(this.jsonEncode({
+    ws.send(JSON.stringify({
       "eventName": "__join",
       "data": {
         "room": room
       }
     }))
     
-    that.fire("ws_opened", ws)
+    that.fire("opened", ws)
   }
 
   ws.onmessage = function (event) {
@@ -110,14 +139,16 @@ SwSocket.prototype.connectByUrl = function (url, room) {
 
     try {
       data = JSON.parse(data)
+
+      // if (data.command) {
+      //   that.fire(data.command, data, ws)
+      // } else {
+      //   that.fire("json_message", data, ws)
+      // }
+
+      that.dispatch(data)
     } catch (err) {
       that.fire("text_message", event.data, ws)
-    }
-
-    if (data.event) {
-      that.fire(data.event, data, ws)
-    } else {
-      that.fire("json_message", data, ws)
     }
   }
 
@@ -132,13 +163,25 @@ SwSocket.prototype.connectByUrl = function (url, room) {
     that.fire('closed', ws, event)
   }
 
-  this.on('_peers', function (data) {
-    //获取所有服务器上的
-    that.connections = data.connections
-    that.me = data.you
-    that.fire("get_peers", that.connections)
-    that.fire('connected', ws)
-  })
+  this.dispatch = function (data) {
+    try {
+      if (data.command) {
+        let cmd = data.command
+
+        if (this.routes[cmd]) {
+          let handler = this.routes[cmd]
+          handler(data, this)
+        } else {
+          this.fire('notFound', cmd)
+        }
+      } else {
+        this.fire("json_message", data, this)
+      }
+    } catch (err) {
+      console.log(err)
+      this.fire('error', 'dispatch ERROR:' + err.message)
+    }
+  }
 }
 
 SwSocket.prototype.send = function (data) {
@@ -150,7 +193,7 @@ SwSocket.prototype.send = function (data) {
   }
 
   if (ws.readyState === ws.CLOSED) {
-    this.fire('error', 'connect is closed')
+    this.fire('error', 'connection has been closed')
     return
   }
 
@@ -168,15 +211,18 @@ SwSocket.prototype.close = function () {
   ws.close()
 }
 
-SwSocket.prototype.jsonEncode = function (data) {
-  return JSON.stringify(data)
-}
+SwSocket.prototype.readImage = function (evt) {
+  let reader = new FileReader()
 
-/**
- * @param data {string}
- */
-SwSocket.prototype.jsonDecode = function (data) {
-  return JSON.parse(data)
+  reader.onload = function(event) {
+    let contents = event.target.result
+    let a = new Image()
+    a.src = contents
+
+    document.body.appendChild(a)
+  }
+
+  reader.readAsDataURL(evt.data)
 }
 
 SwSocket.prototype.destroy = function () {
@@ -185,4 +231,39 @@ SwSocket.prototype.destroy = function () {
   if (ws) {
     ws.onmessage = ws.onclose = ws.onerror = null;
   }
+
+  this.clearEvents()
 }
+
+SwSocket.prototype.command = function (route, cb) {
+  this.routes[route] = cb
+}
+
+SwSocket.prototype.commands = function (routes) {
+  const app = this
+
+  Object.keys(routes).forEach(function (route) {
+    app.routes[route] = routes[route]
+  })
+}
+
+
+/*
+ function heartbeat() {
+ this.isAlive = true;
+ }
+
+ wss.on('connection', function connection(ws) {
+ ws.isAlive = true;
+ ws.on('pong', heartbeat);
+ });
+
+ const interval = setInterval(function ping() {
+ wss.clients.forEach(function each(ws) {
+ if (ws.isAlive === false) return ws.terminate();
+
+ ws.isAlive = false;
+ ws.ping('', false, true);
+ });
+ }, 30000);
+ */

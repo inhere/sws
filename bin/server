@@ -7,17 +7,20 @@ define('BASE_PATH', dirname(__DIR__) );
 
 require dirname(__DIR__) . '/boot/web.php';
 
-$mgr = $di->get('app');
-//$mgr = new \Sws\server\WebSocketServer($config);
-//$mgr = new \inhere\server\BoxServer($config);
+$app = $di->get('app');
+//$app = new \Sws\server\WebSocketServer($config);
+//$app = new \inhere\server\BoxServer($config);
 
-$mgr->attachListener('port2', new \inhere\server\portListeners\UdpListener([
+$app->attachListener('port2', new \inhere\server\portListeners\UdpListener([
     'host' => '0.0.0.0',
     'port' => '9762',
 ]));
 
+// load ws modules
+require dirname(__DIR__) . '/app/Ws/modules.php';
+
 /**
  * do run
- * @var Application $mgr
+ * @var Application $app
  */
-$mgr->run();
+$app->run();

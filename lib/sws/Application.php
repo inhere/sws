@@ -127,7 +127,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         try {
             /** @var RouteDispatcher $dispatcher */
-            $dispatcher = $this->di->get('routeDispatcher');
+            $dispatcher = $this->di->get('httpDispatcher');
             $context = HttpContext::make($swRequest, $swResponse);
 
             $uri = $uri ?: $swRequest->server['request_uri'];

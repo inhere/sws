@@ -2,6 +2,7 @@
 <?php
 
 use Sws\Application;
+use Sws\Rpc\RpcPortListener;
 
 define('BASE_PATH', dirname(__DIR__) );
 
@@ -11,10 +12,12 @@ $app = $di->get('app');
 //$app = new \Sws\server\WebSocketServer($config);
 //$app = new \inhere\server\BoxServer($config);
 
-$app->attachListener('port2', new \inhere\server\portListeners\UdpListener([
+$rpcServer = new RpcPortListener([
     'host' => '0.0.0.0',
     'port' => '9762',
-]));
+]);
+
+$app->attachListener('rpc', $rpcServer);
 
 // load ws modules
 require dirname(__DIR__) . '/app/Ws/modules.php';

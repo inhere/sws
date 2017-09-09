@@ -2,7 +2,7 @@
 <?php
 
 use Sws\Application;
-use Sws\Rpc\RpcPortListener;
+use Sws\Rpc\Application as RpcApp;
 
 define('BASE_PATH', dirname(__DIR__) );
 
@@ -12,7 +12,7 @@ $app = $di->get('app');
 //$app = new \Sws\server\WebSocketServer($config);
 //$app = new \inhere\server\BoxServer($config);
 
-$rpcServer = new RpcPortListener([
+$rpcServer = new RpcApp([
     'host' => '0.0.0.0',
     'port' => '9762',
 ]);

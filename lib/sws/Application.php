@@ -223,12 +223,16 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         // dispatch command
 
-        $result = $this->getModule($conn->getPath())->dispatch($frame->data, $conn);
+        try {
+            $module = $this->getModule($conn->getPath());
+            $result = $module->dispatch($frame->data, $conn);
 
-        if ($result && is_string($result)) {
-            $this->send($result);
+            if ($result && is_string($result)) {
+                $this->send($result);
+            }
+        } catch (\Throwable $e) {
+            throw $e;
         }
-
 //        return;
     }
 

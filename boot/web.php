@@ -9,8 +9,8 @@
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
 use inhere\libraryPlus\web\ViewRenderer;
+use inhere\server\rpc\RpcDispatcher;
 use inhere\sroute\ORouter;
-use Sws\Rpc\RpcDispatcher;
 use Sws\Web\RouteDispatcher;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -52,9 +52,6 @@ $di->set('rpcRouter', function () {
         'tmpCacheNumber' => 200,
     ]);
 
-    // register routes
-    require BASE_PATH . '/app/rpc/routes.php';
-
     return $router;
 });
 
@@ -62,14 +59,11 @@ $di->set('rpcDispatcher', function (Container $di) {
     $dispatcher = new RpcDispatcher([
         'filterFavicon' => true,
         'dynamicAction' => true,
-        RpcDispatcher::ON_NOT_FOUND => '/404'
+        RpcDispatcher::ON_NOT_FOUND => 'noService'
     ]);
 
-    $router = $di->get('rpcRouter');
-
-    $dispatcher->setMatcher(function ($path, $method) use($router) {
-        return $router->match($path, $method);
-    });
+    // register services
+    require BASE_PATH . '/app/rpc/services.php';
 
     return $dispatcher;
 }, [

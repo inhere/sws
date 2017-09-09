@@ -14,7 +14,7 @@ namespace App\Rpc;
  */
 class TestService
 {
-    public function demoAction()
+    public function index()
     {
         return 'hello, this is ' . __METHOD__;
     }

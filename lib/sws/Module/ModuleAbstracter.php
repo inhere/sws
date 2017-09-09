@@ -234,7 +234,11 @@ abstract class ModuleAbstracter implements ModuleInterface
         // parse: get command and real data
         if ($results = $this->getDataParser()->parse($data, $cid, $this)) {
             list($command, $data) = $results;
-            $command = $command ?: $this->options['defaultCmd'] ?: self::DEFAULT_CMD;
+
+            if (!$command) {
+                $command = $this->options['defaultCmd'] ?: self::DEFAULT_CMD;
+            }
+
             $this->log("The #{$cid} request command is: $command, in route: $route, module: $name, handler: " . static::class);
         } else {
             $command = self::PARSE_ERROR;

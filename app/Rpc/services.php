@@ -5,14 +5,14 @@
  * Date: 2017/9/3
  * Time: 上午1:08
  *
- * @var $router  \inhere\sroute\ORouter
+ * @var $dispatcher  \inhere\server\rpc\RpcDispatcher
  */
 
 use App\Rpc\TestService;
 
-$router->any('/', function () {
+$dispatcher->add('demo', function () {
     return 'hello';
 });
 
-$router->any('/test', TestService::class . '@demoAction');
+$dispatcher->add('test', TestService::class);
 

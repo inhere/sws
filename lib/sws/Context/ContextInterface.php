@@ -30,4 +30,8 @@ interface ContextInterface
      * destroy something ...
      */
     public function destroy();
+
+    public function getRequest();
+
+    public function getResponse();
 }

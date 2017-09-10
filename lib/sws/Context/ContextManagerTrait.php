@@ -11,28 +11,23 @@ namespace Sws\Context;
 /**
  * Class ContextManagerTrait
  * @package Sws\Context
- * 
- * @property array $contextMap
- * [
- *  id => ContextInterface
- * ]
  */
 trait ContextManagerTrait
 {
     /**
      * @var ContextInterface[]
      * [
-     *  id => Context
+     *  id => ContextInterface
      * ]
      */
-//    protected static $contextMap = [];
+    protected static $contextMap = [];
 
     /**
      * @return int
      */
     public static function count()
     {
-        return count(static::$contextMap);
+        return count(self::$contextMap);
     }
 
     /**
@@ -41,7 +36,7 @@ trait ContextManagerTrait
      */
     public static function hasContext($id)
     {
-        return isset(static::$contextMap[$id]);
+        return isset(self::$contextMap[$id]);
     }
 
     /**
@@ -49,7 +44,7 @@ trait ContextManagerTrait
      */
     public static function addContext(ContextInterface $context)
     {
-        static::$contextMap[$context->getId()] = $context;
+        self::$contextMap[$context->getId()] = $context;
     }
 
     /**
@@ -58,7 +53,7 @@ trait ContextManagerTrait
      */
     public static function getContext($id)
     {
-        return static::$contextMap[$id] ?? null;
+        return self::$contextMap[$id] ?? null;
     }
 
     /**
@@ -77,8 +72,8 @@ trait ContextManagerTrait
             $id = $id->getId();
         }
 
-        if ($ctx = static::getContext($id)) {
-            unset(static::$contextMap[$id]);
+        if ($ctx = self::getContext($id)) {
+            unset(self::$contextMap[$id]);
         }
 
         return $ctx;
@@ -89,7 +84,7 @@ trait ContextManagerTrait
      */
     public static function getContextMap(): array
     {
-        return static::$contextMap;
+        return self::$contextMap;
     }
 
     /**
@@ -97,6 +92,6 @@ trait ContextManagerTrait
      */
     public static function setContextMap(array $contextMap)
     {
-        static::$contextMap = $contextMap;
+        self::$contextMap = $contextMap;
     }
 }

@@ -3,24 +3,19 @@
  * Created by PhpStorm.
  * User: inhere
  * Date: 2017-09-11
- * Time: 11:09
+ * Time: 17:10
  */
 
 namespace Sws\Annotations;
 
-use Doctrine\Common\Annotations\Annotation\Target;
-
 /**
- * Class RoutePrefix
+ * Class Model - mark class is an model class
  * @package Sws\Annotations
  *
  * @Annotation
  * @Target("CLASS")
  */
-class RoutePrefix
+class Model
 {
-    /**
-     * @var string
-     */
-    public $value = '';
+    
 }

@@ -2,41 +2,36 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2017-08-31
- * Time: 9:43
+ * Date: 2017-09-11
+ * Time: 17:10
  */
 
 namespace Sws\Annotations;
 
-use Doctrine\Common\Annotations\Annotation\Required;
-use Doctrine\Common\Annotations\Annotation\Target;
-
 /**
- * Class Route RouteDocBlock
+ * Class Controller
  * @package Sws\Annotations
  *
  * @Annotation
- * @Target("METHOD")
+ * @Target("CLASS")
  */
-final class Route
+class Controller
 {
+    // normal controller
+    const NORM = 1;
+    // restFul controller
+    const REST = 2;
+
     /**
-     * the route path
      * @var string
-     * @Required()
      */
-    public $path = '';
+    public $type = self::NORM;
 
     /**
-     * -Enum({"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"})
-     * @var string|array
+     * the route prefix path
+     * @var string
      */
-    public $method = 'GET';
-
-    /**
-     * @var array
-     */
-    public $tokens = [];
+    public $prefix = '';
 
     /**
      * on enter
@@ -57,10 +52,10 @@ final class Route
     public function __construct(array $values)
     {
         if (isset($values['value'])) {
-            $this->path = $values['value'];
+            $this->prefix = $values['value'];
         }
 
-        foreach (['path', 'method', 'enter', 'leave', 'tokens'] as $name) {
+        foreach (['prefix', 'type', 'enter', 'leave'] as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

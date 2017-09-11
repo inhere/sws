@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: inhere
  * Date: 2017-09-11
- * Time: 13:53
+ * Time: 16:36
  */
 
 namespace Sws\Annotations;
@@ -11,13 +11,13 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Inject
+ * Class Service
  * @package Sws\Annotations
  *
  * @Annotation
- * @Target({"PROPERTY", "METHOD"})
+ * @Target("CLASS")
  */
-class Inject
+class Service
 {
     /**
      * @var string

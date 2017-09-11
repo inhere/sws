@@ -8,11 +8,10 @@
 
 namespace Sws\Rpc;
 
-use inhere\library\di\Container;
 use Inhere\Server\Rpc\JsonParser;
-use Inhere\Server\Rpc\ParserInterface;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Inhere\Server\Rpc\RpcServerListener;
+use Inhere\Server\Rpc\TextParser;
 use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Sws\ApplicationInterface;
@@ -24,20 +23,23 @@ use Sws\ApplicationInterface;
 class Application extends RpcServerListener implements ApplicationInterface
 {
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $di;
 
     /**
      * {@inheritDoc}
      */
-    public function __construct(array $options = [], ParserInterface $parser = null)
+    public function __construct(array $options = [])
     {
         \Sws::$app = $this;
 
-        $this->parser = $parser ?: new JsonParser();
-
         parent::__construct($options);
+
+        $this->setParsers([
+            new JsonParser(),
+            new TextParser(),
+        ]);
     }
 
     /**

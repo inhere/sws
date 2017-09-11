@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: inhere
  * Date: 2017-09-11
- * Time: 13:53
+ * Time: 16:36
  */
 
 namespace Sws\Annotations;
@@ -11,18 +11,23 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Inject
+ * Class Component - mark class is an Component of the DI container
  * @package Sws\Annotations
  *
  * @Annotation
- * @Target({"PROPERTY", "METHOD"})
+ * @Target("CLASS")
  */
-class Inject
+class Component
 {
     /**
      * @var string
      */
     public $name = '';
+
+    /**
+     * @var bool
+     */
+    public $shared = true;
 
     /**
      * Object constructor.
@@ -34,6 +39,10 @@ class Inject
             $this->name = $values['value'];
         } elseif (isset($values['name'])) {
             $this->name = $values['name'];
+        }
+
+        if (isset($values['shared'])) {
+            $this->shared = (bool)$values['shared'];
         }
     }
 }

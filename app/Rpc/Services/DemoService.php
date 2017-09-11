@@ -11,13 +11,13 @@ namespace App\Rpc;
 use Sws\Annotations\Service;
 
 /**
- * Class TestService
+ * Class DemoService
  *
  * @package App\Rpc
  *
- * @Service("test")
+ * @Service()
  */
-class TestService
+class DemoService
 {
     public function index()
     {

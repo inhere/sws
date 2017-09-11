@@ -11,13 +11,13 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Inject
+ * Class DI
  * @package Sws\Annotations
  *
  * @Annotation
  * @Target({"PROPERTY", "METHOD"})
  */
-class Inject
+class DI
 {
     /**
      * @var string

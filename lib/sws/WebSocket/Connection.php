@@ -11,8 +11,8 @@ namespace Sws\WebSocket;
 use inhere\library\StdObject;
 use inhere\library\traits\ArrayAccessByPropertyTrait;
 use Sws\Components\HttpHelper;
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
 use Traversable;
 
 use Swoole\Http\Request as SwRequest;

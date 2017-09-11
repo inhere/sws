@@ -7,14 +7,14 @@
  */
 
 use inhere\library\collections\SimpleCollection;
-use Sws\Annotations\Component;
+use Sws\Annotations\Service;
 use Sws\Annotations\Controller;
 use Sws\Annotations\DI;
 use Sws\Annotations\Inject;
 use Sws\Annotations\Route;
+use Sws\Annotations\RpcService;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Sws\Annotations\Service;
 
 // AnnotationRegistry::registerFile("/path/to/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
 
@@ -28,8 +28,8 @@ AnnotationReader::addGlobalIgnoredName('foo');
 /**
  * Class DocBlockExample
  *
- * @Component("c1", shared="1")
- * @Service("ann")
+ * @Service("c1", shared="1")
+ * @RpcService("ann")
  * @Controller("/test", type=Controller::REST)
  * @package test
  */

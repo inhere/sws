@@ -8,6 +8,8 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Annotation\Target;
+
 /**
  * Class Dao - mark class is an DAO class
  * @package Sws\Annotations
@@ -15,7 +17,7 @@ namespace Sws\Annotations;
  * @Annotation
  * @Target("CLASS")
  */
-class Dao
+final class Dao
 {
-    
+
 }

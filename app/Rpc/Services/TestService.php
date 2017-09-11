@@ -8,14 +8,14 @@
 
 namespace App\Rpc;
 
-use Sws\Annotations\Service;
+use Sws\Annotations\RpcService;
 
 /**
  * Class TestService
  *
  * @package App\Rpc
  *
- * @Service("test")
+ * @RpcService("test")
  */
 class TestService
 {

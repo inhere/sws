@@ -14,8 +14,8 @@ use Sws\Application;
 use Sws\DataParser\JsonDataParser;
 use Sws\DataParser\DataParserInterface;
 use Sws\WebSocket\Connection;
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
 use Sws\WebSocket\Message;
 
 /**

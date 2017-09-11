@@ -8,9 +8,13 @@
 
 namespace App\Ws\Modules;
 
+use Sws\Annotations\WsModule;
+
 /**
  * Class ChatModule
  * @package App\Ws\Modules
+ *
+ * @WsModule("chat", path="/chat")
  */
 class ChatModule extends \Sws\Module\ChatModule
 {

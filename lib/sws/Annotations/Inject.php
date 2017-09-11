@@ -17,7 +17,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target({"PROPERTY", "METHOD"})
  */
-class Inject
+final class Inject
 {
     /**
      * @var string

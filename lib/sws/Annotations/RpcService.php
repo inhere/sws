@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: inhere
  * Date: 2017-09-11
- * Time: 17:10
+ * Time: 16:36
  */
 
 namespace Sws\Annotations;
@@ -11,23 +11,18 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Model - mark class is an model class
+ * Class Service
  * @package Sws\Annotations
  *
  * @Annotation
  * @Target("CLASS")
  */
-final class Model
+final class RpcService
 {
     /**
      * @var string
      */
-    public $name;
-
-    /**
-     * @var string
-     */
-    public $table;
+    public $name = '';
 
     /**
      * Object constructor.
@@ -37,12 +32,8 @@ final class Model
     {
         if (isset($values['value'])) {
             $this->name = $values['value'];
-        }
-
-        foreach (['name', 'table'] as $name) {
-            if (isset($values[$name])) {
-                $this->$name = $values[$name];
-            }
+        } elseif (isset($values['name'])) {
+            $this->name = $values['name'];
         }
     }
 }

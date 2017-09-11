@@ -2,22 +2,23 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2017-09-11
- * Time: 17:10
+ * Date: 2017/9/11
+ * Time: 下午11:15
  */
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Model - mark class is an model class
+ * Class WsModule
  * @package Sws\Annotations
  *
  * @Annotation
  * @Target("CLASS")
  */
-final class Model
+final class WsModule
 {
     /**
      * @var string
@@ -26,8 +27,9 @@ final class Model
 
     /**
      * @var string
+     * @Required()
      */
-    public $table;
+    public $path;
 
     /**
      * Object constructor.
@@ -39,7 +41,7 @@ final class Model
             $this->name = $values['value'];
         }
 
-        foreach (['name', 'table'] as $name) {
+        foreach (['name', 'path'] as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

@@ -8,26 +8,33 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Component - mark class is an Component of the DI container
+ * Class Service - mark class is an Service of the DI container
  * @package Sws\Annotations
  *
  * @Annotation
  * @Target("CLASS")
  */
-class Component
+final class Service
 {
     /**
+     * @Required()
      * @var string
      */
-    public $name = '';
+    public $name;
 
     /**
      * @var bool
      */
     public $shared = true;
+
+    /**
+     * @var array
+     */
+    public $alias;
 
     /**
      * Object constructor.
@@ -39,6 +46,10 @@ class Component
             $this->name = $values['value'];
         } elseif (isset($values['name'])) {
             $this->name = $values['name'];
+        }
+
+        if (isset($values['alias'])) {
+            $this->alias = $values['alias'];
         }
 
         if (isset($values['shared'])) {

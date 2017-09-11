@@ -9,8 +9,8 @@
 namespace Sws\Module;
 
 use Sws\Application;
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
 use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
 

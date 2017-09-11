@@ -8,13 +8,43 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Annotation\Required;
+use Doctrine\Common\Annotations\Annotation\Target;
+
 /**
- * Class AopDocBlock
+ * Class AopPoint
  * @package Sws\Annotations
  *
- * @usage see examples/aop.php
+ * @Annotation
+ * @Target({"CLASS", "METHOD"})
  */
-class AopDocBlock
+final class AopPoint
 {
+    /**
+     * @var string
+     * @Required()
+     */
+    public $name;
 
+    /**
+     * @var string
+     */
+    public $handler;
+
+    /**
+     * Object constructor.
+     * @param array $values
+     */
+    public function __construct(array $values)
+    {
+        if (isset($values['value'])) {
+            $this->name = $values['value'];
+        }
+
+        foreach (['name', 'handler'] as $name) {
+            if (isset($values[$name])) {
+                $this->$name = $values[$name];
+            }
+        }
+    }
 }

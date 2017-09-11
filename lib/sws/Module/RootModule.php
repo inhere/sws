@@ -8,8 +8,8 @@
 
 namespace Sws\Module;
 
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
 
 /**
  * Class RootHandler

@@ -8,6 +8,8 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Annotation\Target;
+
 /**
  * Class Controller
  * @package Sws\Annotations
@@ -15,7 +17,7 @@ namespace Sws\Annotations;
  * @Annotation
  * @Target("CLASS")
  */
-class Controller
+final class Controller
 {
     // normal controller
     const NORM = 1;

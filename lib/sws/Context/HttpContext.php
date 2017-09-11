@@ -9,8 +9,8 @@
 namespace Sws\Context;
 
 use Swoole\Coroutine;
-use Sws\Http\Request;
-use Sws\Http\Response;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
 
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;

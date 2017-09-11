@@ -17,7 +17,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target({"PROPERTY", "METHOD"})
  */
-class DI
+final class DI
 {
     /**
      * @var string

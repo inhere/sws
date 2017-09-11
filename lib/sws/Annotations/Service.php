@@ -37,6 +37,11 @@ final class Service
     public $alias;
 
     /**
+     * @var bool
+     */
+    public $activate = true;
+
+    /**
      * Object constructor.
      * @param array $values
      */
@@ -49,11 +54,15 @@ final class Service
         }
 
         if (isset($values['alias'])) {
-            $this->alias = $values['alias'];
+            $this->alias = (array)$values['alias'];
         }
 
         if (isset($values['shared'])) {
             $this->shared = (bool)$values['shared'];
+        }
+
+        if (isset($values['activate'])) {
+            $this->activate = (bool)$values['activate'];
         }
     }
 }

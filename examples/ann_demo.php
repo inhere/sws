@@ -28,7 +28,7 @@ AnnotationReader::addGlobalIgnoredName('foo');
 /**
  * Class DocBlockExample
  *
- * @Service("c1", shared="1")
+ * @Service("db", shared="1", alias={"database","myDb"})
  * @RpcService("ann")
  * @Controller("/test", type=Controller::REST)
  * @package test

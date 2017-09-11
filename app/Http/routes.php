@@ -2,7 +2,7 @@
 /**
  * Routes
  *
- * @var $router  \inhere\sroute\ORouter
+ * @var $router \Inhere\Route\ORouter
  */
 
 use App\Http\Controllers\HomeController;

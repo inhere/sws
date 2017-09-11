@@ -9,10 +9,10 @@
 namespace Sws\Rpc;
 
 use inhere\library\di\Container;
-use inhere\server\rpc\JsonParser;
-use inhere\server\rpc\ParserInterface;
-use inhere\server\rpc\RpcDispatcher;
-use inhere\server\rpc\RpcServerListener;
+use Inhere\Server\Rpc\JsonParser;
+use Inhere\Server\Rpc\ParserInterface;
+use Inhere\Server\Rpc\RpcDispatcher;
+use Inhere\Server\Rpc\RpcServerListener;
 use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Sws\ApplicationInterface;
@@ -67,13 +67,14 @@ class Application extends RpcServerListener implements ApplicationInterface
 
     /**
      * @param Server $server
-     * @param string $text
+     * @param string $buffer
+     * @param int $fd
      * @throws \Throwable
      */
-    protected function handleRpcRequest(Server $server, $text, $fd)
+    protected function handleRpcRequest(Server $server, $buffer, $fd)
     {
         try {
-            $request = $this->parser->decode($text);
+            $request = $this->parser->decode($buffer);
 
             /** @var RpcDispatcher $dispatcher */
             $dispatcher = $this->di->get('httpDispatcher');

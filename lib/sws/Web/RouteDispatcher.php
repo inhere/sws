@@ -8,7 +8,7 @@
 
 namespace Sws\Web;
 
-use inhere\sroute\Dispatcher;
+use Inhere\Route\Dispatcher;
 use Sws\Context\HttpContext;
 
 /**

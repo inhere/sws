@@ -6,11 +6,11 @@
  * Time: 9:54
  */
 
-namespace Sws\annotations;
+namespace Sws\Annotations;
 
 /**
  * Class AopDocBlock
- * @package Sws\annotations
+ * @package Sws\Annotations
  *
  * @usage see examples/aop.php
  */

@@ -5,6 +5,7 @@
  * Date: 2017-08-31
  * Time: 10:04
  */
+use Sws\annotations\Route;
 
 /**
  * Class DocBlockExample
@@ -19,6 +20,8 @@ class DocBlockExample
      *
      * @method('GET')
      * @route('index')
+     *
+     * @Route("index", method="GET")
      */
     public function indexAction()
     {

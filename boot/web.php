@@ -9,8 +9,8 @@
 use inhere\library\collections\Collection;
 use inhere\library\di\Container;
 use inhere\libraryPlus\web\ViewRenderer;
-use inhere\server\rpc\RpcDispatcher;
-use inhere\sroute\ORouter;
+use Inhere\Server\Rpc\RpcDispatcher;
+use inhere\Route\ORouter;
 use Sws\Web\RouteDispatcher;
 
 require dirname(__DIR__) . '/vendor/autoload.php';

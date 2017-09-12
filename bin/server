@@ -8,6 +8,9 @@ define('BASE_PATH', dirname(__DIR__) );
 
 require dirname(__DIR__) . '/boot/web.php';
 
+/**
+ * @var \Inhere\Server\BoxServer $app
+ */
 $app = $di->get('app');
 //$app = new \Sws\server\WebSocketServer($config);
 //$app = new \inhere\server\BoxServer($config);
@@ -19,8 +22,10 @@ $rpcServer = new RpcApp([
 
 $app->attachListener('rpc', $rpcServer);
 
-// load ws modules
-require dirname(__DIR__) . '/app/Ws/modules.php';
+$app->on(Application::ON_BOOTSTRAP, function ($app) {
+    // load ws modules
+    require dirname(__DIR__) . '/app/Ws/modules.php';
+});
 
 /**
  * do run

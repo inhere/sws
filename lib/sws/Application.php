@@ -37,7 +37,6 @@ use Sws\Web\RouteDispatcher;
  */
 class Application extends HttpServer implements WsServerInterface, ApplicationInterface
 {
-    use EventTrait;
     use WebSocketServerTrait;
 
     const DATA_JSON = 'json';

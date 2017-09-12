@@ -40,7 +40,7 @@ return [
             'port' => '9761',
             'type' => 'udp',
             // must setting the handler class in config.
-            'listener' => \inhere\server\portListeners\UdpListener::class,
+            'listener' => \Inhere\Server\PortListeners\UdpListener::class,
         ]
     ],
 

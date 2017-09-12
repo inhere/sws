@@ -7,6 +7,7 @@
  */
 
 use inhere\library\collections\SimpleCollection;
+use inhere\library\files\FileFinder;
 use Sws\Annotations\Service;
 use Sws\Annotations\Controller;
 use Sws\Annotations\DI;
@@ -15,9 +16,6 @@ use Sws\Annotations\Route;
 use Sws\Annotations\RpcService;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-
-$baseUri = 'http://www-testing.ugirls.com';
-var_dump($baseUri, preg_replace('/http[s]?:\/\/[\w-]+\./i','', $baseUri));die;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -59,6 +57,19 @@ class AnnExample
         // something ... ...
     }
 }
+
+$ff = new FileFinder([
+    'sourcePath' => dirname(__DIR__) . '/app/',
+    'include' => [
+        'ext' => ['php']
+    ]
+]);
+$ff->setFileFilter(function ($name) {
+    // 必须首字符大写(类文件)
+    return preg_match('/[A-Z]/', $name);
+});
+
+var_dump($ff->findAll(1)->getFiles());die;
 
 $annotationReader = new AnnotationReader();
 //Get class annotation

@@ -8,7 +8,6 @@
 
 namespace Sws\Context;
 
-use Swoole\Coroutine;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
@@ -41,16 +40,14 @@ class ContextManager
      */
     public static function getRequest($id = null, $thrError = true)
     {
-        if (!$id) {
-            $id = Coroutine::getuid();
-        }
+        $id = $id ?: Coroutine::tid();
 
         if ($ctx = self::getContext($id)) {
             return $ctx->getRequest();
         }
 
         if ($thrError) {
-            throw new \RuntimeException("the request context is not exists for [$id]");
+            throw new \RuntimeException("the request context is not exists for CoId:[$id]");
         }
 
         return null;
@@ -63,16 +60,14 @@ class ContextManager
      */
     public static function getResponse($id = null, $thrError = true)
     {
-        if (!$id) {
-            $id = Coroutine::getuid();
-        }
+        $id = $id ?: Coroutine::tid();
 
         if ($ctx = self::getContext($id)) {
             return $ctx->getResponse();
         }
 
         if ($thrError) {
-            throw new \RuntimeException("the request context is not exists for [$id]");
+            throw new \RuntimeException("the request context is not exists for CoId:[$id]");
         }
 
         return null;
@@ -99,8 +94,10 @@ class ContextManager
      * @param string|int $id
      * @return ContextInterface|null
      */
-    public static function getContext($id)
+    public static function getContext($id = null)
     {
+        $id = $id ?: Coroutine::tid();
+
         return self::$contextMap[$id] ?? null;
     }
 
@@ -110,11 +107,8 @@ class ContextManager
      */
     public static function delContext($id = null)
     {
-        if (!$id) {
-            $id = Coroutine::getuid();
-        }
-
         $ctx = null;
+        $id = $id ?: Coroutine::tid();
 
         if ($id instanceof ContextInterface) {
             $id = $id->getId();

@@ -70,6 +70,8 @@ abstract class Context implements ContextInterface
     public function destroy()
     {
         ContextManager::delContext($this->id);
+
+        $this->id = $this->key = null;
     }
 
     /**

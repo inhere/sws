@@ -8,7 +8,7 @@
 
 namespace Sws\Context;
 
-use Swoole\Coroutine;
+//use Swoole\Coroutine;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
@@ -76,7 +76,7 @@ class HttpContext extends Context
 
     protected function init()
     {
-        $id = Coroutine::getuid();
+        $id = Coroutine::id();
 
         $this->setId($id);
         $this->setKey(static::genKey($id));
@@ -85,6 +85,17 @@ class HttpContext extends Context
     public function getLogger()
     {
 
+    }
+
+    /**
+     * destroy
+     */
+    public function destroy()
+    {
+        parent::destroy();
+
+        $this->args = [];
+        $this->request = $this->response = $this->swRequest = $this->swResponse = null;
     }
 
     /*******************************************************************************

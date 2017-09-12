@@ -13,6 +13,7 @@ if (!defined('BASE_PATH')) {
 }
 
 use inhere\library\traits\PathAliasTrait;
+use Sws\Context\ContextManager;
 
 /**
  * Class BaseSws
@@ -38,11 +39,6 @@ abstract class BaseSws
      * @var \Sws\ApplicationInterface
      */
     public static $app;
-
-    /**
-     * @var array
-     */
-    private static $pool;
 
     /**
      * @return \Sws\ApplicationInterface
@@ -72,5 +68,36 @@ abstract class BaseSws
     public static function get($id)
     {
         return self::$app->get($id);
+    }
+
+    /*******************************************************************************
+     * request context
+     ******************************************************************************/
+
+    /**
+     * @param null|string|int $id
+     * @return null|Context\ContextInterface
+     */
+    public static function getContext($id = null)
+    {
+        return ContextManager::getContext($id);
+    }
+
+    /**
+     * @param null|string|int $id
+     * @return \Inhere\Http\Request|null
+     */
+    public static function getRequest($id = null)
+    {
+        return ContextManager::getRequest($id);
+    }
+
+    /**
+     * @param null|string|int $id
+     * @return \Inhere\Http\Response|null
+     */
+    public static function getResponse($id = null)
+    {
+        return ContextManager::getResponse($id);
     }
 }

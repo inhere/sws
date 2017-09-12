@@ -27,6 +27,11 @@ interface ContextInterface
     public function setId($id);
 
     /**
+     * @return string
+     */
+    public function getKey();
+
+    /**
      * destroy something ...
      */
     public function destroy();

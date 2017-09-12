@@ -16,7 +16,6 @@ use Inhere\Http\Response;
 use Inhere\Server\Helpers\StaticAccessHandler;
 use Inhere\Server\Servers\HttpServer;
 use Psr\Container\ContainerInterface;
-use Swoole\Coroutine;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 //use Swoole\Server;
@@ -122,9 +121,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse, $uri = null)
     {
-        $ctxId = Coroutine::getuid();
-        $ctxKey = HttpContext::genKey($ctxId);
-
         try {
             /** @var RouteDispatcher $dispatcher */
             $dispatcher = $this->di->get('httpDispatcher');
@@ -132,7 +128,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
             $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
-            $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: $ctxId, ctxKey: $ctxKey");
+            $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}");
 
             $resp = $dispatcher->setContext($context)->dispatch(parse_url($uri, PHP_URL_PATH), $method);
 
@@ -160,11 +156,9 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
-        $ctxId = Coroutine::getuid();
-        $ctxKey = HttpContext::genKey($ctxId);
-        ContextManager::delContext($ctxKey);
+        $ctx = ContextManager::delContext();
 
-        $this->log("The request end. fd: {$request->fd}, ctxId: $ctxId, ctxKey: $ctxKey, context count:" . ContextManager::count());
+        $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}, context count:" . ContextManager::count());
     }
 
     /**
@@ -225,7 +219,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         try {
             $module = $this->getModule($conn->getPath());
-            $result = $module->dispatch($frame->data, $conn);
+            $result = $module->dispatch($frame->data, $conn, $server);
 
             if ($result && is_string($result)) {
                 $this->send($result);

@@ -16,11 +16,12 @@ use Sws\Annotations\RpcService;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 
-// AnnotationRegistry::registerFile("/path/to/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
+$baseUri = 'http://www-testing.ugirls.com';
+var_dump($baseUri, preg_replace('/http[s]?:\/\/[\w-]+\./i','', $baseUri));die;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-// var_dump(new Route([]));
+// AnnotationRegistry::registerFile("/path/to/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
 // AnnotationRegistry::registerAutoloadNamespace("Sws\Annotations", dirname(__DIR__) . '/lib/sws/Annotations');
 AnnotationRegistry::registerLoader('class_exists');
 AnnotationReader::addGlobalIgnoredName('foo');

@@ -58,6 +58,11 @@ class AnnExample
     }
 }
 
+$conf = [
+//    'base namespace' => 'the real path',
+    'path' => 'App',
+];
+
 $ff = new FileFinder([
     'sourcePath' => dirname(__DIR__) . '/app/',
     'include' => [
@@ -69,7 +74,10 @@ $ff->setFileFilter(function ($name) {
     return preg_match('/[A-Z]/', $name);
 });
 
-var_dump($ff->findAll(1)->getFiles());die;
+$files = $ff->findAll(1)->getFiles();
+$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Rpc')->findAll(1)->getFiles();
+
+var_dump($files, $f2);die;
 
 $annotationReader = new AnnotationReader();
 //Get class annotation

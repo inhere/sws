@@ -30,6 +30,14 @@ class Collector
         return $this;
     }
 
+    /*
+     $clt->addPlate('ws', ['App\\Ws' => 'path']);
+     */
+    public function addPlate($name, array $namespaces)
+    {
+
+    }
+
     public function getAnnotations()
     {
 

@@ -15,16 +15,16 @@ namespace Sws\WebSocket;
 interface WsServerInterface
 {
     // some events
-    const EVT_WS_CONNECT = 'wsConnect';
-    const EVT_WS_OPEN = 'wsOpen';
-    const EVT_WS_DISCONNECT = 'wsDisconnect';
-    const EVT_HANDSHAKE_REQUEST = 'handshakeRequest';
-    const EVT_HANDSHAKE_SUCCESSFUL = 'handshakeSuccessful';
-    const EVT_WS_MESSAGE = 'wsMessage';
-    const EVT_WS_CLOSE = 'wsClose';
-    const EVT_WS_ERROR = 'wsError';
-    const EVT_NO_MODULE = 'noModule';
-    const EVT_PARSE_ERROR = 'parseError';
+    const ON_WS_CONNECT = 'wsConnect';
+    const ON_WS_OPEN = 'wsOpen';
+    const ON_WS_DISCONNECT = 'wsDisconnect';
+    const ON_HANDSHAKE_REQUEST = 'handshakeRequest';
+    const ON_HANDSHAKE_SUCCESSFUL = 'handshakeSuccessful';
+    const ON_WS_MESSAGE = 'wsMessage';
+    const ON_WS_CLOSE = 'wsClose';
+    const ON_WS_ERROR = 'wsError';
+    const ON_NO_MODULE = 'noModule';
+    const ON_PARSE_ERROR = 'parseError';
 
     const WS_VERSION = 13;
     const WS_KEY_PATTEN = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';

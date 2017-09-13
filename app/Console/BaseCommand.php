@@ -6,13 +6,13 @@
  * Time: 11:50
  */
 
-namespace App\Cli;
+namespace App\Console;
 
 use inhere\console\Command;
 
 /**
  * Class BaseCommand
- * @package App\Cli
+ * @package App\Console
  */
 abstract class BaseCommand extends Command
 {

@@ -6,15 +6,15 @@
  * Time: 11:49
  */
 
-namespace App\Cli\Commands;
+namespace App\Console\Commands;
 
-use App\Cli\BaseCommand;
+use App\Console\BaseCommand;
 use inhere\console\io\Input;
 use inhere\console\io\Output;
 
 /**
  * Class TestCommand
- * @package App\Cli\Commands
+ * @package App\Console\Commands
  */
 class TestCommand extends BaseCommand
 {

@@ -6,13 +6,13 @@
  * Time: 9:37
  */
 
-namespace App\Cli;
+namespace App\Console;
 
 use inhere\console\Controller;
 
 /**
  * Class BaseController
- * @package App\Cli
+ * @package App\Console
  */
 class BaseController extends Controller
 {

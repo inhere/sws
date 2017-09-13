@@ -18,7 +18,7 @@ use Sws\ApplicationInterface;
 
 /**
  * Class Application
- * @package App\Cli
+ * @package App\Console
  */
 class Application extends RpcServerListener implements ApplicationInterface
 {

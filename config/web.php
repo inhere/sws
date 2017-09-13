@@ -7,6 +7,6 @@
  */
 
 
-return array_merge(require __DIR__ . '/base.php',[
+return array_merge(require __DIR__ . '/_base.php',[
    'debug' => false,
 ]);

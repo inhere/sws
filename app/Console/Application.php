@@ -6,7 +6,7 @@
  * Time: 17:42
  */
 
-namespace App\Cli;
+namespace App\Console;
 
 use inhere\console\App;
 use inhere\library\di\Container;
@@ -15,7 +15,7 @@ use Sws\ApplicationInterface;
 
 /**
  * Class Application
- * @package App\Cli
+ * @package App\Console
  */
 class Application extends App implements ApplicationInterface
 {

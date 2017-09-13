@@ -10,12 +10,13 @@ namespace Sws\Module;
 
 use inhere\library\helpers\PhpHelper;
 use inhere\library\traits\OptionsTrait;
+use Inhere\Http\Request;
+use Inhere\Http\Response;
+use Swoole\WebSocket\Server;
 use Sws\Application;
 use Sws\DataParser\JsonDataParser;
 use Sws\DataParser\DataParserInterface;
 use Sws\WebSocket\Connection;
-use Inhere\Http\Request;
-use Inhere\Http\Response;
 use Sws\WebSocket\Message;
 
 /**
@@ -223,9 +224,10 @@ abstract class ModuleAbstracter implements ModuleInterface
      * parse and dispatch message command
      * @param string $data
      * @param Connection $conn
+     * @param Server $server
      * @return mixed
      */
-    public function dispatch(string $data, Connection $conn)
+    public function dispatch(string $data, Connection $conn, Server $server)
     {
         $name = $this->name;
         $cid = $conn->getId();

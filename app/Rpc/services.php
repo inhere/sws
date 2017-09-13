@@ -4,7 +4,6 @@
  * User: inhere
  * Date: 2017/9/3
  * Time: 上午1:08
- *
  * @var $dispatcher  \inhere\server\rpc\RpcDispatcher
  */
 

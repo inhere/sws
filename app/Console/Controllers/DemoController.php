@@ -6,13 +6,13 @@
  * Time: 9:37
  */
 
-namespace App\Cli\Controllers;
+namespace App\Console\Controllers;
 
-use App\Cli\BaseController;
+use App\Console\BaseController;
 
 /**
  * Class DemoController
- * @package App\Cli\Controllers
+ * @package App\Console\Controllers
  */
 class DemoController extends BaseController
 {

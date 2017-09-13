@@ -8,6 +8,7 @@
 
 namespace Sws\Module;
 
+use Swoole\WebSocket\Server;
 use Sws\Application;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
@@ -64,9 +65,10 @@ interface ModuleInterface
     /**
      * @param string $data
      * @param Connection $conn
+     * @param Server $server
      * @return mixed
      */
-    public function dispatch(string $data, Connection $conn);
+    public function dispatch(string $data, Connection $conn, Server $server);
 
     /**
      * @param string $command

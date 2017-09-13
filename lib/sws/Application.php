@@ -175,7 +175,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         if (!$module = $this->getModule($path, false)) {
             $this->log("The #$cid request's path [$path] route handler not exists.", [],'error');
 
-            $this->fire(self::EVT_NO_MODULE, [$cid, $path, $this]);
+            $this->fire(self::ON_NO_MODULE, [$cid, $path, $this]);
 
             $response
                 ->setStatus(404)

@@ -62,7 +62,7 @@ trait WebSocketServerTrait
 //        $this->log("onConnect: context ID: $ctxKey, connection ID: $fd, form reactor ID: $fromId, info: " . var_export($info, 1));
 
         // 触发 connect 事件回调
-        $this->fire(self::EVT_WS_CONNECT, [$server, $fd, $fromId]);
+        $this->fire(self::ON_WS_CONNECT, [$server, $fd, $fromId]);
     }
 
     /**
@@ -104,7 +104,7 @@ trait WebSocketServerTrait
 
         $response = $meta->getResponse();
 
-        $this->fire(self::EVT_HANDSHAKE_REQUEST, [$request, $response, $cid]);
+        $this->fire(self::ON_HANDSHAKE_REQUEST, [$request, $response, $cid]);
 
         // 如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
         // 就停止继续处理。并返回信息给客户端
@@ -136,7 +136,7 @@ trait WebSocketServerTrait
         $this->connections[$cid] = $meta;
 
         $this->log("Handshake: The #{$cid} client handshake successful! ctxKey: {$meta->getKey()}, Meta:\n" . var_export($meta->all(), 1));
-        $this->fire(self::EVT_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
+        $this->fire(self::ON_HANDSHAKE_SUCCESSFUL, [$request, $response, $cid]);
         $this->afterHandshake($meta);
 
         // 握手成功 触发 open 事件
@@ -176,7 +176,7 @@ trait WebSocketServerTrait
 
         $this->log("onOpen: The #{$cid} client open successful! ctxKey: {$conn->getKey()}, Meta:\n" . var_export($conn->all(), 1));
 
-        $this->fire(self::EVT_WS_OPEN, [$this, $conn]);
+        $this->fire(self::ON_WS_OPEN, [$this, $conn]);
 
         $this->afterOpen($server, $conn);
     }
@@ -239,7 +239,7 @@ trait WebSocketServerTrait
             $meta = $this->delConnection($fd);
 
             // call on close callback
-            $this->fire(self::EVT_WS_CLOSE, [$this, $fd, $meta]);
+            $this->fire(self::ON_WS_CLOSE, [$this, $fd, $meta]);
 
             $this->log("onClose: The #$fd client has been closed! ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
             $this->log("onClose: Client #{$fd} is closed. client-info:\n" . var_export($fdInfo, 1));

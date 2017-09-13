@@ -67,6 +67,9 @@ $ff = new FileFinder([
     'sourcePath' => dirname(__DIR__) . '/app/',
     'include' => [
         'ext' => ['php']
+    ],
+    'exclude' => [
+        'file' => 'Sws.php'
     ]
 ]);
 $ff->setFileFilter(function ($name) {
@@ -77,21 +80,22 @@ $ff->setFileFilter(function ($name) {
 $files = $ff->findAll(1)->getFiles();
 $f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Rpc')->findAll(1)->getFiles();
 
-var_dump($files, $f2);die;
+var_dump($files, $f2);
 
 $annotationReader = new AnnotationReader();
 //Get class annotation
-$reflectionClass = new ReflectionClass('AnnExample');
-$classAnnotations = $annotationReader->getClassAnnotations($reflectionClass);
+$refClass = new ReflectionClass('AnnExample');
+echo "class Id: {$refClass->getNamespaceName()}{$refClass->getName()}\n";
+$classAnnotations = $annotationReader->getClassAnnotations($refClass);
 echo '========= CLASS ANNOTATIONS =========' . PHP_EOL;
 print_r($classAnnotations);
 
-$refMethod = $reflectionClass->getMethod('testAction');
+$refMethod = $refClass->getMethod('testAction');
 $mAnnotations = $annotationReader->getMethodAnnotations($refMethod);
 echo '========= Method ANNOTATIONS =========' . PHP_EOL;
 print_r($mAnnotations);
 
-$refProp = $reflectionClass->getProperty('prop');
+$refProp = $refClass->getProperty('prop');
 $mAnnotations = $annotationReader->getPropertyAnnotations($refProp);
 echo '========= Property ANNOTATIONS =========' . PHP_EOL;
 print_r($mAnnotations);

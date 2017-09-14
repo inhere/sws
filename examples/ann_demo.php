@@ -8,6 +8,7 @@
 
 use inhere\library\collections\SimpleCollection;
 use inhere\library\files\FileFinder;
+use Sws\Annotations\Collector;
 use Sws\Annotations\Service;
 use Sws\Annotations\Controller;
 use Sws\Annotations\DI;
@@ -64,41 +65,66 @@ $conf = [
 ];
 
 $ff = new FileFinder([
-    'sourcePath' => dirname(__DIR__) . '/app/',
+    // 'sourcePath' => dirname(__DIR__) . '/app/',
     'include' => [
         'ext' => ['php']
     ],
     'exclude' => [
-        'file' => 'Sws.php'
+        'file' => 'Sws.php',
+        'dir' => ['Console','Helpers', 'Annotations'], // 排除目录
     ]
 ]);
+
 $ff->setFileFilter(function ($name) {
     // 必须首字符大写(类文件)
     return preg_match('/[A-Z]/', $name);
 });
 
-$files = $ff->findAll(1)->getFiles();
-$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Rpc')->findAll(1)->getFiles();
+//$files = $ff->find(true)->getFiles();
+//$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Components')->find(true)->getFiles();
+//var_dump($files, $f2);
 
-var_dump($files, $f2);
+$clt = new Collector($ff, [
+    'App\\' => dirname(__DIR__) . '/app/',
+    'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
+]);
 
+$clt->addScanClass(AnnExample::class);
+
+$clt->registerHandlers([
+    'service' => function (\ReflectionClass $refClass) {
+        pr($refClass->getFileName());
+    },
+//    'wsModule' => function (\ReflectionClass $refClass) {
+//
+//    },
+//    'route' => function (\ReflectionClass $refClass) {
+//
+//    },
+//    'rpcService' => function (\ReflectionClass $refClass) {
+//
+//    },
+]);
+//de($clt);
+$clt->handle();
+exit;
 $annotationReader = new AnnotationReader();
 //Get class annotation
 $refClass = new ReflectionClass('AnnExample');
 echo "class Id: {$refClass->getNamespaceName()}{$refClass->getName()}\n";
 $classAnnotations = $annotationReader->getClassAnnotations($refClass);
 echo '========= CLASS ANNOTATIONS =========' . PHP_EOL;
-print_r($classAnnotations);
+pr($classAnnotations);
 
 $refMethod = $refClass->getMethod('testAction');
 $mAnnotations = $annotationReader->getMethodAnnotations($refMethod);
 echo '========= Method ANNOTATIONS =========' . PHP_EOL;
-print_r($mAnnotations);
+pr($mAnnotations);
 
 $refProp = $refClass->getProperty('prop');
 $mAnnotations = $annotationReader->getPropertyAnnotations($refProp);
 echo '========= Property ANNOTATIONS =========' . PHP_EOL;
-print_r($mAnnotations);
+pr($mAnnotations);
 
 //
 //$annotationDemoObject = new AnnExample();

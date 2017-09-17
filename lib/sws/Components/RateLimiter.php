@@ -2,17 +2,28 @@
 
 namespace Wrench\Listener;
 
+use inhere\library\StdObject;
+use inhere\library\traits\OptionsTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Wrench\Connection;
-use Wrench\Exception\RateLimiterException;
+use Sws\WebSocket\Connection;
 use Wrench\Server;
-use Wrench\Util\Configurable;
 
-class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
+/**
+ * Class RateLimiter
+ * @package Wrench\Listener
+ */
+class RateLimiter extends StdObject implements Listener, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use OptionsTrait;
+
+    protected $options = [
+        'connections' => 200, // Total
+        'connections_per_ip' => 5,   // At once
+        'requests_per_minute' => 200  // Per connection
+    ];
 
     /**
      * The server being limited
@@ -47,24 +58,24 @@ class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
         $this->logger = new NullLogger();
     }
 
-    public function listen(Server $server): void
+    public function listen( $server): void
     {
         $this->server = $server;
 
-        $server->addListener(
-            Server::EVENT_SOCKET_CONNECT,
-            [$this, 'onSocketConnect']
-        );
-
-        $server->addListener(
-            Server::EVENT_SOCKET_DISCONNECT,
-            [$this, 'onSocketDisconnect']
-        );
-
-        $server->addListener(
-            Server::EVENT_CLIENT_DATA,
-            [$this, 'onClientData']
-        );
+//        $server->addListener(
+//            Server::EVENT_SOCKET_CONNECT,
+//            [$this, 'onSocketConnect']
+//        );
+//
+//        $server->addListener(
+//            Server::EVENT_SOCKET_DISCONNECT,
+//            [$this, 'onSocketDisconnect']
+//        );
+//
+//        $server->addListener(
+//            Server::EVENT_CLIENT_DATA,
+//            [$this, 'onClientData']
+//        );
     }
 
     /**
@@ -101,13 +112,14 @@ class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
      */
     protected function limit($connection, $limit)
     {
-        $this->logger->notice(sprintf(
+        $msg = sprintf(
             'Limiting connection %s: %s',
             $connection->getIp(),
             $limit
-        ));
+        );
+        $this->logger->notice($msg);
 
-        $connection->close(new RateLimiterException($limit));
+        $connection->close($msg);
     }
 
     /**
@@ -207,19 +219,5 @@ class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
         if (count($this->requests[$id]) > $this->options['requests_per_minute']) {
             $this->limit($connection, 'Requests per minute');
         }
-    }
-
-    /**
-     * @param array $options
-     */
-    protected function configure(array $options): void
-    {
-        $options = array_merge([
-            'connections' => 200, // Total
-            'connections_per_ip' => 5,   // At once
-            'requests_per_minute' => 200  // Per connection
-        ], $options);
-
-        parent::configure($options);
     }
 }

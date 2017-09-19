@@ -17,7 +17,6 @@ use Sws\Components\HttpHelper;
 /**
  * Class WebSocketServer
  * @package Sws\WebSocket
- * @property Server $server
  */
 trait WebSocketServerTrait
 {

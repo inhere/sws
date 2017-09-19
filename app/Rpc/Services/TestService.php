@@ -6,14 +6,14 @@
  * Time: 16:47
  */
 
-namespace App\Rpc;
+namespace App\Rpc\Services;
 
 use Sws\Annotations\RpcService;
 
 /**
  * Class TestService
  *
- * @package App\Rpc
+ * @package App\Rpc\Services
  *
  * @RpcService("test")
  */

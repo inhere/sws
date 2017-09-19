@@ -12,6 +12,8 @@ if (!defined('BASE_PATH')) {
     throw new \LogicException('Must be defined the constant [BASE_PATH - the project root path]');
 }
 
+use inhere\library\di\Container;
+use inhere\library\interfaces\LanguageInterface;
 use inhere\library\traits\PathAliasTrait;
 use Sws\Context\ContextManager;
 
@@ -50,7 +52,7 @@ abstract class BaseSws
 
     /**
      * @param null|string $id
-     * @return \Psr\Container\ContainerInterface
+     * @return Container
      */
     public static function di($id = null)
     {
@@ -68,6 +70,31 @@ abstract class BaseSws
     public static function get($id)
     {
         return self::$app->get($id);
+    }
+
+    public static function getIfExist($id)
+    {
+        return self::$app->getDi()->getIfExist($id);
+    }
+
+    /*******************************************************************************
+     * some public service
+     ******************************************************************************/
+
+    /**
+     * @return \Psr\Log\LoggerInterface
+     */
+    public static function logger()
+    {
+        return self::$app->get('logger');
+    }
+
+    /**
+     * @return LanguageInterface
+     */
+    public static function lang()
+    {
+        return self::$app->get('lang');
     }
 
     /*******************************************************************************

@@ -9,13 +9,10 @@
 namespace Sws;
 
 use inhere\console\utils\Show;
-use inhere\library\di\Container;
-use inhere\library\traits\EventTrait;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 use Inhere\Server\Helpers\StaticAccessHandler;
 use Inhere\Server\Servers\HttpServer;
-use Psr\Container\ContainerInterface;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 //use Swoole\Server;
@@ -34,18 +31,15 @@ use Sws\Web\RouteDispatcher;
 /**
  * Class Application
  * @package Sws
+ * @property \Swoole\Server $server
  */
 class Application extends HttpServer implements WsServerInterface, ApplicationInterface
 {
+    use ApplicationTrait;
     use WebSocketServerTrait;
 
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
-
-    /**
-     * @var Container
-     */
-    private $di;
 
     /**
      * @var ModuleInterface[]
@@ -155,9 +149,11 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
-        $ctx = ContextManager::delContext();
-
-        $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}, context count:" . ContextManager::count());
+        if ($ctx = ContextManager::delContext()) {
+            $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}, context count:" . ContextManager::count());
+        } else {
+            $this->log("The request end. fd: {$request->fd}. context info has lost!");
+        }
     }
 
     /**
@@ -217,11 +213,12 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         // dispatch command
 
         try {
-            $module = $this->getModule($conn->getPath());
-            $result = $module->dispatch($frame->data, $conn, $server);
+            if ($module = $this->getModule($conn->getPath())) {
+                $result = $module->dispatch($frame->data, $conn, $server);
 
-            if ($result && is_string($result)) {
-                $this->send($result);
+                if ($result && is_string($result)) {
+                    $this->send($result);
+                }
             }
         } catch (\Throwable $e) {
             throw $e;
@@ -465,15 +462,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @param $id
-     * @return mixed
-     */
-    public function get($id)
-    {
-        return $this->di->get($id);
-    }
-
-    /**
      * @return bool
      */
     public function isJsonType(): bool
@@ -489,19 +477,4 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         return $this->getOption('dataType');
     }
 
-    /**
-     * @return ContainerInterface
-     */
-    public function getDi()
-    {
-        return $this->di;
-    }
-
-    /**
-     * @param ContainerInterface $di
-     */
-    public function setDi(ContainerInterface $di)
-    {
-        $this->di = $di;
-    }
 }

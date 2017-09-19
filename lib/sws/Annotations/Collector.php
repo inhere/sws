@@ -64,6 +64,12 @@ class Collector
      */
     public function addScan(string $namespace, string $path)
     {
+        $length = strlen($namespace);
+
+        if ('\\' !== $namespace[$length - 1]) {
+            throw new \InvalidArgumentException('A non-empty PSR-4 prefix must end with a namespace separator.');
+        }
+
         $this->scanDirs[$namespace] = $path;
 
         return $this;
@@ -105,12 +111,20 @@ class Collector
         return $this;
     }
 
+    /**
+     * handle resource
+     * @return $this
+     */
     public function handle()
     {
         foreach ($this->findFiles() as $class) {
+            // class_exists 不再为已定义的 interface 返回 TRUE。请使用 interface_exists()
             if (!class_exists($class)) {
-                $this->missClasses[] = $class;
+                if (interface_exists($class)) {
+                    continue;
+                }
 
+                $this->missClasses[] = $class;
                 continue;
             }
 
@@ -152,7 +166,7 @@ class Collector
 
         foreach ($this->scanDirs as $namespace => $dir) {
             foreach ($this->finder->setSourcePath($dir)->find(true)->getFiles() as $file) {
-                yield $namespace . '\\' . substr($file,0, -4);
+                yield $namespace . str_replace('/', '\\', substr($file,0, -4));
 //                yield [$namespace, substr($file,0, -4)];
             }
         }

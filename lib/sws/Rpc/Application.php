@@ -12,9 +12,9 @@ use Inhere\Server\Rpc\JsonParser;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Inhere\Server\Rpc\RpcServerListener;
 use Inhere\Server\Rpc\TextParser;
-use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Sws\ApplicationInterface;
+use Sws\ApplicationTrait;
 
 /**
  * Class Application
@@ -22,10 +22,7 @@ use Sws\ApplicationInterface;
  */
 class Application extends RpcServerListener implements ApplicationInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $di;
+    use ApplicationTrait;
 
     /**
      * {@inheritDoc}
@@ -40,31 +37,6 @@ class Application extends RpcServerListener implements ApplicationInterface
             new JsonParser(),
             new TextParser(),
         ]);
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function get($id)
-    {
-        return $this->di->get($id);
-    }
-
-    /**
-     * @param ContainerInterface $di
-     */
-    public function setDi(ContainerInterface $di)
-    {
-        $this->di = $di;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    public function getDi()
-    {
-        return $this->di;
     }
 
     /**
@@ -85,7 +57,10 @@ class Application extends RpcServerListener implements ApplicationInterface
 
             $server->send($fd, $resp);
 
-            $error = $server->getLastError();
+            if ($error = $server->getLastError()) {
+                $this->get('logger')->error($error);
+            }
+
         } catch (\Throwable $e) {
             throw $e;
         }

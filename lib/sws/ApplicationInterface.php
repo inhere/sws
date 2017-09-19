@@ -8,7 +8,7 @@
 
 namespace Sws;
 
-use Psr\Container\ContainerInterface;
+use inhere\library\di\Container;
 
 /**
  * Class ApplicationInterface
@@ -16,15 +16,25 @@ use Psr\Container\ContainerInterface;
  */
 interface ApplicationInterface
 {
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function get($id);
 
     /**
-     * @param ContainerInterface $di
+     * @param $id
+     * @return mixed
      */
-    public function setDi(ContainerInterface $di);
+    public function has($id);
 
     /**
-     * @return ContainerInterface
+     * @param Container $di
+     */
+    public function setDi(Container $di);
+
+    /**
+     * @return Container
      */
     public function getDi();
 }

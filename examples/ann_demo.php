@@ -89,11 +89,12 @@ $clt = new Collector($ff, [
     'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
 ]);
 
+$clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 $clt->addScanClass(AnnExample::class);
 
 $clt->registerHandlers([
     'service' => function (\ReflectionClass $refClass) {
-        pr($refClass->getFileName());
+        pr($refClass->getName());
     },
 //    'wsModule' => function (\ReflectionClass $refClass) {
 //
@@ -105,9 +106,9 @@ $clt->registerHandlers([
 //
 //    },
 ]);
-//de($clt);
 $clt->handle();
-exit;
+de($clt);
+
 $annotationReader = new AnnotationReader();
 //Get class annotation
 $refClass = new ReflectionClass('AnnExample');

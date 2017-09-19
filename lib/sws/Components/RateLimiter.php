@@ -1,6 +1,6 @@
 <?php
 
-namespace Wrench\Listener;
+namespace Sws\Components;
 
 use inhere\library\StdObject;
 use inhere\library\traits\OptionsTrait;
@@ -8,13 +8,12 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Sws\WebSocket\Connection;
-use Wrench\Server;
 
 /**
  * Class RateLimiter
  * @package Wrench\Listener
  */
-class RateLimiter extends StdObject implements Listener, LoggerAwareInterface
+class RateLimiter extends StdObject implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
     use OptionsTrait;

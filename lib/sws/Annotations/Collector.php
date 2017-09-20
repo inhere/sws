@@ -8,6 +8,7 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use inhere\library\files\FileFinder;
 
 /**
@@ -35,25 +36,31 @@ class Collector
      */
     public $handlers = [];
 
-    /**
-     * @var FileFinder
-     */
+    /** @var FileFinder */
     private $finder;
 
-    /**
-     * @var array
-     */
+    /** @var AnnotationReader  */
+    private $reader;
+
+    /** @var array  */
     private $missClasses = [];
 
+    /** @var array  */
+    private $handledClasses = [];
+
+    /** @var int  */
+    private $foundedCount = 0;
+
     /**
-     * @var array
+     * Collector constructor.
+     * @param FileFinder|null $finder
+     * @param array $scanDirs
      */
-    private $foundedClasses = [];
-
-
     public function __construct(FileFinder $finder = null, array $scanDirs = [])
     {
         $this->finder = $finder;
+        $this->reader = new AnnotationReader();
+
         $this->addScans($scanDirs);
     }
 
@@ -117,7 +124,11 @@ class Collector
      */
     public function handle()
     {
+        $timer = 0;
+
         foreach ($this->findFiles() as $class) {
+            $timer++;
+
             // class_exists 不再为已定义的 interface 返回 TRUE。请使用 interface_exists()
             if (!class_exists($class)) {
                 if (interface_exists($class)) {
@@ -134,12 +145,14 @@ class Collector
                 continue;
             }
 
-            $this->foundedClasses[] = $class;
+            $this->handledClasses[] = $class;
 
             foreach ($this->handlers as $handler) {
-                $handler($refClass);
+                $handler($refClass, $this);
             }
         }
+
+        $this->foundedCount = $timer;
 
         return $this;
     }
@@ -217,9 +230,9 @@ class Collector
     /**
      * @return array
      */
-    public function getFoundedClasses(): array
+    public function getHandledClasses(): array
     {
-        return $this->foundedClasses;
+        return $this->handledClasses;
     }
 
     /**
@@ -258,5 +271,13 @@ class Collector
         $this->finder = $finder;
 
         return $this;
+    }
+
+    /**
+     * @return AnnotationReader
+     */
+    public function getReader(): AnnotationReader
+    {
+        return $this->reader;
     }
 }

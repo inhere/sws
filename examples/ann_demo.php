@@ -93,8 +93,8 @@ $clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 $clt->addScanClass(AnnExample::class);
 
 $clt->registerHandlers([
-    'service' => function (\ReflectionClass $refClass) {
-        pr($refClass->getName());
+    'service' => function (\ReflectionClass $refClass, Collector $clt) {
+        de($refClass->getName(), $clt->getReader()->getClassAnnotations($refClass));
     },
 //    'wsModule' => function (\ReflectionClass $refClass) {
 //

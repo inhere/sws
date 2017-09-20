@@ -77,6 +77,15 @@ class Language extends Collection
      * {@inheritdoc}
      * @see self::translate()
      */
+    public function t($key, array $args = [], $lang = null)
+    {
+        return $this->translate($key, $args, $lang);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see self::translate()
+     */
     public function tl($key, array $args = [], $lang = null)
     {
         return $this->translate($key, $args, $lang);
@@ -100,8 +109,12 @@ class Language extends Collection
      */
     public function translate(string $key, array $args = [], $lang = null)
     {
-        if (!$key || !is_string($key)) {
-            throw new \InvalidArgumentException('A lack of parameters or type error.');
+        if (!is_string($key)) {
+            throw new \InvalidArgumentException('The translate key must be a string.');
+        }
+
+        if (!$key = trim($key, ' ' . $this->separator)) {
+            throw new \InvalidArgumentException('Cannot translate the empty key');
         }
 
         list($lang, $key) = $this->parseKey($key, $lang);

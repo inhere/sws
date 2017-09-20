@@ -97,6 +97,17 @@ abstract class BaseSws
         return self::$app->get('lang');
     }
 
+    /**
+     * @param string $key
+     * @param array $args
+     * @param null $lang
+     * @return array|string
+     */
+    public static function tl($key, array $args = [], $lang = null)
+    {
+        return self::$app->get('lang')->tl($key, $args, $lang);
+    }
+
     /*******************************************************************************
      * request context
      ******************************************************************************/

@@ -15,6 +15,7 @@ if (!defined('BASE_PATH')) {
 use inhere\library\di\Container;
 use inhere\library\interfaces\LanguageInterface;
 use inhere\library\traits\PathAliasTrait;
+use Sws\Components\LogShortTrait;
 use Sws\Context\ContextManager;
 
 /**
@@ -24,6 +25,7 @@ use Sws\Context\ContextManager;
 abstract class BaseSws
 {
     use PathAliasTrait;
+    use LogShortTrait;
 
     /**
      * defined path aliases
@@ -106,6 +108,14 @@ abstract class BaseSws
     public static function tl($key, array $args = [], $lang = null)
     {
         return self::$app->get('lang')->tl($key, $args, $lang);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function log($level, $message, array $context = [])
+    {
+        self::$app->get('logger')->log($level, $message, $context);
     }
 
     /*******************************************************************************

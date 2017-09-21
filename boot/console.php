@@ -1,5 +1,9 @@
 <?php
+/**
+ * @var $di Container
+ */
 
+use inhere\library\di\Container;
 use inhere\library\collections\Configuration;
 
 // autoload
@@ -15,6 +19,28 @@ $di->set('config', function () {
         dirname(__DIR__)  . '/config/console/{env}.php' // envFile
     );
 });
+
+$di->set('logger', function (Container $di) {
+    $settings = $di->get('config')->get('logger', []);
+
+    $logger = new \Monolog\Logger($settings['name']);
+    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+    $logger->pushHandler(new \Monolog\Handler\StreamHandler($settings['file'], (int)$settings['level']));
+
+    return $logger;
+});
+
+// monolog - database logger
+$di['dbLogger'] = function (Container $c) {
+    $settings = $c->get('settings')['dbLogger'];
+    $logger = new \Monolog\Logger($settings['name']);
+    // $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+    $handler = new \Monolog\Handler\StreamHandler($settings['path'], Monolog\Logger::DEBUG);
+    // formatter, ordering log rows
+    $handler->setFormatter(new \Monolog\Formatter\LineFormatter("[%datetime%] SQL: %message% \n"));
+    $logger->pushHandler($handler);
+    return $logger;
+};
 
 $di->set('app', function ($di) {
     $app = new \App\Console\Application();
@@ -35,3 +61,5 @@ $di->sets($config->remove('services'));
 error_reporting(E_ALL);
 define('RUNTIME_ENV', $config->get('env'));
 define('APP_DEBUG', $config->get('debug'));
+
+vd($di, -4);

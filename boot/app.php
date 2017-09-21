@@ -4,8 +4,11 @@
  * User: inhere
  * Date: 2017-08-25
  * Time: 9:39
+ *
+ * @var $di Container
  */
 
+use inhere\library\di\Container;
 use inhere\library\collections\Configuration;
 
 // autoload
@@ -22,13 +25,26 @@ $di->set('config', function () {
     );
 });
 
-$di->set('app', function ($di) {
+$di->set('app', function (Container $di) {
     $config = require BASE_PATH . '/config/server.php';
 
     \Sws::$app = $app = new \Sws\Application($config);
     $app->setDi($di);
 
     return $app;
+});
+
+$di->set('logger', function (Container $di) {
+    $opts = $di->get('config')->get('logger', []);
+
+    $fileHandler = new \Monolog\Handler\StreamHandler($opts['file']);
+    $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
+
+    $logger = new \Monolog\Logger($opts['name']);
+    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+    $logger->pushHandler($mainHandler);
+
+    return $logger;
 });
 
 /** @var Configuration $config */

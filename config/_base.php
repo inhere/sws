@@ -28,15 +28,15 @@ return [
             'target' => FileLogHandler::class,
         ],
 
-        'dbLogHandler' => [
-            'target' => FileLogHandler::class,
-        ],
+//        'dbLogHandler' => [
+//            'target' => FileLogHandler::class,
+//        ],
 
         'logger' => [
             'target' => Logger::class,
             'handlers' => [
                 'file' => '@{fileLogHandler}',
-                'db' => '@{dbLogHandler}',
+//                'db' => '@{dbLogHandler}',
             ]
         ],
 

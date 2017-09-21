@@ -10,6 +10,10 @@ use inhere\library\components\Language;
 use inhere\library\helpers\Arr;
 
 return Arr::merge(require __DIR__ . '/_base.php',[
+    'logger' => [
+
+    ],
+
     'services' => [
         'language' => [
             'target' => Language::class,

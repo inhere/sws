@@ -11,7 +11,11 @@ namespace Sws;
 use inhere\console\utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use inhere\library\collections\Configuration;
+use inhere\library\log\Logger;
+use Inhere\Route\ORouter;
 use Inhere\Server\Helpers\StaticAccessHandler;
+use Inhere\Server\Rpc\RpcDispatcher;
 use Inhere\Server\Servers\HttpServer;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
@@ -20,6 +24,7 @@ use Swoole\Websocket\Frame;
 use Sws\Components\HttpHelper;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
+use Sws\Memory\Language;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 use Sws\WebSocket\Connection;
@@ -86,6 +91,22 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         // rpc service class
     }
+
+    /**
+     * Returns the configuration of core application services.
+     */
+//    public function coreServices()
+//    {
+//        return [
+//            'log' => ['target' => Logger::class],
+//            'language' => ['target' => Language::class],
+//
+//            'httpRouter' => ['target' => ORouter::class],
+//            'httpDispatcher' => ['target' => RouteDispatcher::class],
+//
+//            'rpcDispatcher' => ['target' => RpcDispatcher::class],
+//        ];
+//    }
 
     /**
      * before Server Start

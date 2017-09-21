@@ -26,6 +26,8 @@ class TestCommand extends BaseCommand
      */
     protected function execute($input, $output)
     {
-        // TODO: Implement execute() method.
+        $this->write('hi');
+
+        return 0;
     }
 }

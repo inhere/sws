@@ -6,13 +6,13 @@
  * Time: 下午11:08
  */
 
-namespace App\Models;
+namespace App\Model;
 
 use Sws\Annotations\Model;
 
 /**
  * Class DemoModel
- * @package App\Models
+ * @package App\Model
  *
  * @Model()
  */

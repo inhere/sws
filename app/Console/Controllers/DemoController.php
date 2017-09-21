@@ -16,5 +16,13 @@ use App\Console\BaseController;
  */
 class DemoController extends BaseController
 {
+    protected static $name = 'demo';
 
+    /**
+     * the demo command
+     */
+    public function indexCommand()
+    {
+        $this->write('hello');
+    }
 }

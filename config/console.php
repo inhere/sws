@@ -6,6 +6,20 @@
  * Time: 17:35
  */
 
-return array_merge(require __DIR__ . '/_base.php',[
+use inhere\library\components\Language;
+use inhere\library\helpers\Arr;
 
+return Arr::merge(require __DIR__ . '/_base.php',[
+    'services' => [
+        'language' => [
+            'target' => Language::class,
+            'lang' => 'zh-CN',
+            'langs' => ['en', 'zh-CN'],
+            'files' => [
+                'default.php',
+                'user.php',
+            ],
+        ],
+
+    ],
 ]);

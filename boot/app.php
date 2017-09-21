@@ -1,4 +1,10 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: inhere
+ * Date: 2017-08-25
+ * Time: 9:39
+ */
 
 use inhere\library\collections\Configuration;
 
@@ -11,21 +17,20 @@ require __DIR__ . '/container.php';
 $di->set('config', function () {
     return Configuration::makeByEnv(
         dirname(__DIR__) . '/.local', // locFile
-        dirname(__DIR__)  . '/config/console.php', // baseFile
-        dirname(__DIR__)  . '/config/console/{env}.php' // envFile
+        dirname(__DIR__)  . '/config/app.php', // baseFile
+        dirname(__DIR__)  . '/config/app/{env}.php' // envFile
     );
 });
 
 $di->set('app', function ($di) {
-    $app = new \App\Console\Application();
+    $config = require BASE_PATH . '/config/server.php';
+
+    \Sws::$app = $app = new \Sws\Application($config);
     $app->setDi($di);
 
-    // register commands
-    require dirname(__DIR__) . '/app/Console/routes.php';
     return $app;
 });
 
-//
 /** @var Configuration $config */
 $config = $di->get('config');
 
@@ -35,3 +40,4 @@ $di->sets($config->remove('services'));
 error_reporting(E_ALL);
 define('RUNTIME_ENV', $config->get('env'));
 define('APP_DEBUG', $config->get('debug'));
+

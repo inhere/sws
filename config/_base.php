@@ -6,7 +6,13 @@
  * Time: 16:19
  */
 
+use inhere\library\log\Logger;
+use Sws\Memory\FileLogHandler;
+
 return [
+    'debug' => false,
+    'env'   => 'pdt',
+    'rootPath' => dirname(__DIR__),
     'assets' => [
         'ext' => [],
         'dirMap' => [
@@ -16,12 +22,29 @@ return [
         ]
     ],
 
-    'language' => [
-        'language' => 'zh-CN',
-        'languages' => ['en', 'zh-CN'],
-        'files' => [
-          'default.php',
-          'user.php',
+    'services' => [
+        // log service
+        'fileLogHandler' => [
+            'target' => FileLogHandler::class,
         ],
-    ],
+
+        'dbLogHandler' => [
+            'target' => FileLogHandler::class,
+        ],
+
+        'logger' => [
+            'target' => Logger::class,
+            'handlers' => [
+                'file' => '@{fileLogHandler}',
+                'db' => '@{dbLogHandler}',
+            ]
+        ],
+
+        // db service
+//        'db' => [
+//            'debug' => '&{debug}',
+//        ]
+
+    ]
+
 ];

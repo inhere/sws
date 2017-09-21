@@ -6,13 +6,13 @@
  * Time: 下午11:11
  */
 
-namespace App\Daos;
+namespace App\Dao;
 
 use Sws\Annotations\Dao;
 
 /**
  * Class DemoDao
- * @package App\Daos
+ * @package App\Dao
  *
  * @Dao()
  */

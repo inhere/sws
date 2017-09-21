@@ -17,5 +17,5 @@ $app->commands([
 ]);
 
 $app->controllers([
-//    'home' => \App\console\controllers\HomeController::class,
+    \App\Console\Controllers\DemoController::class,
 ]);

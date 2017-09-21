@@ -6,7 +6,7 @@ use Sws\Rpc\Application as RpcApp;
 
 define('BASE_PATH', dirname(__DIR__) );
 
-require dirname(__DIR__) . '/boot/web.php';
+require dirname(__DIR__) . '/boot/app.php';
 
 /**
  * @var \Inhere\Server\BoxServer $app

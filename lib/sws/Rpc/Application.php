@@ -29,7 +29,9 @@ class Application extends RpcServerListener implements ApplicationInterface
      */
     public function __construct(array $options = [])
     {
-        \Sws::$app = $this;
+        $options = array_merge([
+            'timeoutInMilliseconds' => 1000,
+        ], $options);
 
         parent::__construct($options);
 

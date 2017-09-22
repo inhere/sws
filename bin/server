@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use inhere\library\di\Container;
 use Sws\Application;
 use Sws\Rpc\Application as RpcApp;
 
@@ -9,6 +10,7 @@ define('BASE_PATH', dirname(__DIR__) );
 require dirname(__DIR__) . '/boot/app.php';
 
 /**
+ * @var Container $di
  * @var \Inhere\Server\BoxServer $app
  */
 $app = $di->get('app');

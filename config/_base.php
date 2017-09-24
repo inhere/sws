@@ -34,21 +34,21 @@ return [
 
     'services' => [
         // log service
-        'fileLogHandler' => [
-            'target' => FileLogHandler::class,
-        ],
+//        'fileLogHandler' => [
+//            'target' => FileLogHandler::class,
+//        ],
 
 //        'dbLogHandler' => [
 //            'target' => FileLogHandler::class,
 //        ],
 
-        'logger' => [
-            'target' => Logger::class,
-            'handlers' => [
-                'file' => '@{fileLogHandler}',
-//                'db' => '@{dbLogHandler}',
-            ]
-        ],
+//        'logger' => [
+//            'target' => Logger::class,
+//            'handlers' => [
+//                'file' => '@{fileLogHandler}',
+////                'db' => '@{dbLogHandler}',
+//            ]
+//        ],
 
         // db service
 //        'db' => [

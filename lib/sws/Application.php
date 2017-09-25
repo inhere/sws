@@ -11,11 +11,7 @@ namespace Sws;
 use inhere\console\utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
-use inhere\library\collections\Configuration;
-use inhere\library\log\Logger;
-use Inhere\Route\ORouter;
-use Inhere\Server\Helpers\StaticAccessHandler;
-use Inhere\Server\Rpc\RpcDispatcher;
+use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
@@ -24,7 +20,6 @@ use Swoole\Websocket\Frame;
 use Sws\Components\HttpHelper;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
-use Sws\Memory\Language;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 use Sws\WebSocket\Connection;
@@ -81,6 +76,19 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         $this->options['assets'] = $this->get('config')->get('assets', []);
     }
 
+    protected $middlewares = [];
+
+    /**
+     * @param callable $cb middleware :: (Context $ctx, $next) -> void
+     * @return $this
+     */
+    public function use(callable $cb)
+    {
+        $this->middlewares[] = $cb;
+
+        return $this;
+    }
+
     public function preLoading()
     {
         // collect routes
@@ -123,7 +131,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         $config = $this->options['assets'];
 
         // static handle
-        $this->staticAccessHandler = new StaticAccessHandler(BASE_PATH, $config['ext'], $config['dirMap']);
+        $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);
     }
 
     /**

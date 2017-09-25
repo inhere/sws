@@ -6,13 +6,13 @@
  * Time: 上午1:17
  */
 
-namespace Sws\Tables;
+namespace Sws\Memory;
 
 use Swoole\Table;
 
 /**
  * Class BaseTable
- * @package Sws\Tables
+ * @package Sws\Memory
  *
  * Table使用共享内存来保存数据，在创建子进程前，务必要执行Table->create()
  * swoole_server中使用Table，Table->create() 必须在 swoole_server->start()前执行

@@ -6,17 +6,16 @@
  * Time: 15:11
  */
 
-namespace Sws\Components;
+namespace Sws\Coroutine;
 
-use Inhere\Pool\Swoole\ResourcePool;
-use Swoole\Coroutine;
+use Inhere\Pool\Swoole\CoroSuspendPool;
 use Swoole\Coroutine\Redis;
 
 /**
  * Class CoroRedisPool
  * @package Sws\Components
  */
-class CoroRedisPool extends ResourcePool
+class CoroRedisPool extends CoroSuspendPool
 {
     /**
      * 创建新的资源实例
@@ -26,11 +25,11 @@ class CoroRedisPool extends ResourcePool
     {
         $rds = new Redis();
 
-//        debug('coId:' . Coroutine::getuid() . ' will create new redis connection');
+//        debug('coId:' . Coroutine::id() . ' will create new redis connection');
 
         $rds->connect('redis', 6379);
 
-//        debug('coId:' . Coroutine::getuid() . ' a new redis connection created');
+//        debug('coId:' . Coroutine::id() . ' a new redis connection created');
 
         return $rds;
     }

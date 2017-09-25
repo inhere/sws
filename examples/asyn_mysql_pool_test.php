@@ -8,7 +8,7 @@
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use Swoole\Http\Response;
-use Sws\Components\AsyncMysqlPool;
+use Sws\Async\AsyncMysqlPool;
 
 $host = '127.0.0.1';
 $port = 8399;

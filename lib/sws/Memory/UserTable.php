@@ -6,15 +6,15 @@
  * Time: 下午1:05
  */
 
-namespace Sws\Tables;
+namespace Sws\Memory;
 
 use Swoole\Table;
 
 /**
- * Class User
- * @package Sws\Tables
+ * Class UserTable
+ * @package Sws\Memory
  */
-class User
+class UserTable
 {
     /**
      * @var string

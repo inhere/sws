@@ -6,16 +6,16 @@
  * Time: 16:30
  */
 
-namespace Sws\Components;
+namespace Sws\Async;
 
-use Inhere\Pool\Swoole\ResourcePool;
+use Inhere\Pool\Swoole\CoroSuspendPool;
 use Swoole\MySQL;
 
 /**
  * Class AsyncMysqlPool
  * @package Sws\Components
  */
-class AsyncMysqlPool extends ResourcePool
+class AsyncMysqlPool extends CoroSuspendPool
 {
     /**
      * @var array

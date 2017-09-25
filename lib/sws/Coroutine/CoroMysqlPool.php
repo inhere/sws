@@ -6,17 +6,16 @@
  * Time: 15:11
  */
 
-namespace Sws\Components;
+namespace Sws\Coroutine;
 
-use Inhere\Pool\Swoole\ResourcePool;
-use Swoole\Coroutine;
+use Inhere\Pool\Swoole\CoroSuspendPool;
 use Swoole\Coroutine\MySQL;
 
 /**
  * Class CoroMysqlPool
  * @package Sws\Components
  */
-class CoroMysqlPool extends ResourcePool
+class CoroMysqlPool extends CoroSuspendPool
 {
     /**
      * @var array
@@ -40,11 +39,11 @@ class CoroMysqlPool extends ResourcePool
         $conf = $this->options['db1'];
         $db = new MySQL();
 
-//        debug('coId:' . Coroutine::getuid() . ' will create new db connection');
+//        debug('coId:' . Coroutine::id() . ' will create new db connection');
 
         $db->connect($conf);
 
-//        debug('coId:' . Coroutine::getuid() . ' a new db connection created');
+//        debug('coId:' . Coroutine::id() . ' a new db connection created');
 
         return $db;
     }

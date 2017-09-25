@@ -16,6 +16,7 @@ use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 
 use Sws\Components\HttpHelper;
+use Sws\Coroutine\Coroutine;
 
 /**
  * Class HttpContext

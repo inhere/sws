@@ -10,6 +10,7 @@ namespace Sws\Context;
 
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Sws\Coroutine\Coroutine;
 
 /**
  * Class ContextManager

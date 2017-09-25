@@ -20,7 +20,7 @@ function debug($msg, array $data = [])
 }
 
 
-$pool = new \Sws\Components\CoroMysqlPool([
+$pool = new \Sws\Coroutine\CoroMysqlPool([
     'initSize' => 0,
     'maxSize' => 1,
 ]);

@@ -10,6 +10,7 @@
 
 use inhere\library\di\Container;
 use inhere\library\collections\Configuration;
+use Sws\Async\StreamHandler;
 
 // autoload
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -37,7 +38,7 @@ $di->set('app', function (Container $di) {
 $di->set('logger', function (Container $di) {
     $opts = $di->get('config')->get('logger', []);
 
-    $fileHandler = new \Monolog\Handler\StreamHandler($opts['file']);
+    $fileHandler = new StreamHandler($opts['file']);
     $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
 
     $logger = new \Monolog\Logger($opts['name']);

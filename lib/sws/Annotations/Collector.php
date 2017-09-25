@@ -8,8 +8,11 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use inhere\library\files\FileFinder;
+use Sws\Annotations\Handlers\HandlerInterface;
 
 /**
  * Class Collector
@@ -59,9 +62,20 @@ class Collector
     public function __construct(FileFinder $finder = null, array $scanDirs = [])
     {
         $this->finder = $finder;
-        $this->reader = new AnnotationReader();
+
+        $this->reader = new IndexedReader(new AnnotationReader());
 
         $this->addScans($scanDirs);
+
+        $this->init();
+    }
+
+    protected function init()
+    {
+        AnnotationRegistry::registerLoader('class_exists');
+        AnnotationReader::addGlobalIgnoredName('from');
+        AnnotationReader::addGlobalIgnoredName('notice');
+        AnnotationReader::addGlobalIgnoredName('Notice');
     }
 
     /**
@@ -119,6 +133,19 @@ class Collector
     }
 
     /**
+     * @var array
+     * [
+     *  class name => [
+     *  'class' => class annotations,
+     *  'prop' => props annotations,
+     *  'method' => methods annotations,
+     * ]
+     * ... ...
+     * ]
+     */
+    private $annotations = [];
+
+    /**
      * handle resource
      * @return $this
      */
@@ -145,10 +172,14 @@ class Collector
                 continue;
             }
 
-            $this->handledClasses[] = $class;
+            $hash = spl_object_hash($refClass);
+            $this->handledClasses[$hash] = $class;
+            $classAnn = $this->reader->getClassAnnotations($refClass);
+            // $propsAnn = $this->reader->getPropertyAnnotations($refClass);
+            // $methodsAnn = $this->reader->getMethodAnnotations($refClass);
 
             foreach ($this->handlers as $handler) {
-                $handler($refClass, $this);
+                $handler($classAnn, $refClass, $this);
             }
         }
 
@@ -198,6 +229,10 @@ class Collector
      */
     public function registerHandler(string $name, callable $handler)
     {
+        if ($handler instanceof HandlerInterface) {
+            $handler->setCollector($this);
+        }
+
         $this->handlers[$name] = $handler;
     }
 

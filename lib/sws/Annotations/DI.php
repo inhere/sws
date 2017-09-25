@@ -11,7 +11,7 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class DI
+ * Class DI - Dependency Injection
  * @package Sws\Annotations
  *
  * @Annotation

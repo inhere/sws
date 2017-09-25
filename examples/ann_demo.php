@@ -20,11 +20,6 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-// AnnotationRegistry::registerFile("/path/to/doctrine/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
-// AnnotationRegistry::registerAutoloadNamespace("Sws\Annotations", dirname(__DIR__) . '/lib/sws/Annotations');
-AnnotationRegistry::registerLoader('class_exists');
-AnnotationReader::addGlobalIgnoredName('foo');
-
 /**
  * Class DocBlockExample
  *
@@ -93,8 +88,8 @@ $clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 $clt->addScanClass(AnnExample::class);
 
 $clt->registerHandlers([
-    'service' => function (\ReflectionClass $refClass, Collector $clt) {
-        de($refClass->getName(), $clt->getReader()->getClassAnnotations($refClass));
+    'service' => function ($classAnn, \ReflectionClass $refClass, Collector $clt) {
+        de($refClass->getName(), $classAnn);
     },
 //    'wsModule' => function (\ReflectionClass $refClass) {
 //
@@ -107,7 +102,7 @@ $clt->registerHandlers([
 //    },
 ]);
 $clt->handle();
-de($clt);
+vd($clt, -4);
 
 $annotationReader = new AnnotationReader();
 //Get class annotation

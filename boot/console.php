@@ -62,4 +62,4 @@ error_reporting(E_ALL);
 define('RUNTIME_ENV', $config->get('env'));
 define('APP_DEBUG', $config->get('debug'));
 
-vd($di, -4);
+//vd($di, -4);

@@ -8,7 +8,6 @@
 
 namespace Sws\Context;
 
-//use Swoole\Coroutine;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
@@ -24,6 +23,20 @@ use Sws\Coroutine\Coroutine;
  */
 class HttpContext extends Context
 {
+    /** @var array  */
+    private static $dataTypes = [
+        'html' => 'text/html',
+        'txt' => 'text/plain',
+        'js' => 'application/javascript',
+        'css' => 'text/css',
+        'json' => 'application/json',
+        'xml' => 'text/xml',
+        'rdf' => 'application/rdf+xml',
+        'atom' => 'application/atom+xml',
+        'rss' => 'application/rss+xml',
+        'form' => 'application/x-www-form-urlencoded'
+    ];
+
     /**
      * @var array
      */
@@ -73,6 +86,14 @@ class HttpContext extends Context
         $this->swResponse = $swResponse;
 
         parent::__construct();
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDataTypes(): array
+    {
+        return self::$dataTypes;
     }
 
     protected function init()

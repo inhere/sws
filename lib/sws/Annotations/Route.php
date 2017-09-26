@@ -36,6 +36,16 @@ final class Route
     /**
      * @var array
      */
+    public $schemes = [];
+
+    /**
+     * @var array
+     */
+    public $domains = [];
+
+    /**
+     * @var array
+     */
     public $tokens = [];
 
     /**
@@ -60,7 +70,9 @@ final class Route
             $this->path = $values['value'];
         }
 
-        foreach (['path', 'method', 'enter', 'leave', 'tokens'] as $name) {
+        $props = ['path', 'method', 'enter', 'leave', 'tokens', 'schemes', 'domains'];
+
+        foreach ($props as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

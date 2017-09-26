@@ -11,6 +11,7 @@ namespace Sws;
 use inhere\console\utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Inhere\Route\Dispatcher;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
 use Swoole\Http\Request as SwRequest;
@@ -26,7 +27,6 @@ use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
 use Sws\WebSocket\WebSocketServerTrait;
 use Sws\WebSocket\WsServerInterface;
-use Sws\Web\RouteDispatcher;
 
 /**
  * Class Application
@@ -76,7 +76,8 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
         $this->options['assets'] = $this->get('config')->get('assets', []);
     }
 
-    protected $middlewares = [];
+    /** @var array  */
+    protected $httpMiddlewares = [];
 
     /**
      * @param callable $cb middleware :: (Context $ctx, $next) -> void
@@ -84,7 +85,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     public function use(callable $cb)
     {
-        $this->middlewares[] = $cb;
+        $this->httpMiddlewares[] = $cb;
 
         return $this;
     }
@@ -144,15 +145,24 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse, $uri = null)
     {
         try {
-            /** @var RouteDispatcher $dispatcher */
-            $dispatcher = $this->di->get('httpDispatcher');
+            /**
+             * 当前请求的上下文对象
+             * 包含：
+             * - request 请求对象
+             * - response 响应对象
+             * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
+             * - args 路由的参数信息
+             * @var HttpContext $context
+             */
             $context = HttpContext::make($swRequest, $swResponse);
+            /** @var Dispatcher $dispatcher */
+            $dispatcher = $this->di->get('httpDispatcher');
 
             $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
             $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}");
 
-            $resp = $dispatcher->setContext($context)->dispatch(parse_url($uri, PHP_URL_PATH), $method);
+            $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
             if (!$resp instanceof Response) {
                 $response = HttpHelper::createResponse();

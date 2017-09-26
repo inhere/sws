@@ -6,17 +6,20 @@
  * Time: 9:29
  */
 
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use inhere\library\collections\SimpleCollection;
 use inhere\library\files\FileFinder;
 use Sws\Annotations\Collector;
+use Sws\Annotations\Position;
 use Sws\Annotations\Service;
 use Sws\Annotations\Controller;
 use Sws\Annotations\DI;
 use Sws\Annotations\Inject;
 use Sws\Annotations\Route;
 use Sws\Annotations\RpcService;
+use Sws\Annotations\Parameter;
+use Sws\Annotations\Parameters;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -25,11 +28,17 @@ require dirname(__DIR__) . '/vendor/autoload.php';
  *
  * @Service("db", shared="1", alias={"database","myDb"})
  * @RpcService("ann")
- * @Controller("/test", type=Controller::REST)
+ * @Controller(prefix="/test", type=Controller::REST)
+ *
  * @package test
  */
 class AnnExample
 {
+    /**
+     * @var string
+     */
+    public $prop0;
+
     /**
      * @Inject("user")
      * @var SimpleCollection
@@ -37,8 +46,13 @@ class AnnExample
     public $prop;
 
     /**
-     * @DI("test")
-     * @Route("index", method="GET", enter="onEnter", leave="onLeave")
+     * @DI("logger")
+     * @Route("index", method="GET", enter="onEnter", leave="onLeave", schemes={"http"}, )
+     * @Parameters({
+     *     @Parameter("name", type="string", rule="string; length:2,10;", required = true),
+     *     @Parameter("age", type="int", rule="number; length:2,10;", required = true),
+     *     @Parameter("sex", type="int", rule="in:0,1;", default="0")
+     * })
      */
     public function indexAction()
     {
@@ -47,8 +61,28 @@ class AnnExample
 
     /**
      * @Route("test/{name}", method={"GET", "POST"}, enter="onEnter", leave="onLeave", tokens={"name"="\w+"})
+     * @Context(
+     *     @Request(type="json"),
+     *     @Response(type="json"),
+     * )
+     *
+     * @Request(
+     *     dataType="json",
+     *     parameters={
+     *          @Parameter("name", type="string", rule="string; length:2,10;", required = true),
+     *     }
+     * )
+     *
+     * @API\Tag(name="users", description="用户接口")
+     * @API\Tag(name="test", description="test接口")
+     * @API\Info(
+     *     tags={"users"},
+     *     version="1.0.0",
+     *     title="XXX API接口",
+     *     description="获取用户信息"
+     * )
      */
-    public function testAction()
+    protected function testAction()
     {
         // something ... ...
     }
@@ -89,7 +123,11 @@ $clt->addScanClass(AnnExample::class);
 
 $clt->registerHandlers([
     'service' => function ($classAnn, \ReflectionClass $refClass, Collector $clt) {
-        de($refClass->getName(), $classAnn);
+
+//        $sReader = new SimpleAnnotationReader();
+//        $mAnnotations = $sReader->getMethodAnnotations($refMethod);
+
+        pr($clt->getAnnotations(), -4);
     },
 //    'wsModule' => function (\ReflectionClass $refClass) {
 //
@@ -102,7 +140,7 @@ $clt->registerHandlers([
 //    },
 ]);
 $clt->handle();
-vd($clt, -4);
+pr($clt, -4);
 
 $annotationReader = new AnnotationReader();
 //Get class annotation

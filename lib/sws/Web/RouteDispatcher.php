@@ -15,6 +15,7 @@ use Sws\Context\HttpContext;
  * Class RouteDispatcher
  * - 为swoole的http请求做了一些处理，将上下文对象 `$context` 作为 action 的唯一参数传入要执行的action 方法
  * @package Sws\Web
+ * @deprecated 不能使用注入属性的方式
  */
 class RouteDispatcher extends Dispatcher
 {

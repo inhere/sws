@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2017-09-11
- * Time: 17:10
+ * Date: 2017-09-26
+ * Time: 12:01
  */
 
 namespace Sws\Annotations;
@@ -11,50 +11,46 @@ namespace Sws\Annotations;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Controller
+ * Class Parameters
  * @package Sws\Annotations
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target("ALL")
  */
-final class Controller
+class Parameter
 {
-    // normal controller
-    const NORM = 1;
-    // restFul controller
-    const REST = 2;
+    /**
+     * @var string
+     */
+    public $name;
 
     /**
      * @var string
      */
-    public $type = self::NORM;
+    public $description;
 
     /**
-     * the name
      * @var string
      */
-    public $name = '';
+    public $type;
 
     /**
-     * the route prefix path
-     * @var string
-     */
-    public $prefix = '';
-
-    /**
-     * on enter
      * @var mixed
      */
-    public $enter;
+    public $default;
 
     /**
-     * on leave
      * @var mixed
      */
-    public $leave;
+    public $rule;
 
     /**
-     * Route constructor.
+     * @var boolean
+     */
+    public $required = false;
+
+    /**
+     * Object constructor.
      * @param array $values
      */
     public function __construct(array $values)
@@ -63,7 +59,7 @@ final class Controller
             $this->name = $values['value'];
         }
 
-        foreach (['name', 'prefix', 'type', 'enter', 'leave'] as $name) {
+        foreach (['name', 'description', 'type', 'rule', 'default', 'required'] as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

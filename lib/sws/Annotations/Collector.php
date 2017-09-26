@@ -8,10 +8,13 @@
 
 namespace Sws\Annotations;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use inhere\library\files\FileFinder;
+use ReflectionClass;
+use ReflectionMethod;
 use Sws\Annotations\Handlers\HandlerInterface;
 
 /**
@@ -42,7 +45,7 @@ class Collector
     /** @var FileFinder */
     private $finder;
 
-    /** @var AnnotationReader  */
+    /** @var Reader  */
     private $reader;
 
     /** @var array  */
@@ -166,7 +169,7 @@ class Collector
                 continue;
             }
 
-            $refClass = new \ReflectionClass($class);
+            $refClass = new ReflectionClass($class);
 
             if (!$refClass->isInstantiable()) {
                 continue;
@@ -174,9 +177,12 @@ class Collector
 
             $hash = spl_object_hash($refClass);
             $this->handledClasses[$hash] = $class;
+
             $classAnn = $this->reader->getClassAnnotations($refClass);
-            // $propsAnn = $this->reader->getPropertyAnnotations($refClass);
-            // $methodsAnn = $this->reader->getMethodAnnotations($refClass);
+            $this->addAnnotations($class, $classAnn);
+
+            $this->getAllPropsAnnotations($refClass);
+            $this->getAllMethodsAnnotations($refClass);
 
             foreach ($this->handlers as $handler) {
                 $handler($classAnn, $refClass, $this);
@@ -186,6 +192,38 @@ class Collector
         $this->foundedCount = $timer;
 
         return $this;
+    }
+
+    /**
+     * @param ReflectionClass $refClass
+     */
+    public function getAllPropsAnnotations(ReflectionClass $refClass)
+    {
+        $class = $refClass->getName();
+        $props = $refClass->getProperties();
+
+        foreach ($props as $refProp) {
+            $pAnnotations = $this->reader->getPropertyAnnotations($refProp);
+
+            if ($pAnnotations) {
+                $this->addAnnotations($class, $pAnnotations, Position::AT_PROPERTY, $refProp->getName());
+            }
+        }
+    }
+
+    /**
+     * @param ReflectionClass $refClass
+     */
+    public function getAllMethodsAnnotations(ReflectionClass $refClass)
+    {
+        $class = $refClass->getName();
+
+        foreach ($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $refMethod) {
+
+            if ($mAnnotations = $this->reader->getMethodAnnotations($refMethod)) {
+                $this->addAnnotations($class, $mAnnotations, Position::AT_METHOD, $refMethod->getName());
+            }
+        }
     }
 
     /**
@@ -218,9 +256,54 @@ class Collector
         return [];
     }
 
-    public function getAnnotations()
+    /**
+     * @param $class
+     * @param $annotations
+     * @param string $type Allow class, method, prop
+     * @param null|string $name when type is method or prop, this is method name or prop name
+     */
+    public function addAnnotations($class, array $annotations, $type = Position::AT_CLASS, $name = null)
     {
+        if (!isset($this->annotations[$class])) {
+            $this->annotations[$class] = [];
+        }
 
+        if ($type === Position::AT_CLASS) {
+            $this->annotations[$class][$type] = $annotations;
+
+        } elseif (($type === Position::AT_PROPERTY || $type === Position::AT_METHOD) && $name) {
+            $this->annotations[$class][$type][$name] = $annotations;
+        }
+    }
+
+    /**
+     * @param null $class
+     * @return array
+     */
+    public function getAnnotations($class = null)
+    {
+        if ($class) {
+            return $this->annotations[$class] ?? null;
+        }
+
+        return $this->annotations;
+    }
+
+    /**
+     * @param string $class
+     * @param string $type
+     * @param string|null $name
+     * @return array|null
+     */
+    public function getAnnotationsByType($class, $type = Position::AT_CLASS, $name = null)
+    {
+        $annotations = $this->annotations[$class][$type] ?? null;
+
+        if (($type === Position::AT_PROPERTY || $type === Position::AT_METHOD) && $name && $annotations) {
+            return $annotations[$name] ?? null;
+        }
+
+        return $annotations;
     }
 
     /**
@@ -309,9 +392,9 @@ class Collector
     }
 
     /**
-     * @return AnnotationReader
+     * @return Reader
      */
-    public function getReader(): AnnotationReader
+    public function getReader(): Reader
     {
         return $this->reader;
     }

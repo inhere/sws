@@ -6,12 +6,12 @@
  * Time: 17:36
  */
 
-use inhere\library\di\Container;
 use inhere\library\helpers\Arr;
 use inhere\libraryPlus\web\ViewRenderer;
+use Inhere\Route\ORouter;
+use Inhere\Route\Dispatcher;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Sws\Memory\Language;
-use Sws\Web\RouteDispatcher;
 
 return Arr::merge(require __DIR__ . '/_base.php', [
     'services' => [
@@ -28,21 +28,19 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'ignoreLastSep' => true,
             'tmpCacheNumber' => 200,
         ],
-        'httpDispatcher' => function (Container $di) {
-            $dispatcher = new RouteDispatcher([
+        'httpDispatcher' => [
+            'target' => Dispatcher::class,
+            'config' => [
                 'filterFavicon' => true,
                 'dynamicAction' => true,
-                RouteDispatcher::ON_NOT_FOUND => '/404'
-            ]);
-
-            $router = $di->get('httpRouter');
-
-            $dispatcher->setMatcher(function ($path, $method) use($router) {
+                Dispatcher::ON_NOT_FOUND => '/404'
+            ],
+            'matcher' => function ($path, $method) {
+                /** @var ORouter $router */
+                $router = \Sws::$app->get('router');
                 return $router->match($path, $method);
-            });
-
-            return $dispatcher;
-        },
+            },
+        ],
         'renderer' => [
             'target' => ViewRenderer::class,
             'viewsPath' => dirname(__DIR__) . '/resources/views',

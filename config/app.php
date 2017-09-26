@@ -25,6 +25,7 @@ return Arr::merge(require __DIR__ . '/_base.php', [
 
         // http
         'httpRouter' => [
+            'target' => ORouter::class,
             'ignoreLastSep' => true,
             'tmpCacheNumber' => 200,
         ],

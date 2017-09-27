@@ -8,7 +8,7 @@
 
 namespace App\Logic;
 
-use Sws\Annotations\Logic;
+use Sws\Annotations\Tags\Logic;
 
 /**
  * Class DemoLogic

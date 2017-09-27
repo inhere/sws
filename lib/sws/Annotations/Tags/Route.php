@@ -6,14 +6,14 @@
  * Time: 9:43
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class Route RouteDocBlock
- * @package Sws\Annotations
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
  * @Target("METHOD")

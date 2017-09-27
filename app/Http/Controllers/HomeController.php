@@ -9,10 +9,10 @@
 namespace App\Http\Controllers;
 
 use App\components\BaseController;
-use Sws\Annotations\Controller;
-use Sws\Annotations\Parameter;
-use Sws\Annotations\Parameters;
-use Sws\Annotations\Route;
+use Sws\Annotations\Tags\Controller;
+use Sws\Annotations\Tags\Parameter;
+use Sws\Annotations\Tags\Parameters;
+use Sws\Annotations\Tags\Route;
 use Sws\Context\HttpContext;
 
 /**

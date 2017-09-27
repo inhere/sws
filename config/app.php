@@ -10,10 +10,14 @@ use inhere\library\helpers\Arr;
 use inhere\libraryPlus\web\ViewRenderer;
 use Inhere\Route\ORouter;
 use Inhere\Route\Dispatcher;
+use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Sws\Memory\Language;
 
 return Arr::merge(require __DIR__ . '/_base.php', [
+    'configCenter' => [
+        'addr' => '127.0.0.1:5456',
+    ],
     'services' => [
         // basic
         'language' => [
@@ -47,7 +51,12 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'viewsPath' => dirname(__DIR__) . '/resources/views',
         ],
 
-        // rpc
+        // rpc services consumer(client)
+        'rpcClient' => [
+            'target' => RpcClient::class,
+        ],
+
+        // rpc services provider(server)'s Dispatcher
         'rpcDispatcher' => function () {
             $dispatcher = new RpcDispatcher([
                 'filterFavicon' => true,

@@ -6,13 +6,13 @@
  * Time: 12:01
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class Parameters
- * @package Sws\Annotations
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
  * @Target("METHOD")
@@ -20,7 +20,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
 class Parameters
 {
     /**
-     * @var array<Sws\Annotations\Parameter>
+     * @var array<Sws\Annotations\Tags\Parameter>
      */
     public $value;
 }

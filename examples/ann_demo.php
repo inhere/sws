@@ -6,19 +6,17 @@
  * Time: 9:29
  */
 
-use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use inhere\library\collections\SimpleCollection;
 use inhere\library\files\FileFinder;
 use Sws\Annotations\Collector;
-use Sws\Annotations\Position;
-use Sws\Annotations\Service;
-use Sws\Annotations\Controller;
-use Sws\Annotations\DI;
-use Sws\Annotations\Inject;
-use Sws\Annotations\Route;
-use Sws\Annotations\RpcService;
-use Sws\Annotations\Parameter;
-use Sws\Annotations\Parameters;
+use Sws\Annotations\Tags\Service;
+use Sws\Annotations\Tags\Controller;
+use Sws\Annotations\Tags\DI;
+use Sws\Annotations\Tags\Inject;
+use Sws\Annotations\Tags\Route;
+use Sws\Annotations\Tags\RpcService;
+use Sws\Annotations\Tags\Parameter;
+use Sws\Annotations\Tags\Parameters;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -122,7 +120,7 @@ $clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 $clt->addScanClass(AnnExample::class);
 
 $clt->registerHandlers([
-    'service' => function ($classAnn, \ReflectionClass $refClass, Collector $clt) {
+    'service' => function (Collector $clt, $classAnn, \ReflectionClass $refClass) {
 
 //        $sReader = new SimpleAnnotationReader();
 //        $mAnnotations = $sReader->getMethodAnnotations($refMethod);

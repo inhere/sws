@@ -8,7 +8,7 @@
 
 namespace App\Dao;
 
-use Sws\Annotations\Dao;
+use Sws\Annotations\Tags\Dao;
 
 /**
  * Class DemoDao

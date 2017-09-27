@@ -2,22 +2,23 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2017-09-26
- * Time: 12:01
+ * Date: 2017/9/11
+ * Time: 下午11:15
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
+use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Parameters
- * @package Sws\Annotations
+ * Class WsModule
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
- * @Target("ALL")
+ * @Target("CLASS")
  */
-class Parameter
+final class WsModule
 {
     /**
      * @var string
@@ -26,28 +27,9 @@ class Parameter
 
     /**
      * @var string
+     * @Required()
      */
-    public $description;
-
-    /**
-     * @var string
-     */
-    public $type;
-
-    /**
-     * @var mixed
-     */
-    public $default;
-
-    /**
-     * @var mixed
-     */
-    public $rule;
-
-    /**
-     * @var boolean
-     */
-    public $required = false;
+    public $path;
 
     /**
      * Object constructor.
@@ -59,7 +41,7 @@ class Parameter
             $this->name = $values['value'];
         }
 
-        foreach (['name', 'description', 'type', 'rule', 'default', 'required'] as $name) {
+        foreach (['name', 'path'] as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

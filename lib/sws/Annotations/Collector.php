@@ -113,6 +113,28 @@ class Collector
     }
 
     /**
+     * @param array $classes
+     * @return $this
+     */
+    public function addScanClasses(array $classes)
+    {
+        $this->scanClasses = array_merge($this->scanClasses, $classes);
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
+     * @return $this
+     */
+    public function addScanClass(string $class)
+    {
+        $this->scanClasses[] = $class;
+
+        return $this;
+    }
+
+    /**
      * @param array $config
      * @return $this
      */
@@ -169,6 +191,11 @@ class Collector
                 continue;
             }
 
+            // deny repeat class
+            if (isset($this->annotations[$class])) {
+                continue;
+            }
+
             $refClass = new ReflectionClass($class);
 
             if (!$refClass->isInstantiable()) {
@@ -185,7 +212,7 @@ class Collector
             $this->getAllMethodsAnnotations($refClass);
 
             foreach ($this->handlers as $handler) {
-                $handler($classAnn, $refClass, $this);
+                $handler($this, $classAnn, $refClass);
             }
         }
 
@@ -227,18 +254,7 @@ class Collector
     }
 
     /**
-     * @param string $class
-     * @return $this
-     */
-    public function addScanClass(string $class)
-    {
-        $this->scanClasses[] = $class;
-
-        return $this;
-    }
-
-    /**
-     * @return array|\Generator
+     * @return \Generator
      */
     public function findFiles()
     {
@@ -253,7 +269,7 @@ class Collector
             }
         }
 
-        return [];
+        return null;
     }
 
     /**

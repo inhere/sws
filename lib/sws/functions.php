@@ -5,6 +5,7 @@
  * Date: 2017/9/3
  * Time: 上午12:49
  */
+
 namespace Sws;
 
 use Sws\WebSocket\Message;
@@ -21,10 +22,12 @@ function message(string $data = '', array $receivers = [], array $excepted = [],
     return Message::make($data, $receivers, $excepted, $sender);
 }
 
-function app() {
-    return \Sws::$app;
+function app($prop = null)
+{
+    return $prop ? \Sws::$app->$prop : \Sws::$app;
 }
 
-function di() {
-    return \Sws::$app->getDi();
+function di($service = null)
+{
+    return $service ? \Sws::$app->get($service) : \Sws::$app->getDi();
 }

@@ -8,7 +8,7 @@
 
 namespace App\Ws\Modules;
 
-use Sws\Annotations\WsModule;
+use Sws\Annotations\Tags\WsModule;
 
 /**
  * Class ChatModule

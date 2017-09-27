@@ -6,14 +6,14 @@
  * Time: 9:54
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class AopPoint
- * @package Sws\Annotations
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
  * @Target({"CLASS", "METHOD"})

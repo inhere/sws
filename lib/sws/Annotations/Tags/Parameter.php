@@ -2,22 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: inhere
- * Date: 2017-09-11
- * Time: 17:10
+ * Date: 2017-09-26
+ * Time: 12:01
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Model - mark class is an model class
- * @package Sws\Annotations
+ * Class Parameters
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target("ALL")
  */
-final class Model
+class Parameter
 {
     /**
      * @var string
@@ -27,7 +27,27 @@ final class Model
     /**
      * @var string
      */
-    public $table;
+    public $description;
+
+    /**
+     * @var string
+     */
+    public $type;
+
+    /**
+     * @var mixed
+     */
+    public $default;
+
+    /**
+     * @var mixed
+     */
+    public $rule;
+
+    /**
+     * @var boolean
+     */
+    public $required = false;
 
     /**
      * Object constructor.
@@ -39,7 +59,7 @@ final class Model
             $this->name = $values['value'];
         }
 
-        foreach (['name', 'table'] as $name) {
+        foreach (['name', 'description', 'type', 'rule', 'default', 'required'] as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

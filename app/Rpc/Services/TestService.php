@@ -8,7 +8,7 @@
 
 namespace App\Rpc\Services;
 
-use Sws\Annotations\RpcService;
+use Sws\Annotations\Tags\RpcService;
 
 /**
  * Class TestService

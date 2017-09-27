@@ -6,13 +6,13 @@
  * Time: 17:10
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class Controller
- * @package Sws\Annotations
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
  * @Target("CLASS")

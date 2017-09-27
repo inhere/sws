@@ -8,7 +8,7 @@
 
 namespace App\Components;
 
-use Sws\Annotations\Service;
+use Sws\Annotations\Tags\Service;
 
 /**
  * Class TestService

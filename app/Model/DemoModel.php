@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use Sws\Annotations\Model;
+use Sws\Annotations\Tags\Model;
 
 /**
  * Class DemoModel

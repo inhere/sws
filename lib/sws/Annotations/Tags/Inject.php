@@ -3,21 +3,21 @@
  * Created by PhpStorm.
  * User: inhere
  * Date: 2017-09-11
- * Time: 16:36
+ * Time: 13:53
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Class Service
- * @package Sws\Annotations
+ * Class Inject
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
- * @Target("CLASS")
+ * @Target({"PROPERTY", "METHOD"})
  */
-final class RpcService
+final class Inject
 {
     /**
      * @var string

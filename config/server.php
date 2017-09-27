@@ -41,6 +41,11 @@ return [
             'type' => 'udp',
             // must setting the handler class in config.
             'listener' => \Inhere\Server\PortListeners\UdpListener::class,
+        ],
+        'rpcServer' => [
+            'listener' => \Sws\Rpc\Application::class,
+            'host' => '0.0.0.0',
+            'port' => '9762',
         ]
     ],
 

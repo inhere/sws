@@ -6,13 +6,13 @@
  * Time: 13:53
  */
 
-namespace Sws\Annotations;
+namespace Sws\Annotations\Tags;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
  * Class DI - Dependency Injection
- * @package Sws\Annotations
+ * @package Sws\Annotations\Tags
  *
  * @Annotation
  * @Target({"PROPERTY", "METHOD"})

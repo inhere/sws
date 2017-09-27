@@ -22,6 +22,10 @@ function message(string $data = '', array $receivers = [], array $excepted = [],
     return Message::make($data, $receivers, $excepted, $sender);
 }
 
+/**
+ * @param null|string $prop
+ * @return mixed
+ */
 function app($prop = null)
 {
     return $prop ? \Sws::$app->$prop : \Sws::$app;

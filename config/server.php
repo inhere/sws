@@ -6,17 +6,21 @@
  * Time: 17:28
  */
 
+use Monolog\Logger;
+
 return [
     'debug' => true,
     'name' => 'demo',
     'root_path' => BASE_PATH,
-    'pid_file' => BASE_PATH . '/tmp/test_server.pid',
-    'log_service' => [
-        'name'     => 'slim_server',
-        'basePath' => BASE_PATH . '/tmp/logs/test_server',
-        'logThreshold' => 0,
-    ],
+    'pid_file' => BASE_PATH . '/tmp/sws.pid',
     'auto_reload' => 'app,config',
+    'log' => [
+        'name' => 'sws_server',
+        'file' => BASE_PATH . '/tmp/logs/sws.log',
+        'level' => Logger::DEBUG,
+        'splitType' => 2,
+        'bufferSize' => 0, // 1000,
+    ],
 
     // for current main server/ outside extend server.
     'options' => [

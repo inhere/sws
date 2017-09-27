@@ -50,26 +50,20 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     private $modules;
 
-    /**
-     * @var array
-     */
-    protected $options = [
-        'debug' => false,
+    protected function init()
+    {
+        $this->options = array_merge($this->options, [
+            'debug' => false,
 
-        // request and response data type: json text
-        'dataType' => 'json',
+            // request and response data type: json text
+            'dataType' => 'json',
 
-        // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
-        'allowedOrigins' => '*',
+            // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
+            'allowedOrigins' => '*',
+        ]);
 
-        // 日志配置
-        'log_service' => [
-            'name' => 'ws_app_log',
-            'basePath' => './tmp/logs/app',
-            'logConsole' => false,
-            'logThreshold' => 0,
-        ],
-    ];
+        parent::init();
+    }
 
     protected function beforeRun()
     {
@@ -499,6 +493,24 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     /////////////////////////////////////////////////////////////////////////////////////////
     /// helper method
     /////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * {@inheritdoc}
+     */
+    public function showHelp($scriptName, $quit = false)
+    {
+        $logo = <<<LOGO
+       _____
+      / ___/      _______
+      \__ \ | /| / / ___/
+     ___/ / |/ |/ (__  )
+    /____/|__/|__/____/
+LOGO;
+
+        Show::write("<info>$logo</info> powered by php 7,swoole 2\n");
+
+        return parent::showHelp($scriptName, $quit);
+    }
 
     /**
      * @return bool

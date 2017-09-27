@@ -27,6 +27,11 @@ return [
         'consumer' // 服务消费方
     ],
 
+    'logger' => [
+        'name' => 'app',
+        'file' => '@tmp/logs/application.log',
+    ],
+
     // 扫描注解包(命名空间)路径，多个包用逗号分隔，不填表示扫描当前ApplicationContext中所有的类
     'annotation' => [
 

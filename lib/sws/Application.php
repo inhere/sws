@@ -14,10 +14,14 @@ use Inhere\Http\Response;
 use Inhere\Route\Dispatcher;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Logger;
+use Monolog\Processor\UidProcessor;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 //use Swoole\Server;
 use Swoole\Websocket\Frame;
+use Sws\Async\StreamHandler;
 use Sws\Components\HttpHelper;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
@@ -68,6 +72,19 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     protected function beforeRun()
     {
         $this->options['assets'] = $this->get('config')->get('assets', []);
+
+        // make logger
+        $opts = $this->getValue('log', []);
+
+        $fileHandler = new StreamHandler($opts['file'], (int)$opts['level'], (int)$opts['splitType']);
+        $mainHandler = new FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
+
+        $logger = new Logger($opts['name']);
+        $logger->pushProcessor(new UidProcessor());
+        $logger->pushHandler($mainHandler);
+
+        $this->setLogger($logger);
+
     }
 
     /** @var array  */

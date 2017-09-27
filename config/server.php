@@ -16,9 +16,9 @@ return [
     'auto_reload' => 'app,config',
     'log' => [
         'name' => 'sws_server',
-        'file' => BASE_PATH . '/tmp/logs/sws.log',
+        'file' => BASE_PATH . '/tmp/logs/server/sws.log',
         'level' => Logger::DEBUG,
-        'splitType' => 2,
+        'splitType' => 1,
         'bufferSize' => 0, // 1000,
     ],
 

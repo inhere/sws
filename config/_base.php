@@ -6,8 +6,7 @@
  * Time: 16:19
  */
 
-use inhere\library\log\Logger;
-use Sws\Memory\FileLogHandler;
+use Monolog\Logger;
 
 return [
     'debug' => false,
@@ -29,7 +28,10 @@ return [
 
     'logger' => [
         'name' => 'app',
-        'file' => '@tmp/logs/application.log',
+        'file' => '@tmp/logs/app/application.log',
+        'level' => Logger::DEBUG,
+        'splitType' => 1,
+        'bufferSize' => 0, // 1000,
     ],
 
     // 扫描注解包(命名空间)路径，多个包用逗号分隔，不填表示扫描当前ApplicationContext中所有的类

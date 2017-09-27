@@ -29,20 +29,8 @@ $di->set('config', function () {
 $di->set('logger', function (Container $di) {
     $opts = $di->get('config')->get('logger', []);
 
-    $fileHandler = new StreamHandler($opts['file']);
-    $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
-
-    $logger = new \Monolog\Logger($opts['name']);
-    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
-    $logger->pushHandler($mainHandler);
-
-    return $logger;
-});
-
-$di->set('svrLogger', function (Container $di) {
-    $opts = $di->get('config')->get('logger', []);
-
-    $fileHandler = new StreamHandler($opts['file']);
+    $file = \Sws::alias($opts['file']);
+    $fileHandler = new StreamHandler($file, (int)$opts['level'], (int)$opts['splitType']);
     $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
 
     $logger = new \Monolog\Logger($opts['name']);
@@ -57,18 +45,6 @@ $di->set('app', function (Container $di) {
 
     \Sws::$app = $app = new \Sws\Application($config);
     $app->setDi($di);
-
-    // make logger
-    $opts = $app->getValue('log', []);
-
-    $fileHandler = new StreamHandler($opts['file'], (int)$opts['level'], (int)$opts['splitType']);
-    $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
-
-    $logger = new \Monolog\Logger($opts['name']);
-    $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
-    $logger->pushHandler($mainHandler);
-
-    $app->setLogger($logger);
 
     return $app;
 });

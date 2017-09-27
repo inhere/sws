@@ -4,7 +4,7 @@
  * User: inhere
  * Date: 2017-03-17
  * Time: 11:20
- * @var \inhere\console\App $app
+ * @var \inhere\console\Application $app
  */
 
 

@@ -8,7 +8,7 @@
 
 namespace App\Console;
 
-use inhere\console\App;
+use inhere\console\Application as BaseApp;
 use Sws\ApplicationInterface;
 use Sws\ApplicationTrait;
 
@@ -16,7 +16,7 @@ use Sws\ApplicationTrait;
  * Class Application
  * @package App\Console
  */
-class Application extends App implements ApplicationInterface
+class Application extends BaseApp implements ApplicationInterface
 {
     use ApplicationTrait;
 

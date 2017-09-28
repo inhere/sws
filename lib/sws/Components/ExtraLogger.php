@@ -9,7 +9,7 @@
 namespace Sws\Components;
 
 use Monolog\Logger;
-use Sws\SwsServer;
+use Sws\Server;
 
 /**
  * Class ExtraLogger
@@ -22,7 +22,7 @@ class ExtraLogger extends Logger
      */
     public function addRecord($level, $message, array $context = [])
     {
-        /** @var SwsServer $svr */
+        /** @var Server $svr */
         if ($svr = \Sws::$app->get('server')) {
             $trace = [
                 'workerId' => $svr->getWorkId(),

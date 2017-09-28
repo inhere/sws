@@ -27,7 +27,7 @@ use Sws\WebSocket\WsServerInterface;
  * @package Sws
  * @property \Swoole\Server $server
  */
-final class SwsServer extends HttpServer implements WsServerInterface
+final class Server extends HttpServer implements WsServerInterface
 {
     use WebSocketServerTrait;
 

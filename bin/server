@@ -2,14 +2,14 @@
 <?php
 /**
  * @var Container $di
- * @var SwsServer $server
+ * @var Server $server
  * @var Application $app
  * @usage `php bin/server start|stop|...`
  */
 
 use inhere\library\di\Container;
 use Sws\Application;
-use Sws\SwsServer;
+use Sws\Server;
 
 define('BASE_PATH', dirname(__DIR__) );
 
@@ -17,12 +17,12 @@ require dirname(__DIR__) . '/boot/app.php';
 
 $server = $di->get('server');
 
-$server->on(SwsServer::ON_BOOTSTRAP, function () {
+$server->on(Server::ON_BOOTSTRAP, function () {
     // load ws modules
 //    require dirname(__DIR__) . '/app/Ws/modules.php';
 });
 
-$server->on(SwsServer::ON_WORKER_STARTED, function ($server) {
+$server->on(Server::ON_WORKER_STARTED, function ($server) {
     /** @var Application $app */
     $app = Sws::$app;
 

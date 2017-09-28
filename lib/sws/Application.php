@@ -48,7 +48,7 @@ class Application implements ApplicationInterface
      */
     private $modules;
 
-    /** @var  SwsServer */
+    /** @var  Server */
     private $server;
 
     /** @var array  */
@@ -373,17 +373,17 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * @return SwsServer
+     * @return Server
      */
-    public function getServer(): SwsServer
+    public function getServer(): Server
     {
         return $this->server;
     }
 
     /**
-     * @param SwsServer $server
+     * @param Server $server
      */
-    public function setServer(SwsServer $server)
+    public function setServer(Server $server)
     {
         $this->server = $server;
     }

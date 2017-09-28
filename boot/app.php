@@ -12,7 +12,7 @@ use inhere\library\di\Container;
 use inhere\library\collections\Configuration;
 use Sws\Components\AppLogHandler;
 use Sws\Components\ExtraLogger;
-use Sws\SwsServer;
+use Sws\Server;
 
 // autoload
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -46,7 +46,7 @@ $di->set('server', function (Container $di) {
     $config = require dirname(__DIR__) . '/config/server.php';
     // $sever = new SwsServer($config);
 
-    return new SwsServer($config);
+    return new Server($config);
 });
 
 $di->set('app', function (Container $di) {

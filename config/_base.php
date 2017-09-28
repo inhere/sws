@@ -13,14 +13,6 @@ return [
     'env'   => 'pdt',
     'rootPath' => dirname(__DIR__),
 
-    'assets' => [
-        'ext' => [],
-        'dirMap' => [
-            // 'url_match' => 'assets dir',
-            '/assets' => 'web/assets',
-            '/uploads' => 'web/uploads'
-        ]
-    ],
     'role' => [
         'provider', // 服务提供方
         'consumer' // 服务消费方

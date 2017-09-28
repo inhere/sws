@@ -9,8 +9,8 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use inhere\console\io\Input;
-use inhere\console\io\Output;
+use Inhere\Console\IO\Input;
+use Inhere\Console\IO\Output;
 
 $in = new Input();
 $out = new Output();

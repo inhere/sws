@@ -7,16 +7,25 @@
  */
 
 use inhere\library\helpers\Arr;
-use inhere\libraryPlus\web\ViewRenderer;
 use Inhere\Route\ORouter;
 use Inhere\Route\Dispatcher;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Sws\Memory\Language;
+use Sws\Web\ViewRenderer;
 
 return Arr::merge(require __DIR__ . '/_base.php', [
     'configCenter' => [
         'addr' => '127.0.0.1:5456',
+    ],
+
+    'assets' => [
+        'ext' => [],
+        'dirMap' => [
+            // 'url_match' => 'assets dir',
+            '/assets' => 'web/assets',
+            '/uploads' => 'web/uploads'
+        ]
     ],
     'services' => [
         // basic

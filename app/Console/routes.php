@@ -4,9 +4,8 @@
  * User: inhere
  * Date: 2017-03-17
  * Time: 11:20
- * @var \inhere\console\Application $app
+ * @var \Inhere\Console\Application $app
  */
-
 
 $app->commands([
     'test' => function () {

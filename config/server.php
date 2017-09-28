@@ -10,12 +10,12 @@ use Monolog\Logger;
 
 return [
     'debug' => true,
-    'name' => 'demo',
+    'name' => 'sws',
     'root_path' => BASE_PATH,
     'pid_file' => BASE_PATH . '/tmp/sws.pid',
     'auto_reload' => 'app,config',
     'log' => [
-        'name' => 'sws_server',
+        'name' => 'sws',
         'file' => BASE_PATH . '/tmp/logs/server/sws.log',
         'level' => Logger::DEBUG,
         'splitType' => 1,
@@ -24,7 +24,7 @@ return [
 
     // for current main server/ outside extend server.
     'options' => [
-
+        'assets' => $di->get('config')->get('assets', [])
     ],
 
     // main server

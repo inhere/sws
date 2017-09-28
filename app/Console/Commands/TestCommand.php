@@ -8,15 +8,15 @@
 
 namespace App\Console\Commands;
 
-use App\Console\BaseCommand;
-use inhere\console\io\Input;
-use inhere\console\io\Output;
+use Inhere\Console\Command;
+use Inhere\Console\IO\Input;
+use Inhere\Console\IO\Output;
 
 /**
  * Class TestCommand
  * @package App\Console\Commands
  */
-class TestCommand extends BaseCommand
+class TestCommand extends Command
 {
     /**
      * do execute

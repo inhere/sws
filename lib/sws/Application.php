@@ -8,42 +8,36 @@
 
 namespace Sws;
 
-use inhere\console\utils\Show;
+use Inhere\Console\Utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use inhere\library\traits\EventTrait;
+use inhere\library\traits\OptionsTrait;
 use Inhere\Route\Dispatcher;
-use Inhere\Server\Components\StaticResourceProcessor;
-use Inhere\Server\Servers\HttpServer;
-use Monolog\Handler\FingersCrossedHandler;
-use Monolog\Logger;
-use Monolog\Processor\UidProcessor;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
-//use Swoole\Server;
 use Swoole\Websocket\Frame;
-use Sws\Async\StreamHandler;
+use Sws;
 use Sws\Components\HttpHelper;
-use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
 use Sws\Module\ModuleInterface;
 use Sws\Module\RootModule;
 use Sws\WebSocket\Connection;
-use Sws\WebSocket\Message;
-use Sws\WebSocket\WebSocketServerTrait;
-use Sws\WebSocket\WsServerInterface;
 
 /**
  * Class Application
  * @package Sws
- * @property \Swoole\Server $server
  */
-class Application extends HttpServer implements WsServerInterface, ApplicationInterface
+class Application implements ApplicationInterface
 {
     use ApplicationTrait;
-    use WebSocketServerTrait;
+    use EventTrait;
+    use OptionsTrait;
 
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
+
+    const ON_NO_MODULE = 'noModule';
 
     /**
      * @var ModuleInterface[]
@@ -54,37 +48,45 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
      */
     private $modules;
 
-    protected function init()
+    /** @var  SwsServer */
+    private $server;
+
+    /** @var array  */
+    protected $options = [
+        'debug' => false,
+
+        'name' => 'sws',
+
+        // request and response data type: json text
+        'dataType' => 'json',
+
+        // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
+        'allowedOrigins' => '*',
+    ];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct(array $options = [])
     {
-        $this->options = array_merge($this->options, [
-            'debug' => false,
+        if ($options) {
+            $this->setOptions($options);
+        }
 
-            // request and response data type: json text
-            'dataType' => 'json',
-
-            // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
-            'allowedOrigins' => '*',
-        ]);
-
-        parent::init();
+        $this->init();
     }
 
-    protected function beforeRun()
+    protected function init()
     {
-        $this->options['assets'] = $this->get('config')->get('assets', []);
+    }
 
-        // make logger
-        $opts = $this->getValue('log', []);
-
-        $fileHandler = new StreamHandler($opts['file'], (int)$opts['level'], (int)$opts['splitType']);
-        $mainHandler = new FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
-
-        $logger = new Logger($opts['name']);
-        $logger->pushProcessor(new UidProcessor());
-        $logger->pushHandler($mainHandler);
-
-        $this->setLogger($logger);
-
+    /**
+     * run
+     */
+    public function run()
+    {
+//        $this->server->setApp($this);
+//        $this->server->run();
     }
 
     /** @var array  */
@@ -128,23 +130,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 //        ];
 //    }
 
-    /**
-     * before Server Start
-     */
-    protected function beforeServerStart()
-    {
-        // if not register route, add a default root path module handler
-        if (0 === count($this->modules)) {
-            $this->module('/', new RootModule());
-        }
-
-        $this->handleDynamicRequest([$this, 'handleHttpRequest']);
-
-        $config = $this->options['assets'];
-
-        // static handle
-        $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);
-    }
 
     /**
      * @param SwRequest $swRequest
@@ -171,7 +156,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
             $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
-            $this->log("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}");
+            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}");
 
             $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
@@ -195,18 +180,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function afterRequest(SwRequest $request, SwResponse $response)
-    {
-        if ($ctx = ContextManager::delContext()) {
-            $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}, context count:" . ContextManager::count());
-        } else {
-            $this->log("The request end. fd: {$request->fd}. context info has lost!");
-        }
-    }
-
-    /**
      * webSocket 只会在连接握手时会有 request, response
      * @param Request $request
      * @param Response $response
@@ -219,7 +192,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         // check module. if not exists, response 404 error
         if (!$module = $this->getModule($path, false)) {
-            $this->log("The #$cid request's path [$path] route handler not exists.", [],'error');
+            Sws::error("The #$cid request's path [$path] route handler not exists.");
 
             $this->fire(self::ON_NO_MODULE, [$cid, $path, $this]);
 
@@ -238,7 +211,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
 
         // application/json
         // text/plain
-        $response->setHeader('Server', $this->config['name'] . '-websocket-server');
+        $response->setHeader('Server', $this->getOption('name') . '-websocket-server');
         // $response->setHeader('Access-Control-Allow-Origin', '*');
 
         $module->setApp($this)->onHandshake($request, $response);
@@ -249,17 +222,8 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     /**
      * @inheritdoc
      */
-    protected function handleWsMessage($server, Frame $frame, Connection $conn)
+    public function handleWsMessage($server, Frame $frame, Connection $conn)
     {
-        $cid = $frame->fd;
-
-        if (!$conn) {
-            $this->log("The connection #{$cid} has lost, meta: \n" . var_export($conn->all(), 1));
-            $this->close($cid);
-
-            return;
-        }
-
         // dispatch command
 
         try {
@@ -267,7 +231,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
                 $result = $module->dispatch($frame->data, $conn, $server);
 
                 if ($result && is_string($result)) {
-                    $this->send($result);
+                    $this->server->send($result);
                 }
             }
         } catch (\Throwable $e) {
@@ -304,7 +268,7 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
             throw new \InvalidArgumentException("The route path[$path] have been registered!");
         }
 
-        $this->log("register the ws module for path: $path, module: {$module->getName()}, class: " . get_class($module));
+        Sws::info("register the ws module for path: $path, module: {$module->getName()}, class: " . get_class($module));
 
         $this->modules[$path] = $module;
 
@@ -365,125 +329,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    /// response
-    /////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @param string $data
-     * @param string $msg
-     * @param int $code
-     * @return string
-     */
-    public function fmtJson($data, string $msg = 'success', int $code = 0): string
-    {
-        return json_encode([
-            'data' => $data,
-            'msg' => $msg,
-            'code' => $code,
-            'time' => microtime(true),
-        ]);
-    }
-
-    /**
-     * @param $data
-     * @param string $msg
-     * @param int $code
-     * @return string
-     */
-    public function formatMessage($data, string $msg = 'success', int $code = 0)
-    {
-        // json
-        if ($this->isJsonType()) {
-            $data = $this->fmtJson($data, $msg ?: 'success', $code);
-
-            // text
-        } else {
-            if ($data && is_array($data)) {
-                $data = json_encode($data);
-            }
-
-            $data = $data ?: $msg;
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param string $data
-     * @param int $sender
-     * @param array $receivers
-     * @param array $excepted
-     * @return Message
-     */
-    public function createMessage(string $data = '', int $sender = 0, array $receivers = [], array $excepted = [])
-    {
-        return Message::make($data, $sender, $receivers, $excepted)->setWs($this);
-    }
-
-    /**
-     * response data to client, will auto build formatted message by 'data_type'
-     * @param mixed $data
-     * @param string $msg
-     * @param int $code
-     * @param bool $doSend
-     * @return int|Message
-     */
-    public function wsRespond($data, string $msg = '', int $code = 0, bool $doSend = true)
-    {
-        $data = $this->formatMessage($data, $msg, $code);
-
-        return $this->respondText($data, $doSend);
-    }
-
-    /**
-     * response text data to client
-     * @param $data
-     * @param bool $doSend
-     * @return int|Message
-     */
-    public function respondText($data, bool $doSend = true)
-    {
-        if (is_array($data)) {
-            $data = implode('', $data);
-        }
-
-        $wrs = Message::make($data)->setWs($this);
-
-        if ($doSend) {
-            $wrs->send();
-        }
-
-        return $wrs;
-    }
-
-    /**
-     * @param string $data
-     * @param string $msg
-     * @param int $code
-     * @return Message
-     */
-    public function sendFormatted($data, string $msg = '', int $code = 0)
-    {
-        $response = $this->formatMessage($data, $msg, $code);
-
-        return Message::make($response)->setWs($this);
-    }
-
-    /**
-     * response text data to client
-     * @param $data
-     * @return Message
-     */
-    public function sendText($data)
-    {
-        if (is_array($data)) {
-            $data = implode('', $data);
-        }
-
-        return $this->createMessage($data);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////
     /// a very simple's user storage
     /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -512,24 +357,6 @@ class Application extends HttpServer implements WsServerInterface, ApplicationIn
     /////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * {@inheritdoc}
-     */
-    public function showHelp($scriptName, $quit = false)
-    {
-        $logo = <<<LOGO
-       _____
-      / ___/      _______
-      \__ \ | /| / / ___/
-     ___/ / |/ |/ (__  )
-    /____/|__/|__/____/
-LOGO;
-
-        Show::write("<info>$logo</info> powered by php 7,swoole 2\n");
-
-        return parent::showHelp($scriptName, $quit);
-    }
-
-    /**
      * @return bool
      */
     public function isJsonType(): bool
@@ -543,6 +370,22 @@ LOGO;
     public function getDataType(): string
     {
         return $this->getOption('dataType');
+    }
+
+    /**
+     * @return SwsServer
+     */
+    public function getServer(): SwsServer
+    {
+        return $this->server;
+    }
+
+    /**
+     * @param SwsServer $server
+     */
+    public function setServer(SwsServer $server)
+    {
+        $this->server = $server;
     }
 
 }

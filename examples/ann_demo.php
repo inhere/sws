@@ -18,6 +18,7 @@ use Sws\Annotations\Tags\RpcService;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Sws\Context\HttpContext;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -51,8 +52,9 @@ class AnnExample
      *     @Parameter("age", type="int", rule="number; length:2,10;", required = true),
      *     @Parameter("sex", type="int", rule="in:0,1;", default="0")
      * })
+     * @param HttpContext $ctx
      */
-    public function indexAction()
+    public function indexAction(HttpContext $ctx)
     {
         // something ... ...
     }

@@ -1,28 +1,39 @@
 #!/usr/bin/env php
 <?php
+/**
+ * @var Container $di
+ * @var SwsServer $server
+ * @var Application $app
+ * @usage `php bin/server start|stop|...`
+ */
 
 use inhere\library\di\Container;
 use Sws\Application;
+use Sws\SwsServer;
 
 define('BASE_PATH', dirname(__DIR__) );
 
 require dirname(__DIR__) . '/boot/app.php';
 
-/**
- * @var Container $di
- * @var \Inhere\Server\BoxServer $app
- */
-$app = $di->get('app');
-//$app = new \Sws\server\WebSocketServer($config);
-//$app = new \inhere\server\BoxServer($config);
+$server = $di->get('server');
 
-$app->on(Application::ON_BOOTSTRAP, function ($app) {
+$server->on(SwsServer::ON_BOOTSTRAP, function () {
     // load ws modules
-    require dirname(__DIR__) . '/app/Ws/modules.php';
+//    require dirname(__DIR__) . '/app/Ws/modules.php';
 });
 
-/**
- * do run
- * @var Application $app
- */
-$app->run();
+$server->on(SwsServer::ON_WORKER_STARTED, function ($server) {
+    /** @var Application $app */
+    $app = Sws::$app;
+
+    // load ws modules
+    require dirname(__DIR__) . '/app/Ws/modules.php';
+
+//    $app->run();
+});
+
+$server->setApp($di->get('app'));
+$server->run();
+
+//$app = $di->get('app');
+//$app->run();

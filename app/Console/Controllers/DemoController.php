@@ -8,13 +8,13 @@
 
 namespace App\Console\Controllers;
 
-use App\Console\BaseController;
+use Inhere\Console\Controller;
 
 /**
  * Class DemoController
  * @package App\Console\Controllers
  */
-class DemoController extends BaseController
+class DemoController extends Controller
 {
     protected static $name = 'demo';
 

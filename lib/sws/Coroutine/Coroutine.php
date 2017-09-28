@@ -9,6 +9,7 @@
 namespace Sws\Coroutine;
 
 use inhere\library\helpers\PhpHelper;
+use Inhere\Server\Helpers\ServerHelper;
 use Swoole\Coroutine as SwCoroutine;
 
 /**
@@ -34,6 +35,10 @@ class Coroutine
      */
     public static function id()
     {
+        if (!ServerHelper::coroutineIsEnabled()) {
+            return 0;
+        }
+
         return SwCoroutine::getuid();
     }
 
@@ -43,6 +48,10 @@ class Coroutine
      */
     public static function tid()
     {
+        if (!ServerHelper::coroutineIsEnabled()) {
+            return 0;
+        }
+
         $id = SwCoroutine::getuid();
 
         return self::$idMap[$id] ?? $id;
@@ -55,6 +64,10 @@ class Coroutine
      */
     public static function create(callable $cb)
     {
+        if (!ServerHelper::coroutineIsEnabled()) {
+            return false;
+        }
+
         $tid = self::tid();
 
         return SwCoroutine::create(function() use($cb, $tid) {
@@ -63,6 +76,14 @@ class Coroutine
 
             PhpHelper::call($cb);
         });
+    }
+
+    /**
+     * @param int|float $seconds
+     */
+    public static function sleep($seconds)
+    {
+        SwCoroutine::sleep($seconds);
     }
 
     /**

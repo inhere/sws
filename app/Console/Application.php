@@ -8,7 +8,7 @@
 
 namespace App\Console;
 
-use inhere\console\Application as BaseApp;
+use Inhere\Console\Application as BaseApp;
 use Sws\ApplicationInterface;
 use Sws\ApplicationTrait;
 

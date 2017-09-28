@@ -10,7 +10,9 @@
 
 use inhere\library\di\Container;
 use inhere\library\collections\Configuration;
-use Sws\Async\StreamHandler;
+use Sws\Components\AppLogHandler;
+use Sws\Components\ExtraLogger;
+use Sws\SwsServer;
 
 // autoload
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -30,20 +32,28 @@ $di->set('logger', function (Container $di) {
     $opts = $di->get('config')->get('logger', []);
 
     $file = \Sws::alias($opts['file']);
-    $fileHandler = new StreamHandler($file, (int)$opts['level'], (int)$opts['splitType']);
+    $fileHandler = new AppLogHandler($file, (int)$opts['level'], (int)$opts['splitType']);
     $mainHandler = new \Monolog\Handler\FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
 
-    $logger = new \Monolog\Logger($opts['name']);
+    $logger = new ExtraLogger($opts['name']);
     $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
     $logger->pushHandler($mainHandler);
 
     return $logger;
 });
 
-$di->set('app', function (Container $di) {
+$di->set('server', function (Container $di) {
     $config = require dirname(__DIR__) . '/config/server.php';
+    // $sever = new SwsServer($config);
 
-    \Sws::$app = $app = new \Sws\Application($config);
+    return new SwsServer($config);
+});
+
+$di->set('app', function (Container $di) {
+    $opts = $di->get('config')->get('application', []);
+
+    \Sws::$app = $app = new \Sws\Application($opts);
+    $app->setServer($di->get('server'));
     $app->setDi($di);
 
     return $app;

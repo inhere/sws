@@ -45,6 +45,11 @@ abstract class BaseSws
     public static $app;
 
     /**
+     * @var Container
+     */
+    public static $di;
+
+    /**
      * @return \Sws\ApplicationInterface
      */
     public static function app()
@@ -59,10 +64,10 @@ abstract class BaseSws
     public static function di($id = null)
     {
         if ($id) {
-            return self::$app->get($id);
+            return self::$di->get($id);
         }
 
-        return self::$app->getDi();
+        return self::$di;
     }
 
     /**
@@ -71,12 +76,12 @@ abstract class BaseSws
      */
     public static function get($id)
     {
-        return self::$app->get($id);
+        return self::$di->get($id);
     }
 
     public static function getIfExist($id)
     {
-        return self::$app->getDi()->getIfExist($id);
+        return self::$di->getIfExist($id);
     }
 
     /*******************************************************************************
@@ -88,7 +93,7 @@ abstract class BaseSws
      */
     public static function logger()
     {
-        return self::$app->get('logger');
+        return self::$di->get('logger');
     }
 
     /**
@@ -96,7 +101,7 @@ abstract class BaseSws
      */
     public static function lang()
     {
-        return self::$app->get('lang');
+        return self::$di->get('lang');
     }
 
     /**
@@ -107,7 +112,7 @@ abstract class BaseSws
      */
     public static function tl($key, array $args = [], $lang = null)
     {
-        return self::$app->get('lang')->tl($key, $args, $lang);
+        return self::$di->get('lang')->tl($key, $args, $lang);
     }
 
     /**
@@ -115,7 +120,7 @@ abstract class BaseSws
      */
     public static function log($level, $message, array $context = [])
     {
-        self::$app->get('logger')->log($level, $message, $context);
+        self::$di->get('logger')->log($level, $message, $context);
     }
 
     /*******************************************************************************

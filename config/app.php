@@ -31,6 +31,7 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         // basic
         'language' => [
             'target' => Language::class,
+            '_options' => ['active' => 1],
             'lang' => 'zh-CN',
             'langs' => ['en', 'zh-CN'],
             'basePath' => dirname(__DIR__) . '/resources/langs',
@@ -39,11 +40,13 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         // http
         'httpRouter' => [
             'target' => ORouter::class,
+            '_options' => ['active' => 1],
             'ignoreLastSep' => true,
             'tmpCacheNumber' => 200,
         ],
         'httpDispatcher' => [
             'target' => Dispatcher::class,
+            '_options' => ['active' => 1],
             'config' => [
                 'filterFavicon' => true,
                 'dynamicAction' => true,
@@ -51,12 +54,14 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             ],
             'matcher' => function ($path, $method) {
                 /** @var ORouter $router */
-                $router = \Sws::$app->get('router');
+                $router = \Sws::$app->get('httpRouter');
                 return $router->match($path, $method);
             },
+
         ],
         'renderer' => [
             'target' => ViewRenderer::class,
+            '_options' => ['active' => 1],
             'viewsPath' => dirname(__DIR__) . '/resources/views',
         ],
 

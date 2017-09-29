@@ -15,7 +15,7 @@ return [
     'pid_file' => BASE_PATH . '/tmp/sws.pid',
     'auto_reload' => 'app,config',
     'log' => [
-        'name' => 'sws',
+        'name' => 'server',
         'file' => BASE_PATH . '/tmp/logs/server/sws.log',
         'level' => Logger::DEBUG,
         'splitType' => 1,

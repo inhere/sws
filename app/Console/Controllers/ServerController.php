@@ -36,4 +36,9 @@ class ServerController extends Controller
     {
         return ;
     }
+
+    private function createServer()
+    {
+        return ;
+    }
 }

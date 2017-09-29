@@ -11,7 +11,7 @@
 use inhere\library\components\AopProxy;
 use inhere\library\di\ContainerManager;
 
-$di = ContainerManager::make();
+$di = Sws::$di = ContainerManager::make();
 
 $di->set('aop', function () {
     return new AopProxy();

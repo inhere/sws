@@ -43,8 +43,6 @@ final class Server extends HttpServer implements WsServerInterface
      */
     protected function beforeServerStart()
     {
-        $this->handleDynamicRequest([$this->app, 'handleHttpRequest']);
-
         $config = $this->options['assets'];
 
         // static handle
@@ -56,10 +54,15 @@ final class Server extends HttpServer implements WsServerInterface
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
+        $info = [
+            'context count' =>  ContextManager::count(),
+            'context ids' => ContextManager::getIds(),
+        ];
+
         if ($ctx = ContextManager::delContext()) {
-            $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}, context count:" . ContextManager::count());
+            $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}", $info);
         } else {
-            $this->log("The request end. fd: {$request->fd}. context info has lost!");
+            $this->log("The request end. fd: {$request->fd}. context info has lost!", $info);
         }
     }
 

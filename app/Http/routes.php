@@ -6,8 +6,8 @@
  */
 
 use App\Http\Controllers\HomeController;
-use inhere\library\di\Container;
 
+$router = Sws::$di->get('httpRouter');
 $router->get('/', function () {
    return 'xxx';
 });
@@ -17,8 +17,8 @@ $router->get('/404', function () {
 });
 
 $router->get('/ws', function () {
-   return \Sws::$app->getDi()->get('renderer')->render('ws.html');
+   return \Sws::$di->get('renderer')->render('ws.html');
 });
 
-$router->any('/home', HomeController::class . '@indexAction');
+$router->any('/home', HomeController::class . '@index');
 $router->any('/home/{act}', HomeController::class);

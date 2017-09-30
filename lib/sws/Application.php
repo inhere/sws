@@ -19,9 +19,9 @@ use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
 use Sws;
 use Sws\Components\HttpHelper;
+use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
 use Sws\Module\ModuleInterface;
-use Sws\Module\RootModule;
 use Sws\WebSocket\Connection;
 
 /**
@@ -85,8 +85,9 @@ class Application implements ApplicationInterface
      */
     public function run()
     {
-//        $this->server->setApp($this);
-//        $this->server->run();
+        $this->server->handleDynamicRequest([$this, 'handleHttpRequest']);
+
+        $this->bootstrap();
     }
 
     /** @var array  */
@@ -103,7 +104,7 @@ class Application implements ApplicationInterface
         return $this;
     }
 
-    public function preLoading()
+    public function bootstrap()
     {
         // collect routes
 
@@ -156,7 +157,12 @@ class Application implements ApplicationInterface
 
             $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
-            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}");
+            $info = [
+                'context count' =>  ContextManager::count(),
+                'context ids' => ContextManager::getIds(),
+            ];
+
+            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}", $info);
 
             $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
@@ -240,9 +246,9 @@ class Application implements ApplicationInterface
 //        return;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /// handle ws request route module
-    /////////////////////////////////////////////////////////////////////////////////////////
+    /*******************************************************************************
+     * handle ws request route module
+     ******************************************************************************/
 
     /**
      * register a route and it's handler module
@@ -328,9 +334,9 @@ class Application implements ApplicationInterface
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /// a very simple's user storage
-    /////////////////////////////////////////////////////////////////////////////////////////
+    /*******************************************************************************
+     * a very simple's user storage
+     ******************************************************************************/
 
     /**
      * @var array
@@ -352,9 +358,9 @@ class Application implements ApplicationInterface
 
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /// helper method
-    /////////////////////////////////////////////////////////////////////////////////////////
+    /*******************************************************************************
+     * helper method
+     ******************************************************************************/
 
     /**
      * @return bool

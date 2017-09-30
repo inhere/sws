@@ -8,10 +8,10 @@
 
 use inhere\library\helpers\Arr;
 use Inhere\Route\ORouter;
-use Inhere\Route\Dispatcher;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Sws\Memory\Language;
+use Sws\Web\HttpDispatcher;
 use Sws\Web\ViewRenderer;
 
 return Arr::merge(require __DIR__ . '/_base.php', [
@@ -45,12 +45,12 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'tmpCacheNumber' => 200,
         ],
         'httpDispatcher' => [
-            'target' => Dispatcher::class,
+            'target' => HttpDispatcher::class,
             '_options' => ['active' => 1],
             'config' => [
                 'filterFavicon' => true,
                 'dynamicAction' => true,
-                Dispatcher::ON_NOT_FOUND => '/404'
+                HttpDispatcher::ON_NOT_FOUND => '/404'
             ],
             'matcher' => function ($path, $method) {
                 /** @var ORouter $router */

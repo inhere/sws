@@ -19,7 +19,7 @@ return [
         'file' => BASE_PATH . '/tmp/logs/server/sws.log',
         'level' => Logger::DEBUG,
         'splitType' => 1,
-        'bufferSize' => 0, // 1000,
+        'bufferSize' => 1000, // 1000,
     ],
 
     // for current main server/ outside extend server.

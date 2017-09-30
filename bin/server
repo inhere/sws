@@ -22,17 +22,21 @@ $server->on(Server::ON_BOOTSTRAP, function () {
 //    require dirname(__DIR__) . '/app/Ws/modules.php';
 });
 
-$server->on(Server::ON_WORKER_STARTED, function ($server) {
+// 启动worker 后，再初始化应用(加载应用配置、路由 ...)
+$server->on(Server::ON_WORKER_STARTED, function (Server $server) {
     /** @var Application $app */
-    $app = Sws::$app;
+    $app = Sws::$di->get('app');
+    $server->setApp($app);
+
+    // load http routes
+    require dirname(__DIR__) . '/app/Http/routes.php';
 
     // load ws modules
     require dirname(__DIR__) . '/app/Ws/modules.php';
 
-//    $app->run();
+    $app->run();
 });
 
-$server->setApp($di->get('app'));
 $server->run();
 
 //$app = $di->get('app');

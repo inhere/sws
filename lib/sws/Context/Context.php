@@ -22,7 +22,7 @@ abstract class Context implements ContextInterface
      * it is `request->fd` OR `\Swoole\Coroutine::getuid()`
      * @var int|string
      */
-    private $id;
+    private $id = 0;
 
     /**
      * @var string
@@ -44,11 +44,11 @@ abstract class Context implements ContextInterface
      */
     public function __construct($addToManager = true)
     {
+        $this->init();
+
         if ($addToManager) {
             ContextManager::addContext($this);
         }
-
-        $this->init();
     }
 
     protected function init()

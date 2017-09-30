@@ -14,7 +14,7 @@ use Sws\Context\HttpContext;
  * Class RestController
  * @package Sws\Web
  */
-class RestController
+class RestController extends BaseController
 {
     public function optionsAction(HttpContext $ctx)
     {

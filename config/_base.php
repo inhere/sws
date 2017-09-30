@@ -23,7 +23,7 @@ return [
         'file' => '@tmp/logs/app/application.log',
         'level' => Logger::DEBUG,
         'splitType' => 1,
-        'bufferSize' => 0, // 1000,
+        'bufferSize' => 1000, // 1000,
     ],
 
     // 扫描注解包(命名空间)路径，多个包用逗号分隔，不填表示扫描当前ApplicationContext中所有的类

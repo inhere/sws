@@ -111,7 +111,7 @@ class ContextManager
         $ctx = null;
         $id = $id ?: Coroutine::tid();
 
-        if ($id instanceof ContextInterface) {
+        if (is_object($id) && $id instanceof ContextInterface) {
             $id = $id->getId();
         }
 
@@ -136,5 +136,13 @@ class ContextManager
     public static function setContextMap(array $contextMap)
     {
         self::$contextMap = $contextMap;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getIds()
+    {
+        return array_keys(self::$contextMap);
     }
 }

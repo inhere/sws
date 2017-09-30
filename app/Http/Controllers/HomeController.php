@@ -8,12 +8,12 @@
 
 namespace App\Http\Controllers;
 
-use App\components\BaseController;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Sws\Annotations\Tags\Route;
 use Sws\Context\HttpContext;
+use Sws\Web\BaseController;
 
 /**
  * Class HomeController
@@ -38,8 +38,15 @@ class HomeController extends BaseController
      */
     public function indexAction($ctx)
     {
-        $text = var_export($ctx, 1);
+        $text = dump_vars($ctx, $this->getContext());
 
         return "<pre>$text</pre>";
+    }
+
+    public function testAction()
+    {
+        $id = spl_object_hash($this);
+
+        return "<pre>$id</pre>";
     }
 }

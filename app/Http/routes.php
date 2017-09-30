@@ -13,7 +13,7 @@ $router->get('/', function () {
 });
 
 $router->get('/404', function () {
-   return '404 NOT FOUND!';
+   return '404, PAGE NOT FOUND!';
 });
 
 $router->get('/ws', function () {

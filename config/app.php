@@ -41,8 +41,10 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         'httpRouter' => [
             'target' => ORouter::class,
             '_options' => ['active' => 1],
-            'ignoreLastSep' => true,
-            'tmpCacheNumber' => 200,
+            'config' => [
+                'ignoreLastSep' => true,
+                'tmpCacheNumber' => 200,
+            ]
         ],
         'httpDispatcher' => [
             'target' => HttpDispatcher::class,

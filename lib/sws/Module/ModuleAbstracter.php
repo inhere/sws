@@ -8,8 +8,8 @@
 
 namespace Sws\Module;
 
-use inhere\library\helpers\PhpHelper;
-use inhere\library\traits\OptionsTrait;
+use Inhere\Library\Helpers\PhpHelper;
+use Inhere\Library\Traits\OptionsTrait;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 use Swoole\WebSocket\Server;

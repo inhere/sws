@@ -2,8 +2,8 @@
 
 namespace Sws\Components;
 
-use inhere\library\StdObject;
-use inhere\library\traits\OptionsTrait;
+use Inhere\Library\StdObject;
+use Inhere\Library\Traits\OptionsTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;

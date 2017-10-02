@@ -12,7 +12,7 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use inhere\library\files\FileFinder;
+use Inhere\Library\Files\FileFinder;
 use ReflectionClass;
 use ReflectionMethod;
 use Sws\Annotations\Handlers\HandlerInterface;

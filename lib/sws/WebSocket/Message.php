@@ -8,8 +8,8 @@
 
 namespace Sws\WebSocket;
 
-use inhere\library\traits\ArrayAccessByPropertyTrait;
-use inhere\library\traits\PropertyAccessByGetterSetterTrait;
+use Inhere\Library\Traits\ArrayAccessByPropertyTrait;
+use Inhere\Library\Traits\PropertyAccessByGetterSetterTrait;
 
 /**
  * Class Message

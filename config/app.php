@@ -6,7 +6,7 @@
  * Time: 17:36
  */
 
-use inhere\library\helpers\Arr;
+use Inhere\Library\Helpers\Arr;
 use Inhere\Route\ORouter;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;

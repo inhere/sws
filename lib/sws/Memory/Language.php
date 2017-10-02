@@ -8,11 +8,11 @@
 
 namespace Sws\Memory;
 
-use inhere\library\collections\Collection;
-use inhere\library\files\Directory;
-use inhere\library\helpers\Arr;
-use inhere\library\helpers\Obj;
-use inhere\library\helpers\Str;
+use Inhere\Library\Collections\Collection;
+use Inhere\Library\Files\Directory;
+use Inhere\Library\Helpers\Arr;
+use Inhere\Library\Helpers\Obj;
+use Inhere\Library\Helpers\Str;
 
 /**
  * Class Language

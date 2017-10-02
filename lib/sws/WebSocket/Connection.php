@@ -8,8 +8,8 @@
 
 namespace Sws\WebSocket;
 
-use inhere\library\StdObject;
-use inhere\library\traits\ArrayAccessByPropertyTrait;
+use Inhere\Library\StdObject;
+use Inhere\Library\Traits\ArrayAccessByPropertyTrait;
 use Sws\Components\HttpHelper;
 use Inhere\Http\Request;
 use Inhere\Http\Response;

@@ -5,11 +5,11 @@
  * Date: 2017-08-24
  * Time: 16:19
  *
- * @var $di \inhere\library\di\Container
+ * @var $di \Inhere\Library\DI\Container
  */
 
-use inhere\library\components\AopProxy;
-use inhere\library\di\ContainerManager;
+use Inhere\Library\Components\AopProxy;
+use Inhere\Library\DI\ContainerManager;
 
 $di = Sws::$di = ContainerManager::make();
 

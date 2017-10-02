@@ -8,7 +8,7 @@
 
 namespace Sws\Components;
 
-use inhere\library\helpers\PhpHelper;
+use Inhere\Library\Helpers\PhpHelper;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Sws\Server;

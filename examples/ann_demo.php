@@ -6,8 +6,8 @@
  * Time: 9:29
  */
 
-use inhere\library\collections\SimpleCollection;
-use inhere\library\files\FileFinder;
+use Inhere\Library\Collections\SimpleCollection;
+use Inhere\Library\Files\FileFinder;
 use Sws\Annotations\Collector;
 use Sws\Annotations\Tags\Service;
 use Sws\Annotations\Tags\Controller;

@@ -8,7 +8,7 @@
 
 namespace Sws;
 
-use inhere\library\di\Container;
+use Inhere\Library\DI\Container;
 
 /**
  * Class ApplicationInterface

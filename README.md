@@ -9,6 +9,12 @@
 
 a webSocket application by php swoole.
 
+## TODO
+
+- error catch
+- db orm, data model
+- rpc data pack protocol: thirft and protobuf
+
 ## project
 
 - **github** https://github.com/inhere/sws.git

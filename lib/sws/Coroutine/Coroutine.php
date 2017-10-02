@@ -8,7 +8,7 @@
 
 namespace Sws\Coroutine;
 
-use inhere\library\helpers\PhpHelper;
+use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Server\Helpers\ServerHelper;
 use Swoole\Coroutine as SwCoroutine;
 

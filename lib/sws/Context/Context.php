@@ -8,7 +8,7 @@
 
 namespace Sws\Context;
 
-use inhere\library\traits\PropertyAccessByGetterSetterTrait;
+use Inhere\Library\Traits\PropertyAccessByGetterSetterTrait;
 
 /**
  * Class Context

@@ -8,8 +8,8 @@
 
 namespace Sws\Components;
 
-use inhere\library\di\Container;
-use inhere\library\di\ServiceProviderInterface;
+use Inhere\Library\DI\Container;
+use Inhere\Library\DI\ServiceProviderInterface;
 
 /**
  * Class CoreServiceProvider

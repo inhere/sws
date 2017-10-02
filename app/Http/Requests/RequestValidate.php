@@ -8,7 +8,7 @@
 
 namespace App\Http\Requests;
 
-use inhere\library\collections\SimpleCollection;
+use Inhere\Library\Collections\SimpleCollection;
 use Inhere\Validate\ValidationTrait;
 
 /**

@@ -3,8 +3,8 @@
  * @var $di Container
  */
 
-use inhere\library\di\Container;
-use inhere\library\collections\Configuration;
+use Inhere\Library\DI\Container;
+use Inhere\Library\Collections\Configuration;
 
 // autoload
 require dirname(__DIR__) . '/vendor/autoload.php';

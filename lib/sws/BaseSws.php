@@ -12,9 +12,9 @@ if (!defined('BASE_PATH')) {
     throw new \LogicException('Must be defined the constant [BASE_PATH - the project root path]');
 }
 
-use inhere\library\di\Container;
-use inhere\library\interfaces\LanguageInterface;
-use inhere\library\traits\PathAliasTrait;
+use Inhere\Library\DI\Container;
+use Inhere\Library\Interfaces\LanguageInterface;
+use Inhere\Library\Traits\PathAliasTrait;
 use Sws\Components\LogShortTrait;
 use Sws\Context\ContextManager;
 

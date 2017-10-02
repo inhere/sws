@@ -6,8 +6,8 @@
  * Time: 17:35
  */
 
-use inhere\library\components\Language;
-use inhere\library\helpers\Arr;
+use Inhere\Library\Components\Language;
+use Inhere\Library\Helpers\Arr;
 
 return Arr::merge(require __DIR__ . '/_base.php',[
     'logger' => [

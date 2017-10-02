@@ -2,13 +2,13 @@
 <?php
 /**
  * @var Container $di
- * @var \inhere\library\collections\Configuration $config
+ * @var \Inhere\Library\Collections\Configuration $config
  * @var Server $server
  * @var Application $app
  * @usage `php bin/server start|stop|...`
  */
 
-use inhere\library\di\Container;
+use Inhere\Library\DI\Container;
 use Sws\Application;
 use Sws\Server;
 

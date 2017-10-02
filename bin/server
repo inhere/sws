@@ -2,6 +2,7 @@
 <?php
 /**
  * @var Container $di
+ * @var \inhere\library\collections\Configuration $config
  * @var Server $server
  * @var Application $app
  * @usage `php bin/server start|stop|...`
@@ -15,6 +16,13 @@ define('BASE_PATH', dirname(__DIR__) );
 
 require dirname(__DIR__) . '/boot/app.php';
 
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
+define('RUNTIME_ENV', $config->get('env'));
+define('APP_DEBUG', $config->get('debug'));
+
+// create app server.
 $server = $di->get('server');
 
 $server->on(Server::ON_BOOTSTRAP, function () {

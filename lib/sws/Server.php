@@ -50,19 +50,30 @@ final class Server extends HttpServer implements WsServerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function beforeRequest(SwRequest $request, SwResponse $response)
+    {
+        $uri = $request->server['request_uri'];
+
+        $this->log("The request [$uri] start. fd: {$request->fd}");
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
+        $uri = $request->server['request_uri'];
         $info = [
             'context count' =>  ContextManager::count(),
             'context ids' => ContextManager::getIds(),
         ];
 
         if ($ctx = ContextManager::delContext()) {
-            $this->log("The request end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}", $info);
+            $this->log("The request [$uri] end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}", $info);
         } else {
-            $this->log("The request end. fd: {$request->fd}. context info has lost!", $info);
+            $this->log("The request [$uri] end. fd: {$request->fd}. context info has lost!", $info);
         }
     }
 

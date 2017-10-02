@@ -13,7 +13,7 @@ use Inhere\Http\Request;
 use Inhere\Http\Response;
 use inhere\library\traits\EventTrait;
 use inhere\library\traits\OptionsTrait;
-use Inhere\Route\Dispatcher;
+use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
@@ -108,6 +108,7 @@ class Application implements ApplicationInterface
     {
         // collect routes
 
+
         // model class
 
         // controller class
@@ -152,7 +153,7 @@ class Application implements ApplicationInterface
              * @var HttpContext $context
              */
             $context = HttpContext::make($swRequest, $swResponse);
-            /** @var Dispatcher $dispatcher */
+            /** @var Sws\Web\HttpDispatcher $dispatcher */
             $dispatcher = $this->di->get('httpDispatcher');
 
             $uri = $uri ?: $swRequest->server['request_uri'];
@@ -361,6 +362,16 @@ class Application implements ApplicationInterface
     /*******************************************************************************
      * helper method
      ******************************************************************************/
+
+    /**
+     * @param string $message
+     * @param array $data
+     * @param int $level
+     */
+    public function log($message, array $data, $level = Logger::INFO)
+    {
+        $this->get('logger')->log($level, strip_tags($message), $data);
+    }
 
     /**
      * @return bool

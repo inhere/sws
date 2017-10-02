@@ -64,8 +64,3 @@ $config = $di->get('config');
 
 // load config services
 $di->sets($config->remove('services'));
-
-error_reporting(E_ALL);
-define('RUNTIME_ENV', $config->get('env'));
-define('APP_DEBUG', $config->get('debug'));
-

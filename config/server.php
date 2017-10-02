@@ -55,10 +55,10 @@ return [
 
     'swoole' => [
         'user'    => 'www-data',
-        'worker_num'    => 4,
-        'task_worker_num' => 2,
+        'worker_num'    => 2,
+        'task_worker_num' => 1,
         'daemonize'     => false,
         'max_request'   => 10000,
-        // 'log_file' => PROJECT_PATH . '/temp/logs/slim_server_swoole.log',
+        'log_file' => BASE_PATH . '/tmp/logs/swoole.log',
     ]
 ];

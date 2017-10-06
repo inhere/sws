@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\Logic;
+use Sws\Annotations\Tags\Logic;
 
 /**
  * Class LogicHandler

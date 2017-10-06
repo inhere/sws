@@ -113,7 +113,7 @@ $ff->setFileFilter(function ($name) {
 //$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Components')->find(true)->getFiles();
 //var_dump($files, $f2);
 
-$clt = new Collector($ff, [
+$clt = new Collector($ff, null, [
     'App\\' => dirname(__DIR__) . '/app/',
     'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
 ]);

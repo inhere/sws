@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-use Inhere\Route\ORouter;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
@@ -20,14 +19,14 @@ use Sws\Web\BaseController;
  * Class HomeController
  * @package App\Http\Controllers
  *
- * @Controller(prefix="/home")
+ * @Controller(prefix="/test")
  */
-class HomeController extends BaseController
+class TestController extends BaseController
 {
     /**
      * test action
      *
-     * @Route("index", method={"GET", "POST"})
+     * @Route("index", method="GET")
      * @Parameters({
      *     @Parameter("name", type="string", rule="string; length:2,10;", required=true),
      *     @Parameter("age", type="int", rule="number; length:2,10;", required=true),
@@ -45,39 +44,10 @@ class HomeController extends BaseController
     }
 
     /**
-     * @Route("/hi/{name}", method="GET")
+     * @Route("/demo")
      * @return string
      */
-    public function hiAction()
-    {
-        $name = $this->getRequest()->getAttribute('args')[0];
-
-        return "<h2>hi, {$name}</h2>";
-    }
-
-    /**
-     * @Route("/routes", method="GET")
-     * @param $ctx
-     * @return string
-     */
-    public function routesAction(HttpContext $ctx)
-    {
-        /** @var ORouter $router */
-        $router = \Sws::get('httpRouter');
-
-        $ctx->getResponse()->setHeader('Content-Type', 'application/json;charset=utf-8');
-
-        return json_encode([
-            'static' => $router->getStaticRoutes(),
-            'regular' => $router->getRegularRoutes(),
-        ]);
-    }
-
-    /**
-     * @Route(method="POST")
-     * @return string
-     */
-    public function testAction()
+    public function demoAction()
     {
         $id = spl_object_hash($this);
 
@@ -85,21 +55,10 @@ class HomeController extends BaseController
     }
 
     /**
-     * @Route(path="/test1")
+     * @Route("/demo1")
      * @return string
      */
-    public function test1Action()
-    {
-        $id = spl_object_hash($this);
-
-        return "<pre>$id</pre>";
-    }
-
-    /**
-     * @Route()
-     * @return string
-     */
-    public function test2Action()
+    public function demo1Action()
     {
         $id = spl_object_hash($this);
 

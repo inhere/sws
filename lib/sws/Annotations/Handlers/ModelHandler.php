@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\Model;
+use Sws\Annotations\Tags\Model;
 
 /**
  * Class ModelHandler

@@ -41,3 +41,61 @@ class SomeController
 
 }
 ```
+
+## usage
+
+```php
+
+$conf = [
+//    'base namespace' => 'the real path',
+    'path' => 'App',
+];
+
+$ff = new FileFinder([
+    // 'sourcePath' => dirname(__DIR__) . '/app/',
+    'include' => [
+        'ext' => ['php']
+    ],
+    'exclude' => [
+        'file' => 'Sws.php',
+        'dir' => ['Console','Helpers', 'Annotations'], // 排除目录
+    ]
+]);
+
+$ff->setFileFilter(function ($name) {
+    // 必须首字符大写(类文件)
+    return preg_match('/[A-Z]/', $name);
+});
+
+//$files = $ff->find(true)->getFiles();
+//$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Components')->find(true)->getFiles();
+//var_dump($files, $f2);
+
+$clt = new Collector($ff, [
+    'App\\' => dirname(__DIR__) . '/app/',
+    'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
+]);
+
+$clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
+$clt->addScanClass(AnnExample::class);
+
+$clt->registerHandlers([
+    'service' => function (Collector $clt, $classAnn, \ReflectionClass $refClass) {
+
+//        $sReader = new SimpleAnnotationReader();
+//        $mAnnotations = $sReader->getMethodAnnotations($refMethod);
+
+        pr($clt->getAnnotations(), -4);
+    },
+//    'wsModule' => function (\ReflectionClass $refClass) {
+//
+//    },
+//    'route' => function (\ReflectionClass $refClass) {
+//
+//    },
+//    'rpcService' => function (\ReflectionClass $refClass) {
+//
+//    },
+]);
+$clt->handle();
+```

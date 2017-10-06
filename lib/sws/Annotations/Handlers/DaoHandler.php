@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\Dao;
+use Sws\Annotations\Tags\Dao;
 
 /**
  * Class DaoHandler

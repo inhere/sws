@@ -13,6 +13,7 @@ use Doctrine\Common\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Inhere\Library\Files\FileFinder;
+use Psr\Log\InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 use Sws\Annotations\Handlers\HandlerInterface;
@@ -23,6 +24,11 @@ use Sws\Annotations\Handlers\HandlerInterface;
  */
 class Collector
 {
+    /**
+     * @var string
+     */
+    private $basePath;
+
     /**
      * @var array
      * [
@@ -60,13 +66,14 @@ class Collector
     /**
      * Collector constructor.
      * @param FileFinder|null $finder
+     * @param string|null $basePath
      * @param array $scanDirs
      */
-    public function __construct(FileFinder $finder = null, array $scanDirs = [])
+    public function __construct(FileFinder $finder = null, string $basePath = null, array $scanDirs = [])
     {
         $this->finder = $finder;
-
         $this->reader = new IndexedReader(new AnnotationReader());
+        $this->basePath = $basePath;
 
         $this->addScans($scanDirs);
 
@@ -76,7 +83,9 @@ class Collector
     protected function init()
     {
         AnnotationRegistry::registerLoader('class_exists');
+        AnnotationReader::addGlobalIgnoredName('date');
         AnnotationReader::addGlobalIgnoredName('from');
+        AnnotationReader::addGlobalIgnoredName('reference');
         AnnotationReader::addGlobalIgnoredName('notice');
         AnnotationReader::addGlobalIgnoredName('Notice');
     }
@@ -86,12 +95,16 @@ class Collector
      * @param string $path
      * @return $this
      */
-    public function addScan(string $namespace, string $path)
+    public function addScan(string $namespace, string $path = null)
     {
-        $length = strlen($namespace);
+        $namespace = trim($namespace, '\\') . '\\';
 
-        if ('\\' !== $namespace[$length - 1]) {
-            throw new \InvalidArgumentException('A non-empty PSR-4 prefix must end with a namespace separator.');
+        if (!$path) {
+            if (!$this->basePath) {
+                throw new InvalidArgumentException('arg path and prop basePath at least one is not empty');
+            }
+
+            $path = $this->basePath . '/' . str_replace('\\', '/', $namespace);
         }
 
         $this->scanDirs[$namespace] = $path;
@@ -212,7 +225,7 @@ class Collector
             $this->getAllMethodsAnnotations($refClass);
 
             foreach ($this->handlers as $handler) {
-                $handler($this, $classAnn, $refClass);
+                $handler($classAnn, $refClass, $this);
             }
         }
 
@@ -246,9 +259,15 @@ class Collector
         $class = $refClass->getName();
 
         foreach ($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $refMethod) {
+            $mName = $refMethod->getName();
+
+            // ignore magic methods
+            if (0 === strpos($mName, '__')) {
+                continue;
+            }
 
             if ($mAnnotations = $this->reader->getMethodAnnotations($refMethod)) {
-                $this->addAnnotations($class, $mAnnotations, Position::AT_METHOD, $refMethod->getName());
+                $this->addAnnotations($class, $mAnnotations, Position::AT_METHOD, $mName);
             }
         }
     }
@@ -306,9 +325,9 @@ class Collector
     }
 
     /**
-     * @param string $class
-     * @param string $type
-     * @param string|null $name
+     * @param string $class the full class name
+     * @param string $type @see Position::AT_*
+     * @param string|null $name the method name or property name
      * @return array|null
      */
     public function getAnnotationsByType($class, $type = Position::AT_CLASS, $name = null)
@@ -413,5 +432,21 @@ class Collector
     public function getReader(): Reader
     {
         return $this->reader;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBasePath(): string
+    {
+        return $this->basePath;
+    }
+
+    /**
+     * @param string $basePath
+     */
+    public function setBasePath(string $basePath)
+    {
+        $this->basePath = $basePath;
     }
 }

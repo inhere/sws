@@ -13,6 +13,7 @@ use Inhere\Http\Request;
 use Inhere\Http\Response;
 use Inhere\Library\Traits\EventTrait;
 use Inhere\Library\Traits\OptionsTrait;
+use Inhere\Pool\ObjectPool;
 use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
@@ -48,7 +49,7 @@ class Application implements ApplicationInterface
      */
     private $modules;
 
-    /** @var  Server */
+    /** @var  AppServer */
     private $server;
 
     /** @var array  */
@@ -107,7 +108,18 @@ class Application implements ApplicationInterface
     public function bootstrap()
     {
         // collect routes
+        \Sws::server()->log('collected route count: ' . \Sws::get('httpRouter')->count());
 
+        \Sws::server()->log(sprintf(
+            'registered services count: %d, names: %s',
+            \Sws::$di->count(),
+            \Sws::$di->getIds(false)
+        ));
+
+        \Sws::server()->log(sprintf(
+            'stored objects count: %d',
+            ObjectPool::count()
+        ));
 
         // model class
 
@@ -390,17 +402,17 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * @return Server
+     * @return AppServer
      */
-    public function getServer(): Server
+    public function getServer(): AppServer
     {
         return $this->server;
     }
 
     /**
-     * @param Server $server
+     * @param AppServer $server
      */
-    public function setServer(Server $server)
+    public function setServer(AppServer $server)
     {
         $this->server = $server;
     }

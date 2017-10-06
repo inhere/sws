@@ -12,7 +12,7 @@ use Inhere\Library\DI\Container;
 use Inhere\Library\Collections\Configuration;
 use Sws\Components\AppLogHandler;
 use Sws\Components\ExtraLogger;
-use Sws\Server;
+use Sws\AppServer;
 
 // autoload
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -20,6 +20,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 // create service container
 require __DIR__ . '/container.php';
 
+// register some service components
 $di->set('config', function () {
     return Configuration::makeByEnv(
         dirname(__DIR__) . '/.local', // locFile
@@ -46,7 +47,7 @@ $di->set('server', function (Container $di) {
     $config = require dirname(__DIR__) . '/config/server.php';
     // $sever = new SwsServer($config);
 
-    return new Server($config);
+    return new AppServer($config);
 });
 
 $di->set('app', function (Container $di) {
@@ -62,5 +63,5 @@ $di->set('app', function (Container $di) {
 /** @var Configuration $config */
 $config = $di->get('config');
 
-// load config services
+// load services from config
 $di->sets($config->remove('services'));

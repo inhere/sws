@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\Service;
+use Sws\Annotations\Tags\Service;
 
 /**
  * Class ServiceHandler

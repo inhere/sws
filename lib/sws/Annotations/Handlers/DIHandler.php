@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\DI;
+use Sws\Annotations\Tags\DI;
 
 /**
  * Class DIHandler

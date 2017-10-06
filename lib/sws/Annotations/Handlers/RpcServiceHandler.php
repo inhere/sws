@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\RpcService;
+use Sws\Annotations\Tags\RpcService;
 
 /**
  * Class RpcServiceHandler

@@ -3,14 +3,14 @@
 /**
  * @var Container $di
  * @var \Inhere\Library\Collections\Configuration $config
- * @var Server $server
+ * @var AppServer $server
  * @var Application $app
  * @usage `php bin/server start|stop|...`
  */
 
 use Inhere\Library\DI\Container;
 use Sws\Application;
-use Sws\Server;
+use Sws\AppServer;
 
 define('BASE_PATH', dirname(__DIR__) );
 
@@ -25,16 +25,21 @@ define('APP_DEBUG', $config->get('debug'));
 // create app server.
 $server = $di->get('server');
 
-$server->on(Server::ON_BOOTSTRAP, function () {
+$server->on(AppServer::ON_BOOTSTRAP, function () {
     // load ws modules
 //    require dirname(__DIR__) . '/app/Ws/modules.php';
 });
 
+$server->on(AppServer::ON_SERVER_CREATE, function () {
+});
+
 // 启动worker 后，再初始化应用(加载应用配置、路由 ...)
-$server->on(Server::ON_WORKER_STARTED, function (Server $server) {
+$server->on(AppServer::ON_WORKER_STARTED, function (AppServer $server) {
     /** @var Application $app */
     $app = Sws::$di->get('app');
     $server->setApp($app);
+
+    require dirname(__DIR__) . '/app/annotations.php';
 
     // load http routes
     require dirname(__DIR__) . '/app/Http/routes.php';
@@ -44,6 +49,10 @@ $server->on(Server::ON_WORKER_STARTED, function (Server $server) {
 
     $app->run();
 });
+
+
+//require dirname(__DIR__) . '/app/annotations.php';
+//exit;
 
 $server->run();
 

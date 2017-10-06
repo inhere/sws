@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\AopPoint;
+use Sws\Annotations\Tags\AopPoint;
 
 /**
  * Class AopPointHandler

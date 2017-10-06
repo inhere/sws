@@ -59,7 +59,9 @@ class Parameter
             $this->name = $values['value'];
         }
 
-        foreach (['name', 'description', 'type', 'rule', 'default', 'required'] as $name) {
+        $fields = ['name', 'description', 'type', 'rule', 'default', 'required'];
+
+        foreach ($fields as $name) {
             if (isset($values[$name])) {
                 $this->$name = $values[$name];
             }

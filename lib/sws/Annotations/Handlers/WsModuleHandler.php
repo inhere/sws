@@ -9,7 +9,7 @@
 namespace Sws\Annotations\Handlers;
 
 use Sws\Annotations\Collector;
-use Sws\Annotations\WsModule;
+use Sws\Annotations\Tags\WsModule;
 
 /**
  * Class WsModuleHandler

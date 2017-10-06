@@ -16,7 +16,7 @@ use Inhere\Library\DI\Container;
 use Inhere\Library\Interfaces\LanguageInterface;
 use Inhere\Library\Traits\PathAliasTrait;
 use Sws\Components\LogShortTrait;
-use Sws\Context\ContextManager;
+use Sws\Context\ContextStaticGetTrait;
 
 /**
  * Class BaseSws
@@ -24,6 +24,7 @@ use Sws\Context\ContextManager;
  */
 abstract class BaseSws
 {
+    use ContextStaticGetTrait;
     use PathAliasTrait;
     use LogShortTrait;
 
@@ -89,6 +90,14 @@ abstract class BaseSws
      ******************************************************************************/
 
     /**
+     * @return AppServer
+     */
+    public static function server()
+    {
+        return self::$di->get('server');
+    }
+
+    /**
      * @return \Psr\Log\LoggerInterface
      */
     public static function logger()
@@ -123,34 +132,4 @@ abstract class BaseSws
         self::$di->get('logger')->log($level, $message, $context);
     }
 
-    /*******************************************************************************
-     * request context
-     ******************************************************************************/
-
-    /**
-     * @param null|string|int $id
-     * @return null|Context\ContextInterface
-     */
-    public static function getContext($id = null)
-    {
-        return ContextManager::getContext($id);
-    }
-
-    /**
-     * @param null|string|int $id
-     * @return \Inhere\Http\Request|null
-     */
-    public static function getRequest($id = null)
-    {
-        return ContextManager::getRequest($id);
-    }
-
-    /**
-     * @param null|string|int $id
-     * @return \Inhere\Http\Response|null
-     */
-    public static function getResponse($id = null)
-    {
-        return ContextManager::getResponse($id);
-    }
 }

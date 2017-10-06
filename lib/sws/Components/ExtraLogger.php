@@ -11,7 +11,7 @@ namespace Sws\Components;
 use Inhere\Library\Helpers\PhpHelper;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Sws\Server;
+use Sws\AppServer;
 
 /**
  * Class ExtraLogger
@@ -24,7 +24,7 @@ class ExtraLogger extends Logger
      */
     public function addRecord($level, $message, array $context = [])
     {
-        /** @var Server $svr */
+        /** @var AppServer $svr */
         if ($svr = \Sws::$app->get('server')) {
             $trace = [
                 'workerId' => $svr->getWorkId(),
@@ -50,6 +50,7 @@ class ExtraLogger extends Logger
     /**
      * alias method of the parent::addRecord()
      * translate `call_user_func` -> PhpHelper::call()
+     * @see Logger::addRecord()
      * @param $level
      * @param $message
      * @param array $context
@@ -102,7 +103,7 @@ class ExtraLogger extends Logger
         );
 
         foreach ($this->processors as $processor) {
-            $record = PhpHelper::call($processor, $record);
+            $record = $processor($record);
         }
 
         while ($handler = current($this->handlers)) {

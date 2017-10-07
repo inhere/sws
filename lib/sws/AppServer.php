@@ -34,8 +34,15 @@ final class AppServer extends HttpServer implements WsServerInterface
     /** @var  Application */
     private $app;
 
+    /**
+     * {@inheritDoc}
+     */
     protected function beforeRun()
     {
+        // 捕获异常
+        register_shutdown_function([$this, 'handleFatal']);
+        set_error_handler([$this, 'handleError']);
+        set_exception_handler([$this, 'handleException']);
     }
 
     /**
@@ -43,7 +50,7 @@ final class AppServer extends HttpServer implements WsServerInterface
      */
     protected function beforeServerStart()
     {
-        $config = $this->options['assets'];
+        $config = \Sws::$di->get('config')->get('assets', []);
 
         // static handle
         $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);

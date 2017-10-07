@@ -8,6 +8,7 @@
 
 namespace Sws\Web;
 
+use App\Http\Requests\RequestValidate;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 use Sws\Context\ContextGetTrait;
@@ -19,6 +20,25 @@ use Sws\Context\ContextGetTrait;
 abstract class BaseController
 {
     use ContextGetTrait;
+
+    /**
+     * @var int
+     */
+    private $type = 1;
+
+    /**
+     * @var array
+     * [ action name => method name]
+     */
+    private $actions = [];
+
+    /**
+     * @var array
+     * [
+     *  action => RequestValidate
+     * ]
+     */
+    private $validations = [];
 
     /**
      * @param Request $req
@@ -41,10 +61,63 @@ abstract class BaseController
     {
         $response = $response ?: $this->getResponse();
 
-        $response->setStatus((int)$status);
-        $response->setHeader('Location', $url);
-
-        return $response;
+        return $response->redirect($url, $status);
     }
 
+    /**
+     * @return array
+     */
+    public function getActions(): array
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @param array $actions
+     */
+    public function setActions(array $actions)
+    {
+        $this->actions = $actions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidations(): array
+    {
+        return $this->validations;
+    }
+
+    /**
+     * @param array $validations
+     */
+    public function setValidations(array $validations)
+    {
+        $this->validations = $validations;
+    }
+
+    /**
+     * @param string $name
+     * @param RequestValidate $validation
+     */
+    public function setValidation(string $name, RequestValidate $validation)
+    {
+        $this->validations[$name] = $validation;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType(int $type)
+    {
+        $this->type = $type;
+    }
 }

@@ -64,6 +64,19 @@ class Collector
     private $foundedCount = 0;
 
     /**
+     * @var array
+     * [
+     *  class name => [
+     *  'class' => class annotations,
+     *  'prop' => props annotations,
+     *  'method' => methods annotations,
+     * ]
+     * ... ...
+     * ]
+     */
+    private $annotations = [];
+
+    /**
      * Collector constructor.
      * @param FileFinder|null $finder
      * @param string|null $basePath
@@ -78,6 +91,17 @@ class Collector
         $this->addScans($scanDirs);
 
         $this->init();
+    }
+
+    public function __destruct()
+    {
+        $this->clear();
+    }
+
+    public function clear()
+    {
+        $this->finder = null;
+        $this->annotations = $this->scanClasses = $this->handlers = $this->handledClasses = [];
     }
 
     protected function init()
@@ -169,19 +193,6 @@ class Collector
 
         return $this;
     }
-
-    /**
-     * @var array
-     * [
-     *  class name => [
-     *  'class' => class annotations,
-     *  'prop' => props annotations,
-     *  'method' => methods annotations,
-     * ]
-     * ... ...
-     * ]
-     */
-    private $annotations = [];
 
     /**
      * handle resource

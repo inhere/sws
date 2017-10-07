@@ -8,12 +8,6 @@
 use Inhere\Library\Files\FileFinder;
 use Sws\Annotations\Collector;
 
-$conf = [
-//    'base namespace' => 'the real path',
-    'App\\' => dirname(__DIR__) . '/app/',
-    'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
-];
-
 $ff = new FileFinder([
     // 'sourcePath' => dirname(__DIR__) . '/app/',
     'include' => [
@@ -21,7 +15,7 @@ $ff = new FileFinder([
     ],
     'exclude' => [
         'file' => 'Sws.php',
-        'dir' => ['Console','Helpers', 'Annotations'], // 排除目录
+        'dir' => ['Console', 'Helpers', 'Annotations'], // 排除目录
     ]
 ]);
 
@@ -34,12 +28,20 @@ $ff->setFileFilter(function ($name) {
 //$f2 = $ff->setSourcePath(dirname(__DIR__) . '/lib/sws/Components')->find(true)->getFiles();
 //var_dump($files, $f2);
 
+$conf = [
+//    'base namespace' => 'the real path',
+    'App\\' => dirname(__DIR__) . '/app/',
+    'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
+];
 $clt = new Collector($ff, null, $conf);
-$clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 
+$clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
 $clt->registerHandlers([
     'route' => new \Sws\Annotations\Handlers\RouteHandler(),
     'service' => new \Sws\Annotations\Handlers\ServiceHandler(),
 ]);
 
 $clt->handle();
+
+// destroy
+$clt->clear();

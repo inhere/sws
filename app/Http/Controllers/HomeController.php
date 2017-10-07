@@ -39,7 +39,7 @@ class HomeController extends BaseController
      */
     public function indexAction($ctx)
     {
-        $text = dump_vars($ctx, $this->getContext());
+        $text = dump_vars(spl_object_hash($ctx), spl_object_hash($this->getContext()));
 
         return "<pre>$text</pre>";
     }

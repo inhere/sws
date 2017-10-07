@@ -17,7 +17,7 @@ $router->get('/404', function () {
 });
 
 $router->get('/ws', function () {
-   return \Sws::$di->get('renderer')->render('ws.html');
+   return \Sws::$di->get('renderer')->render('ws/index.html');
 });
 
 $router->any('/home', HomeController::class . '@index');

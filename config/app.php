@@ -19,6 +19,14 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         'addr' => '127.0.0.1:5456',
     ],
 
+    'logger' => [
+        'name' => 'app',
+        'file' => '@tmp/logs/app/application.log',
+        'level' => \Monolog\Logger::DEBUG,
+        'splitType' => 1,
+        'bufferSize' => 0, // 0 1000,
+    ],
+
     'assets' => [
         'ext' => [],
         'dirMap' => [

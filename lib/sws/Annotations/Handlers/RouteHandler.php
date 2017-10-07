@@ -14,6 +14,7 @@ use Sws\Annotations\Collector;
 use Sws\Annotations\Position;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Route;
+use Sws\Web\BaseController;
 
 /**
  * Class RouteHandler
@@ -36,22 +37,21 @@ class RouteHandler extends AbstractHandler
         }
 
         $class = $classRef->getName();
+        /** @var BaseController $object */
         $object = new $class;
 
-        // store the controller object
-        ObjectPool::put($object);
+        // todo rest ful support...
+//        if ($isRest = $conf->type === Controller::REST) {
+            $object->setType((int)$conf->type);
+//        }
 
-        if ($isRest = $conf->type === Controller::REST) {
-
-        }
-
+        $actions = [];
         $basename = basename($classRef->getFileName(), '.php');
-        // if not setting prefix, will use the controller name. e.g `HomeController -> '/home'`
+        // if not setting prefix, will use the controller name. e.g `HomeController -> home`
         $prefix = $conf->prefix ?: lcfirst(str_replace($this->controllerSuffix, '', $basename));
 
         /** @var ORouter $router */
         $router = \Sws::get('httpRouter');
-//        $router->map($conf, $route, $handler);
 
         foreach ($collector->getAnnotationsByType($class, Position::AT_METHOD) as $mName => $mAnn) {
             /** @var Route $route */
@@ -59,15 +59,22 @@ class RouteHandler extends AbstractHandler
                 continue;
             }
 
-            $nameNoSfx = str_replace($this->actionSuffix, '', $mName);
-            $path = $route->path ?: $nameNoSfx;
+            // e.g. `indexAction -> index`
+            $action = str_replace($this->actionSuffix, '', $mName);
+            $actions[$action] = $mName;
+            $path = $route->path ?: $action;
 
             if ($path{0} !== '/') {
                 $path = $prefix . '/' . $path;
             }
 
-            $router->map($route->method, $path, $class . '@' . $nameNoSfx);
+            $router->map($route->method, $path, $class . '@' . $action);
         }
+
+        $object->setActions($actions);
+
+        // store the controller object
+        ObjectPool::put($object);
 
 //        var_dump($conf, $basename, $class, $prefix);die;
     }

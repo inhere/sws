@@ -34,6 +34,9 @@ class RequestValidate extends SimpleCollection
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function rules()
     {
         return [
@@ -41,6 +44,9 @@ class RequestValidate extends SimpleCollection
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function translates()
     {
         return [

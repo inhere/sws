@@ -8,6 +8,8 @@
 
 namespace Sws\Web;
 
+use Inhere\Files\File;
+
 /**
  * Class ViewRenderer
  *  Render PHP view scripts into a PSR-7 Response object
@@ -34,6 +36,9 @@ class ViewRenderer
 
     /** @var string  */
     protected $suffix = 'php';
+
+    /** @var array allowed suffix list */
+    protected $suffixes = ['php','html'];
 
     /**
      * in layout file '...<body>{_CONTENT_}</body>...'
@@ -205,10 +210,10 @@ class ViewRenderer
             throw new \InvalidArgumentException('Duplicate view key found');
         }
 
-        $file = $this->viewsPath . $view;
+        $file = $this->getViewFile($view);
 
         if (!is_file($file)) {
-            throw new \RuntimeException("View cannot render '$view' because the view does not exist");
+            throw new \RuntimeException("cannot render '$view' because the view file does not exist. File: $file");
         }
 
         /*
@@ -236,13 +241,24 @@ class ViewRenderer
     }
 
     /**
-     * @param string $view
+     * @param $view
+     * @return string
+     */
+    public function getViewFile($view)
+    {
+        $view = $this->getRealView($view);
+
+        return File::isAbsPath($view) ? $view : $this->viewsPath . $view;
+    }
+
+    /**
+     * @param string $file
      * @param array $data
      */
-    protected function protectedIncludeScope($view, array $data)
+    protected function protectedIncludeScope($file, array $data)
     {
         extract($data, EXTR_OVERWRITE);
-        include $view;
+        include $file;
     }
 
     /**
@@ -267,9 +283,14 @@ class ViewRenderer
      */
     protected function getRealView($view)
     {
-        $ext = ".{$this->suffix}";
+        $sfx = File::getSuffix($view);
+        $ext = $this->suffix;
 
-        return substr($view, - strlen($ext)) === $ext ? $view : $view . $ext;
+        if ($sfx === $ext || in_array($sfx, $this->suffixes, true)) {
+            return $view;
+        }
+
+        return $view . $ext;
     }
 
     /**

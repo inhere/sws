@@ -11,6 +11,7 @@ namespace Sws;
 use Inhere\Console\Utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\EventTrait;
 use Inhere\Library\Traits\OptionsTrait;
 use Inhere\Pool\ObjectPool;
@@ -111,7 +112,7 @@ class Application implements ApplicationInterface
         \Sws::server()->log('collected route count: ' . \Sws::get('httpRouter')->count());
 
         \Sws::server()->log(sprintf(
-            'registered services count: %d, names: %s',
+            'registered services count: %d, services: %s',
             \Sws::$di->count(),
             \Sws::$di->getIds(false)
         ));
@@ -177,15 +178,16 @@ class Application implements ApplicationInterface
 
             Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}", $info);
 
-            $resp = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
+            $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
-            if (!$resp instanceof Response) {
-                $response = HttpHelper::createResponse();
-                $response->getBody()->write((string)$resp);
+            if (!$result instanceof Response) {
+                $response = $context->getResponse();
+                $response->getBody()->write((string)$result);
             } else {
-                $response = $resp;
+                $response = $result;
             }
         } catch (\Throwable $e) {
+            Sws::error(PhpHelper::exceptionToString($e, true, true, __METHOD__));
             throw $e;
         }
 
@@ -218,7 +220,7 @@ class Application implements ApplicationInterface
             $response
                 ->setStatus(404)
                 ->setHeaders(['Connection' => 'close'])
-                ->setBodyContent("You request route path [$path] not found!");
+                ->write("You request route path [$path] not found!");
 
             return false;
         }

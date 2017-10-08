@@ -8,7 +8,9 @@
 
 namespace App\Http\Controllers;
 
+use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Route\ORouter;
+use Monolog\Logger;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
@@ -53,6 +55,22 @@ class HomeController extends BaseController
         $name = $this->getRequest()->getAttribute('args')[0];
 
         return "<h2>hi, {$name}</h2>";
+    }
+
+    /**
+     * @Route(method="GET")
+     * @return string
+     */
+    public function logAction()
+    {
+        \Sws::$di->get('server')->log('info log');
+        \Sws::$di->get('server')->log('error log', [], Logger::ERROR);
+        $e = new \RuntimeException('exception log');
+        $err = PhpHelper::exceptionToString($e, true, true);
+        \Sws::$di->get('server')->log($err, [], Logger::ERROR);
+        \Sws::$di->get('server')->log('notice log', [], Logger::NOTICE);
+
+        return 'log test';
     }
 
     /**

@@ -11,8 +11,10 @@ namespace Sws;
 use Inhere\Console\Utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
+use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\WebSocket\Frame;
@@ -39,10 +41,6 @@ final class AppServer extends HttpServer implements WsServerInterface
      */
     protected function beforeRun()
     {
-        // 捕获异常
-        register_shutdown_function([$this, 'handleFatal']);
-        set_error_handler([$this, 'handleError']);
-        set_exception_handler([$this, 'handleException']);
     }
 
     /**
@@ -61,9 +59,25 @@ final class AppServer extends HttpServer implements WsServerInterface
      */
     protected function beforeRequest(SwRequest $request, SwResponse $response)
     {
+        $request->server['request_memory'] = memory_get_usage();
         $uri = $request->server['request_uri'];
 
         $this->log("The request [$uri] start. fd: {$request->fd}");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function prepareRuntimeContext()
+    {
+        $info = parent::prepareRuntimeContext();
+
+        if ($ctx = ContextManager::getContext()) {
+            $info['ctxId'] = $ctx->getId();
+            $info['ctxKey'] = $ctx->getKey();
+        }
+
+        return $info;
     }
 
     /**
@@ -73,15 +87,22 @@ final class AppServer extends HttpServer implements WsServerInterface
     {
         $uri = $request->server['request_uri'];
         $info = [
-            'context count' =>  ContextManager::count(),
-            'context ids' => ContextManager::getIds(),
+//            'context count' =>  ContextManager::count(),
+//            'context ids' => ContextManager::getIds(),
         ];
 
         if ($ctx = ContextManager::delContext()) {
-            $this->log("The request [$uri] end. fd: {$request->fd}, ctxId: {$ctx->getId()}, ctxKey: {$ctx->getKey()}", $info);
-        } else {
-            $this->log("The request [$uri] end. fd: {$request->fd}. context info has lost!", $info);
+            $info['_context'] = [
+                'ctxId' => $ctx->getId(),
+                'ctxKey' => $ctx->getKey(),
+            ];
         }
+
+        $this->log("The request [$uri] end. fd: {$request->fd}", $info);
+
+        $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
+
+        $this->log("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info, Logger::NOTICE);
     }
 
     /**

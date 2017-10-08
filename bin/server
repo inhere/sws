@@ -50,7 +50,6 @@ $server->on(AppServer::ON_WORKER_STARTED, function (AppServer $server) {
     $app->run();
 });
 
-
 //require dirname(__DIR__) . '/app/annotations.php';
 //exit;
 

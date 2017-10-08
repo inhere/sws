@@ -17,6 +17,8 @@ use Sws\Components\HttpHelper;
 /**
  * Class WebSocketServer
  * @package Sws\WebSocket
+ *
+ * @property Server $server
  */
 trait WebSocketServerTrait
 {
@@ -44,6 +46,7 @@ trait WebSocketServerTrait
      */
     private $connections = [];
 
+    /** @var array  */
     protected $messageParsers = [];
 
 ////////////////////// WS Server event //////////////////////
@@ -124,7 +127,7 @@ trait WebSocketServerTrait
                 'Sec-WebSocket-Accept' => $this->genSign($secKey),
                 'Sec-WebSocket-Version' => self::WS_VERSION,
             ]);
-        $this->debug("Handshake: response info:\n" . $response->toString());
+        $this->log("Handshake: response info:\n" . $response->toString());
 
         // 响应握手成功
         HttpHelper::paddingSwResponse($response, $swResponse);
@@ -240,7 +243,7 @@ trait WebSocketServerTrait
             // call on close callback
             $this->fire(self::ON_WS_CLOSE, [$this, $fd, $meta]);
 
-            $this->log("onClose: The #$fd client has been closed! ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
+            $this->log("onClose: The #$fd client has been closed! workerId: {$server->worker_id} ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
             $this->log("onClose: Client #{$fd} is closed. client-info:\n" . var_export($fdInfo, 1));
         }
     }

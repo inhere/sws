@@ -14,6 +14,8 @@ return [
     'root_path' => BASE_PATH,
     'pid_file' => BASE_PATH . '/tmp/sws.pid',
     'auto_reload' => 'app,config',
+
+    'error_handler' => \Sws\Components\ErrorHandler::class,
     'log' => [
         'name' => 'server',
         'file' => BASE_PATH . '/tmp/logs/server/sws.log',

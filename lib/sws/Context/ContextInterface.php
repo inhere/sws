@@ -8,6 +8,11 @@
 
 namespace Sws\Context;
 
+use Inhere\Http\Request;
+use Inhere\Http\Response;
+//use Psr\Http\Message\ResponseInterface;
+//use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Interface ContextInterface
  * @package Sws\Context
@@ -36,7 +41,13 @@ interface ContextInterface
      */
     public function destroy();
 
+    /**
+     * @return Request
+     */
     public function getRequest();
 
+    /**
+     * @return Response
+     */
     public function getResponse();
 }

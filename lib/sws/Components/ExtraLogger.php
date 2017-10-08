@@ -19,6 +19,7 @@ use Sws\AppServer;
  */
 class ExtraLogger extends Logger
 {
+
     /**
      * {@inheritdoc}
      */
@@ -116,4 +117,44 @@ class ExtraLogger extends Logger
 
         return true;
     }
+
+    /**
+     * @var array
+     */
+    private $profiles = [];
+
+    /**
+     * mark data analysis start
+     * @param $name
+     * @param array $context
+     * @param string $category
+     */
+    public function profile($name, array $context = [], $category = 'application')
+    {
+        $context['startTime'] = microtime(true);
+        $context['memUsage'] = memory_get_usage();
+        $context['memPeakUsage'] = memory_get_peak_usage();
+
+        $this->profiles[$category][$name] = $context;
+    }
+
+    /**
+     * mark data analysis end
+     * @param $name
+     * @param $message
+     * @param array $context
+     * @param string $category
+     */
+    public function profileEnd($name, $message, array $context = [], $category = 'application')
+    {
+        if (isset($this->profiles[$category][$name])) {
+            $oldInfo = $this->profiles[$category][$name];
+            $info['endTime'] = microtime(true);
+            $info['memUsage'] = memory_get_usage();
+            $info['memPeakUsage'] = memory_get_peak_usage();
+
+            $this->log(self::DEBUG, $message, $context);
+        }
+    }
+
 }

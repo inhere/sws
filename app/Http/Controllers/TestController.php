@@ -64,4 +64,20 @@ class TestController extends BaseController
 
         return "<pre>$id</pre>";
     }
+
+    /**
+     * @Route("error")
+     */
+    public function errorAction()
+    {
+        trigger_error('trigger a user error', E_USER_ERROR);
+    }
+
+    /**
+     * @Route("exp")
+     */
+    public function expAction()
+    {
+        throw new \RuntimeException('throw a exception');
+    }
 }

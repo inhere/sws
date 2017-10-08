@@ -187,6 +187,7 @@ class Application implements ApplicationInterface
                 $response = $result;
             }
         } catch (\Throwable $e) {
+            var_dump($e);
             Sws::error(PhpHelper::exceptionToString($e, true, true, __METHOD__));
             throw $e;
         }

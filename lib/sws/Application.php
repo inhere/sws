@@ -11,10 +11,10 @@ namespace Sws;
 use Inhere\Console\Utils\Show;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Inhere\Library\Helpers\Obj;
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\EventTrait;
 use Inhere\Library\Traits\OptionsTrait;
-use Inhere\Pool\ObjectPool;
 use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
@@ -124,7 +124,7 @@ class Application implements ApplicationInterface
 
         $this->log(sprintf(
             'stored objects count: %d',
-            ObjectPool::count()
+            Obj::count()
         ));
 
         // model class

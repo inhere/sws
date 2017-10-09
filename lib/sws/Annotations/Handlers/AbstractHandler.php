@@ -28,4 +28,9 @@ abstract class AbstractHandler implements HandlerInterface
     {
         $this->collector = $collector;
     }
+
+    protected function parsePropertyInject(\ReflectionProperty $property)
+    {
+        $property->setAccessible(true);
+    }
 }

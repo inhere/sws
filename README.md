@@ -19,6 +19,37 @@ a webSocket application by php swoole.
 
 - **github** https://github.com/inhere/sws.git
 
+## extra
+
+### gRpc
+
+- [github](https://github.com/grpc/grpc)
+- [grpc php](https://github.com/grpc/grpc/tree/master/src/php)
+- [doc](https://grpc.io/docs/)
+
+```text
+$ [sudo] pecl install grpc
+$ [sudo] pecl install protobuf
+
+composer require grpc/grpc
+composer require google/protobuf
+```
+
+### thrift
+
+- [github](https://github.com/apache/thrift)
+- [doc](http://thrift.apache.org/tutorial/php)
+
+install: 
+
+see http://thrift.apache.org/docs/install/
+
+php lib:
+
+```text
+composer require apache/thrift
+```
+
 ## license
 
 MIT

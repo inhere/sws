@@ -8,7 +8,7 @@
 
 namespace Sws\Annotations\Handlers;
 
-use Inhere\Pool\ObjectPool;
+use Inhere\Library\Helpers\Obj;
 use Inhere\Route\ORouter;
 use Sws\Annotations\Collector;
 use Sws\Annotations\Position;
@@ -53,7 +53,7 @@ class RouteHandler extends AbstractHandler
         /** @var ORouter $router */
         $router = \Sws::get('httpRouter');
 
-        foreach ($collector->getAnnotationsByType($class, Position::AT_METHOD) as $mName => $mAnn) {
+        foreach ($collector->getAnnotations($class, Position::AT_METHOD) as $mName => $mAnn) {
             /** @var Route $route */
             if (!$route = $mAnn[Route::class] ?? null) {
                 continue;
@@ -63,19 +63,30 @@ class RouteHandler extends AbstractHandler
             $action = str_replace($this->actionSuffix, '', $mName);
             $actions[$action] = $mName;
             $path = $route->path ?: $action;
+            $handler = $class . '@' . $action;
 
-            if ($path{0} !== '/') {
-                $path = $prefix . '/' . $path;
+            // Allows you to register multiple routes to one method
+            if (is_array($path)) {
+                foreach ($path as $p) {
+                    $router->map($route->method, $this->getRealPath($p, $prefix), $handler);
+                }
+            } else {
+                $router->map($route->method, $this->getRealPath($path, $prefix), $handler);
             }
-
-            $router->map($route->method, $path, $class . '@' . $action);
         }
 
         $object->setActions($actions);
 
-        // store the controller object
-        ObjectPool::put($object);
+        // store the object
+        Obj::put($object);
+    }
 
-//        var_dump($conf, $basename, $class, $prefix);die;
+    private function getRealPath($path, $prefix)
+    {
+        if ($path{0} !== '/') {
+            $path = $prefix . '/' . $path;
+        }
+
+        return $path;
     }
 }

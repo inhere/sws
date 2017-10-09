@@ -27,7 +27,10 @@
         "psr/http-message": "^1.0",
         "psr/container": "^1.0",
         "monolog/monolog": "^1.2",
-        "overtrue/pinyin": "^3.0"
+        "overtrue/pinyin": "^3.0",
+        "apache/thrift": "^0.10.0",
+        "grpc/grpc": "^1.6",
+        "google/protobuf": "^3.4"
     },
     "require-dev": {
         "inhere/simple-print-tool": "dev-master"

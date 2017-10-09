@@ -20,6 +20,7 @@ use Doctrine\Common\Annotations\Annotation\Target;
 final class DI
 {
     /**
+     * service name or a class name
      * @var string
      */
     public $name = '';

@@ -89,7 +89,6 @@ class Collector
         $this->basePath = $basePath;
 
         $this->addScans($scanDirs);
-
         $this->init();
     }
 
@@ -101,6 +100,7 @@ class Collector
     public function clear()
     {
         $this->finder = null;
+        $this->reader = null;
         $this->annotations = $this->scanClasses = $this->handlers = $this->handledClasses = [];
     }
 
@@ -175,21 +175,9 @@ class Collector
      * @param array $config
      * @return $this
      */
-    public function configFinder(array $config)
+    public function createFinder(array $config)
     {
         $this->finder = new FileFinder($config);
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function scan()
-    {
-        new FileFinder([
-            'sourcePath' => '/var/xxx/vendor/bower/jquery'
-        ]);
 
         return $this;
     }
@@ -270,6 +258,10 @@ class Collector
         $class = $refClass->getName();
 
         foreach ($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $refMethod) {
+            if ($refMethod->isStatic() || $refMethod->isAbstract()) {
+                continue;
+            }
+
             $mName = $refMethod->getName();
 
             // ignore magic methods
@@ -324,14 +316,14 @@ class Collector
 
     /**
      * @param string $class the full class name
-     * @param string $type @see Position::AT_*
+     * @param string $pos @see Position::AT_*
      * @param string|null $name the method name or property name
      * @return array
      */
-    public function getAnnotations($class = null, $type = null, $name = null)
+    public function getAnnotations($class = null, $pos = null, $name = null)
     {
-        if ($class && $type) {
-            return $this->getAnnotationsByType($class, $type, $name);
+        if ($class && $pos) {
+            return $this->getAnnotationsByType($class, $pos, $name);
         }
 
         if ($class) {
@@ -343,15 +335,15 @@ class Collector
 
     /**
      * @param string $class the full class name
-     * @param string $type @see Position::AT_*
+     * @param string $pos @see Position::AT_*
      * @param string|null $name the method name or property name
      * @return array|null
      */
-    public function getAnnotationsByType($class, $type = Position::AT_CLASS, $name = null)
+    public function getAnnotationsByType($class, $pos = Position::AT_CLASS, $name = null)
     {
-        $annotations = $this->annotations[$class][$type] ?? null;
+        $annotations = $this->annotations[$class][$pos] ?? null;
 
-        if (($type === Position::AT_PROPERTY || $type === Position::AT_METHOD) && $name && $annotations) {
+        if (($pos === Position::AT_PROPERTY || $pos === Position::AT_METHOD) && $name && $annotations) {
             return $annotations[$name] ?? null;
         }
 

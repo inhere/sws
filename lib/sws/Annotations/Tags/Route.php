@@ -22,7 +22,7 @@ final class Route
 {
     /**
      * the route path
-     * @var string
+     * @var string|array
      * @Required()
      */
     public $path = '';

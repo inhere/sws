@@ -8,7 +8,9 @@
 
 namespace App\Dao;
 
+use App\Model\DemoModel;
 use Sws\Annotations\Tags\Dao;
+use Sws\Annotations\Tags\DI;
 
 /**
  * Class DemoDao
@@ -18,5 +20,9 @@ use Sws\Annotations\Tags\Dao;
  */
 class DemoDao
 {
-
+    /**
+     * @DI()
+     * @var DemoModel
+     */
+    public $demoModel;
 }

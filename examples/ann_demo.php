@@ -6,6 +6,9 @@
  * Time: 9:29
  */
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\DocParser;
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Inhere\Library\Collections\SimpleCollection;
 use Inhere\Library\Files\FileFinder;
 use Sws\Annotations\Collector;
@@ -34,15 +37,15 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 class AnnExample
 {
     /**
-     * @var string
-     */
-    public $prop0;
-
-    /**
      * @Inject("user")
      * @var SimpleCollection
      */
     public $prop;
+
+    /**
+     * @var string
+     */
+    public $prop0;
 
     /**
      * @DI("logger")
@@ -87,6 +90,17 @@ class AnnExample
         // something ... ...
     }
 }
+
+AnnotationRegistry::registerLoader('class_exists');
+//$sReader = new AnnotationReader();
+$sReader = new SimpleAnnotationReader();
+$parser = new DocParser();
+$refClass = new ReflectionClass('AnnExample');
+$refProp = $refClass->getProperty('prop');
+//$cAnn = $sReader->getClassAnnotations($refClass);
+$pAnn = $sReader->getPropertyAnnotations($refProp);
+
+var_dump($parser->parse($refProp->getDocComment()), $pAnn);die;
 
 $conf = [
 //    'base namespace' => 'the real path',
@@ -142,6 +156,7 @@ $clt->registerHandlers([
 $clt->handle();
 pr($clt, -4);
 
+AnnotationRegistry::registerLoader('class_exists');
 $annotationReader = new AnnotationReader();
 //Get class annotation
 $refClass = new ReflectionClass('AnnExample');

@@ -8,8 +8,7 @@
 
 namespace Sws\Web;
 
-
-use Inhere\Pool\ObjectPool;
+use Inhere\Library\Helpers\Obj;
 use Inhere\Route\Dispatcher;
 use Inhere\Route\ORouter;
 
@@ -62,7 +61,7 @@ class HttpDispatcher extends Dispatcher
 
         // Instantiation controller
 //        $controller = new $segments[0]();
-        $controller = ObjectPool::get($segments[0]);
+        $controller = Obj::get($segments[0]);
 
         if (isset($segments[1])) {
             $action = $segments[1];
@@ -82,7 +81,7 @@ class HttpDispatcher extends Dispatcher
 
         if ($executor = $this->getConfig('actionExecutor')) {
             $result = $controller->$executor($actionMethod, $args);
-            ObjectPool::put($controller);
+            Obj::put($controller);
 
             return $result;
         }
@@ -93,7 +92,7 @@ class HttpDispatcher extends Dispatcher
 
         $result = $controller->$actionMethod(...$args);
 
-        ObjectPool::put($controller);
+        Obj::put($controller);
 
         return $result;
     }

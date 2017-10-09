@@ -8,9 +8,9 @@
 use App\Http\Controllers\HomeController;
 
 $router = Sws::$di->get('httpRouter');
-$router->get('/', function () {
-   return 'xxx';
-});
+//$router->get('/', function () {
+//   return 'xxx';
+//});
 
 $router->get('/404', function () {
    return '404, PAGE NOT FOUND!';

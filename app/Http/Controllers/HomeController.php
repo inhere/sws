@@ -8,10 +8,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Logic\DemoLogic;
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Route\ORouter;
 use Monolog\Logger;
 use Sws\Annotations\Tags\Controller;
+use Sws\Annotations\Tags\DI;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Sws\Annotations\Tags\Route;
@@ -27,9 +29,15 @@ use Sws\Web\BaseController;
 class HomeController extends BaseController
 {
     /**
+     * @DI()
+     * @var DemoLogic
+     */
+    private $demoLogic;
+
+    /**
      * test action
      *
-     * @Route("index", method={"GET", "POST"})
+     * @Route({"index", "/"}, method={"GET", "POST"})
      * @Parameters({
      *     @Parameter("name", type="string", rule="string; length:2,10;", required=true),
      *     @Parameter("age", type="int", rule="number; length:2,10;", required=true),

@@ -13,6 +13,7 @@ use Sws\Annotations\Tags\Logic;
 /**
  * Class DemoLogic
  * @package App\Logic
+ *
  * @Logic()
  */
 class DemoLogic

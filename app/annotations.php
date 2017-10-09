@@ -29,13 +29,14 @@ $ff->setFileFilter(function ($name) {
 //var_dump($files, $f2);
 
 $conf = [
-//    'base namespace' => 'the real path',
-    'App\\' => dirname(__DIR__) . '/app/',
-    'Sws\\Components\\' => dirname(__DIR__) . '/lib/sws/Components',
+    // 'base namespace' => 'the real path',
+    'App\\' => 'app/',
+    'Sws\\Components\\' => 'lib/sws/Components',
 ];
-$clt = new Collector($ff, null, $conf);
 
-$clt->addScan('Sws\\Module\\', dirname(__DIR__) . '/lib/sws/Module');
+$clt = new Collector($ff, dirname(__DIR__), $conf);
+$clt->addScan('Sws\\Module\\', 'lib/sws/Module');
+
 $clt->registerHandlers([
     'route' => new \Sws\Annotations\Handlers\RouteHandler(),
     'service' => new \Sws\Annotations\Handlers\ServiceHandler(),

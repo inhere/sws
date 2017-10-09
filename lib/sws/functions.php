@@ -33,5 +33,10 @@ function app($prop = null)
 
 function di($service = null)
 {
-    return $service ? \Sws::$app->get($service) : \Sws::$app->getDi();
+    return $service ? \Sws::$di->get($service) : \Sws::$di;
+}
+
+function config($name, $default = null)
+{
+    return \Sws::$di->get('config')->get($name, $default);
 }

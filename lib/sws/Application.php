@@ -21,6 +21,7 @@ use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
 use Sws;
 use Sws\Components\HttpHelper;
+use Sws\Context\ContextGetTrait;
 use Sws\Context\ContextManager;
 use Sws\Context\HttpContext;
 use Sws\Module\ModuleInterface;
@@ -35,6 +36,7 @@ class Application implements ApplicationInterface
     use ApplicationTrait;
     use EventTrait;
     use OptionsTrait;
+    use ContextGetTrait;
 
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
@@ -57,7 +59,7 @@ class Application implements ApplicationInterface
     protected $options = [
         'debug' => false,
 
-        'name' => 'sws',
+        'name' => 'application',
 
         // request and response data type: json text
         'dataType' => 'json',
@@ -80,6 +82,9 @@ class Application implements ApplicationInterface
 
     protected function init()
     {
+        $timeZone = \Sws::get('config')->get('timeZone', 'UTC');
+
+        date_default_timezone_set($timeZone);
     }
 
     /**
@@ -109,15 +114,15 @@ class Application implements ApplicationInterface
     public function bootstrap()
     {
         // collect routes
-        \Sws::server()->log('collected route count: ' . \Sws::get('httpRouter')->count());
+        $this->log('collected route count: ' . \Sws::get('httpRouter')->count());
 
-        \Sws::server()->log(sprintf(
+        $this->log(sprintf(
             'registered services count: %d, services: %s',
             \Sws::$di->count(),
             \Sws::$di->getIds(false)
         ));
 
-        \Sws::server()->log(sprintf(
+        $this->log(sprintf(
             'stored objects count: %d',
             ObjectPool::count()
         ));
@@ -145,6 +150,9 @@ class Application implements ApplicationInterface
 //        ];
 //    }
 
+    /*******************************************************************************
+     * http handle
+     ******************************************************************************/
 
     /**
      * @param SwRequest $swRequest
@@ -187,10 +195,10 @@ class Application implements ApplicationInterface
                 $response = $result;
             }
         } catch (\Throwable $e) {
-            var_dump($e);
-            Sws::error(PhpHelper::exceptionToString($e, true, true, __METHOD__));
-            throw $e;
+            $response = $this->handleHttpException($e);
         }
+
+        $response->setHeader('Server', $this->getName() . '-http-server');
 
         Show::write([
             "Response Status: <info>{$response->getStatusCode()}</info>"
@@ -200,6 +208,23 @@ class Application implements ApplicationInterface
 
         return HttpHelper::paddingSwResponse($response, $swResponse);
     }
+
+    /**
+     * @param \Throwable $e
+     * @return Response
+     */
+    protected function handleHttpException(\Throwable $e)
+    {
+        $response = $this->getResponse();
+
+        Sws::error(PhpHelper::exceptionToString($e, true, true, __METHOD__));
+
+        return $response->write('error');
+    }
+
+    /*******************************************************************************
+     * websocket handle
+     ******************************************************************************/
 
     /**
      * webSocket 只会在连接握手时会有 request, response
@@ -233,7 +258,7 @@ class Application implements ApplicationInterface
 
         // application/json
         // text/plain
-        $response->setHeader('Server', $this->getOption('name') . '-websocket-server');
+        $response->setHeader('Server', $this->getName() . '-websocket-server');
         // $response->setHeader('Access-Control-Allow-Origin', '*');
 
         $module->setApp($this)->onHandshake($request, $response);
@@ -379,13 +404,28 @@ class Application implements ApplicationInterface
      ******************************************************************************/
 
     /**
-     * @param string $message
-     * @param array $data
-     * @param int $level
+     * output log message
+     * @param  string $msg
+     * @param  array $data
+     * @param string|int $level
+     * @return void
+     * @throws \RuntimeException
      */
-    public function log($message, array $data, $level = Logger::INFO)
+    public function log($msg, array $data = [], $level = Logger::INFO)
     {
-        $this->get('logger')->log($level, strip_tags($message), $data);
+        // if close debug, don't output debug log.
+        if ($this->server && !$this->server->isDaemon()) {
+            list($ts, $ms) = explode('.', sprintf('%.4f', microtime(true)));
+            $ms = str_pad($ms, 4, 0);
+            $time = date('Y-m-d H:i:s', $ts);
+            $json = $data ? json_encode($data) : '';
+            $type = Logger::getLevelName($level);
+
+            Show::write(sprintf('[%s.%s] [%s.%s] %s %s', $time, $ms, $this->getName(), strtoupper($type), $msg, $json));
+        }
+
+        $this->get('logger')->log($level, strip_tags($msg), $data);
+        // return;
     }
 
     /**
@@ -418,6 +458,14 @@ class Application implements ApplicationInterface
     public function setServer(AppServer $server)
     {
         $this->server = $server;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->getOption('name');
     }
 
 }

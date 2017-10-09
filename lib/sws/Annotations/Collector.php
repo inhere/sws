@@ -323,11 +323,17 @@ class Collector
     }
 
     /**
-     * @param null $class
+     * @param string $class the full class name
+     * @param string $type @see Position::AT_*
+     * @param string|null $name the method name or property name
      * @return array
      */
-    public function getAnnotations($class = null)
+    public function getAnnotations($class = null, $type = null, $name = null)
     {
+        if ($class && $type) {
+            return $this->getAnnotationsByType($class, $type, $name);
+        }
+
         if ($class) {
             return $this->annotations[$class] ?? null;
         }

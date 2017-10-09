@@ -27,7 +27,6 @@ use Sws\WebSocket\WsServerInterface;
 /**
  * Class AppServer
  * @package Sws
- * @property \Swoole\Server $server
  */
 final class AppServer extends HttpServer implements WsServerInterface
 {
@@ -55,17 +54,6 @@ final class AppServer extends HttpServer implements WsServerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function beforeRequest(SwRequest $request, SwResponse $response)
-    {
-        $request->server['request_memory'] = memory_get_usage();
-        $uri = $request->server['request_uri'];
-
-        $this->log("The request [$uri] start. fd: {$request->fd}");
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected function prepareRuntimeContext()
@@ -78,6 +66,21 @@ final class AppServer extends HttpServer implements WsServerInterface
         }
 
         return $info;
+    }
+
+    /*******************************************************************************
+     * http handle
+     ******************************************************************************/
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function beforeRequest(SwRequest $request, SwResponse $response)
+    {
+        $request->server['request_memory'] = memory_get_usage();
+        $uri = $request->server['request_uri'];
+
+        $this->log("The request [$uri] start. fd: {$request->fd}");
     }
 
     /**
@@ -104,6 +107,10 @@ final class AppServer extends HttpServer implements WsServerInterface
 
         $this->log("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info, Logger::NOTICE);
     }
+
+    /*******************************************************************************
+     * websocket handle
+     ******************************************************************************/
 
     /**
      * webSocket 只会在连接握手时会有 request, response
@@ -134,9 +141,9 @@ final class AppServer extends HttpServer implements WsServerInterface
         $this->app->handleWsMessage($server, $frame, $conn);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////
-    /// response
-    /////////////////////////////////////////////////////////////////////////////////////////
+    /*******************************************************************************
+     * websocket message response
+     ******************************************************************************/
 
     /**
      * @param string $data

@@ -79,7 +79,7 @@ class HttpHelper
      */
     public static function createResponse()
     {
-        $headers = ['Content-Type' => 'text/html; charset=UTF-8'];
+        $headers = ['Content-Type' => 'text/html; charset=' . \Sws::get('config')->get('charset', 'UTF-8')];
 
         return new Response(200, $headers);
     }

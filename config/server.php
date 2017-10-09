@@ -6,11 +6,9 @@
  * Time: 17:28
  */
 
-use Monolog\Logger;
-
 return [
     'debug' => true,
-    'name' => 'sws',
+    'name' => 'svr',
     'root_path' => BASE_PATH,
     'pid_file' => BASE_PATH . '/tmp/sws.pid',
     'auto_reload' => 'app,config',
@@ -19,7 +17,7 @@ return [
     'log' => [
         'name' => 'server',
         'file' => BASE_PATH . '/tmp/logs/server/sws.log',
-        'level' => Logger::DEBUG,
+        'level' => \Monolog\Logger::DEBUG,
         'splitType' => 1,
         'bufferSize' => 0, //0 1000,
     ],

@@ -11,6 +11,8 @@ use Monolog\Logger;
 return [
     'debug' => false,
     'env'   => 'pdt',
+    'charset' => 'UTF-8',
+    'timeZone' => 'Asia/Shanghai',
     'rootPath' => dirname(__DIR__),
 
     'role' => [
@@ -18,6 +20,9 @@ return [
         'consumer' // 服务消费方
     ],
 
+    'application' => [
+        'name' => 'app',
+    ],
     'logger' => [
         'name' => 'app',
         'file' => '@tmp/logs/app/application.log',
@@ -26,7 +31,7 @@ return [
         'bufferSize' => 1000, // 1000,
     ],
 
-    // 扫描注解包(命名空间)路径，多个包用逗号分隔，不填表示扫描当前ApplicationContext中所有的类
+    // 扫描注解包(命名空间)路径
     'annotation' => [
 
     ],

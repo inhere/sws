@@ -14,9 +14,11 @@ use Inhere\Http\Response;
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
+use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
+use Swoole\Server;
 use Swoole\WebSocket\Frame;
 use Sws\Context\ContextManager;
 use Sws\WebSocket\Connection;
@@ -53,6 +55,15 @@ final class AppServer extends HttpServer implements WsServerInterface
         $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);
     }
 
+    public function onWorkerStop(Server $server, $workerId)
+    {
+        parent::onWorkerStop($server, $workerId);
+
+        \Sws::get('logger')->flush();
+
+        $this->flushLog();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -66,6 +77,18 @@ final class AppServer extends HttpServer implements WsServerInterface
         }
 
         return $info;
+    }
+
+    /**
+     * flush server log buffer data
+     */
+    protected function flushLog()
+    {
+        foreach ($this->logger->getHandlers() as $handler) {
+            if ($handler instanceof AbstractHandler) {
+                $handler->close();
+            }
+        }
     }
 
     /*******************************************************************************

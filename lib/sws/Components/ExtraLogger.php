@@ -8,7 +8,9 @@
 
 namespace Sws\Components;
 
+use Inhere\Console\Utils\Show;
 use Inhere\Library\Helpers\PhpHelper;
+use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Sws\AppServer;
@@ -19,14 +21,43 @@ use Sws\AppServer;
  */
 class ExtraLogger extends Logger
 {
+    /**
+     * {@inheritDoc}
+     */
+    public function log($level, $message, array $context = array())
+    {
+        // translate object to string.
+        if (is_object($message)) {
+            $message = PhpHelper::dumpVars($message);
+        }
+
+        $svr = \Sws::$di->get('server');
+        $context = $this->collectContext($context, $svr);
+
+        if ($svr && !$svr->isDaemon()) {
+            list($ts, $ms) = explode('.', sprintf('%.4f', microtime(true)));
+            $ms = str_pad($ms, 4, 0);
+            $time = date('Y-m-d H:i:s', $ts);
+            $json = $context ? json_encode($context) : '';
+            $type = Logger::getLevelName($level);
+
+            Show::write(sprintf(
+                '[%s.%s] [%s.%s] %s %s',
+                $time, $ms, \Sws::$app->getName(), strtoupper($type), $message, $json
+            ));
+        }
+
+        return parent::log($level, strip_tags($message), $context);
+    }
 
     /**
-     * {@inheritdoc}
+     * @param array $context
+     * @param AppServer $svr
+     * @return array
      */
-    public function addRecord($level, $message, array $context = [])
+    protected function collectContext(array $context, $svr)
     {
-        /** @var AppServer $svr */
-        if ($svr = \Sws::$app->get('server')) {
+        if ($svr) {
             $trace = [
                 'workerId' => $svr->getWorkId(),
                 'workerPid' => $svr->getWorkPid(),
@@ -45,19 +76,14 @@ class ExtraLogger extends Logger
             }
         }
 
-        return $this->parentAddRecord($level, $message, $context);
+        return $context;
     }
 
     /**
-     * alias method of the parent::addRecord()
-     * translate `call_user_func` -> PhpHelper::call()
-     * @see Logger::addRecord()
-     * @param $level
-     * @param $message
-     * @param array $context
-     * @return bool
+     * replace `call_user_func` -> PhpHelper::call()
+     * {@inheritdoc}
      */
-    protected function parentAddRecord($level, $message, array $context = [])
+    public function addRecord($level, $message, array $context = [])
     {
         if (!$this->handlers) {
             $this->pushHandler(new StreamHandler('php://stderr', static::DEBUG));
@@ -118,6 +144,15 @@ class ExtraLogger extends Logger
         return true;
     }
 
+    public function flush()
+    {
+        foreach ($this->getHandlers() as $handler) {
+            if ($handler instanceof AbstractHandler) {
+                $handler->close();
+            }
+        }
+    }
+
     /**
      * @var array
      */
@@ -157,4 +192,8 @@ class ExtraLogger extends Logger
         }
     }
 
+    public function getUniqueId()
+    {
+        // \Sws::getContext();
+    }
 }

@@ -132,6 +132,19 @@ trait LogShortTrait
     }
 
     /**
+     * @param string $message
+     * @param array $context
+     */
+    public static function trace($message, array $context = array())
+    {
+        $tce = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+
+        $context['_called_at'] = $tce[1]['file'];
+
+        self::log(Logger::DEBUG, $message, $context);
+    }
+
+    /**
      * Logs with an arbitrary level.
      *
      * @param mixed  $level

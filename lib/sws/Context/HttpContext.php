@@ -104,11 +104,6 @@ class HttpContext extends Context
         $this->setKey(static::genKey($id));
     }
 
-    public function getLogger()
-    {
-
-    }
-
     /**
      * destroy
      */

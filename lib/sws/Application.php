@@ -195,7 +195,7 @@ class Application implements ApplicationInterface
                 $response = $result;
             }
         } catch (\Throwable $e) {
-            $response = $this->handleHttpException($e);
+            $response = $this->handleHttpException($e, __METHOD__);
         }
 
         $response->setHeader('Server', $this->getName() . '-http-server');
@@ -211,15 +211,16 @@ class Application implements ApplicationInterface
 
     /**
      * @param \Throwable $e
+     * @param string $catcher
      * @return Response
      */
-    protected function handleHttpException(\Throwable $e)
+    protected function handleHttpException(\Throwable $e, $catcher)
     {
-        $response = $this->getResponse();
+        $error = PhpHelper::exceptionToString($e, $this->isDebug(), $catcher);
 
-        Sws::error(PhpHelper::exceptionToString($e, true, true, __METHOD__));
+        Sws::error($error);
 
-        return $response->write('error');
+        return $this->getResponse()->write($error);
     }
 
     /*******************************************************************************
@@ -413,19 +414,7 @@ class Application implements ApplicationInterface
      */
     public function log($msg, array $data = [], $level = Logger::INFO)
     {
-        // if close debug, don't output debug log.
-        if ($this->server && !$this->server->isDaemon()) {
-            list($ts, $ms) = explode('.', sprintf('%.4f', microtime(true)));
-            $ms = str_pad($ms, 4, 0);
-            $time = date('Y-m-d H:i:s', $ts);
-            $json = $data ? json_encode($data) : '';
-            $type = Logger::getLevelName($level);
-
-            Show::write(sprintf('[%s.%s] [%s.%s] %s %s', $time, $ms, $this->getName(), strtoupper($type), $msg, $json));
-        }
-
-        $this->get('logger')->log($level, strip_tags($msg), $data);
-        // return;
+        $this->get('logger')->log($level, $msg, $data);
     }
 
     /**
@@ -468,4 +457,11 @@ class Application implements ApplicationInterface
         return $this->getOption('name');
     }
 
+    /**
+     * @return bool
+     */
+    public function isDebug(): bool
+    {
+        return (bool)Sws::get('config')->get('debug', false);
+    }
 }

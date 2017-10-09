@@ -39,10 +39,11 @@ $server->on(AppServer::ON_WORKER_STARTED, function (AppServer $server) {
     $app = Sws::$di->get('app');
     $server->setApp($app);
 
-    require dirname(__DIR__) . '/app/annotations.php';
-
     // load http routes
     require dirname(__DIR__) . '/app/Http/routes.php';
+
+    // collect and parse annotations
+    require dirname(__DIR__) . '/app/annotations.php';
 
     // load ws modules
     require dirname(__DIR__) . '/app/Ws/modules.php';

@@ -32,7 +32,7 @@ $di->set('logger', function (Container $di) {
 
 // monolog - database logger
 $di['dbLogger'] = function (Container $c) {
-    $settings = $c->get('settings')['dbLogger'];
+    $settings = $c->get('config')->get('dbLogger', []);
     $logger = new \Monolog\Logger($settings['name']);
     // $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
     $handler = new \Monolog\Handler\StreamHandler($settings['path'], Monolog\Logger::DEBUG);
@@ -42,8 +42,9 @@ $di['dbLogger'] = function (Container $c) {
     return $logger;
 };
 
-$di->set('app', function ($di) {
-    $app = new \App\Console\Application();
+$di->set('app', function (Container $di) {
+    $settings = $di->get('config')->get('application', []);
+    $app = new \Sws\Console\Application($settings);
     $app->setDi($di);
 
     // register commands

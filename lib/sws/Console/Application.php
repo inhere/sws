@@ -6,7 +6,7 @@
  * Time: 17:42
  */
 
-namespace App\Console;
+namespace Sws\Console;
 
 use Inhere\Console\Application as BaseApp;
 use Sws\ApplicationInterface;
@@ -29,6 +29,14 @@ class Application extends BaseApp implements ApplicationInterface
         date_default_timezone_set($timeZone);
 
         parent::init();
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->getMeta('name');
     }
 
 }

@@ -30,6 +30,7 @@ class Application extends RpcServerListener implements ApplicationInterface
     public function __construct(array $options = [])
     {
         $options = array_merge([
+            'name' => 'rpcSvr',
             'timeoutInMilliseconds' => 1000,
         ], $options);
 
@@ -67,5 +68,13 @@ class Application extends RpcServerListener implements ApplicationInterface
         } catch (\Throwable $e) {
             throw $e;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->getOption('name');
     }
 }

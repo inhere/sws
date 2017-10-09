@@ -37,4 +37,9 @@ interface ApplicationInterface
      * @return Container
      */
     public function getDi();
+
+    /**
+     * @return string
+     */
+    public function getName();
 }

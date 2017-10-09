@@ -21,8 +21,8 @@ class AppLogHandler extends FileLogHandler
      */
     protected function write(array $record)
     {
-        if (!$this->server && \Sws::$app) {
-            $this->server = \Sws::$app->get('server');
+        if (!$this->server) {
+            $this->server = \Sws::get('server');
         }
 
         parent::write($record);

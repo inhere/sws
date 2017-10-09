@@ -25,7 +25,7 @@ final class Route
      * @var string|array
      * @Required()
      */
-    public $path = '';
+    public $path;
 
     /**
      * -Enum({"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"})

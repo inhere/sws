@@ -42,7 +42,7 @@ class RouteHandler extends AbstractHandler
 
         // todo rest ful support...
 //        if ($isRest = $conf->type === Controller::REST) {
-            $object->setType((int)$conf->type);
+        $object->setType((int)$conf->type);
 //        }
 
         $actions = [];
@@ -62,7 +62,7 @@ class RouteHandler extends AbstractHandler
             // e.g. `indexAction -> index`
             $action = str_replace($this->actionSuffix, '', $mName);
             $actions[$action] = $mName;
-            $path = $route->path ?: $action;
+            $path = $route->path ?? $action;
             $handler = $class . '@' . $action;
 
             // Allows you to register multiple routes to one method
@@ -81,9 +81,16 @@ class RouteHandler extends AbstractHandler
         Obj::put($object);
     }
 
+    /**
+     * @param string $path
+     * @param string $prefix
+     * @return string
+     */
     private function getRealPath($path, $prefix)
     {
-        if ($path{0} !== '/') {
+        if (!$path) {
+            $path = $prefix;
+        } elseif ($path{0} !== '/') {
             $path = $prefix . '/' . $path;
         }
 

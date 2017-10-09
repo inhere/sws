@@ -35,7 +35,7 @@ abstract class Context implements ContextInterface
      */
     public static function genKey($id)
     {
-        return md5($id);
+        return md5($id . getmypid());
     }
 
     /**

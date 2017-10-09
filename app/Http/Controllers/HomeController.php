@@ -37,7 +37,7 @@ class HomeController extends BaseController
     /**
      * test action
      *
-     * @Route({"index", "/"}, method={"GET", "POST"})
+     * @Route({"", "index", "/"}, method={"GET", "POST"})
      * @Parameters({
      *     @Parameter("name", type="string", rule="string; length:2,10;", required=true),
      *     @Parameter("age", type="int", rule="number; length:2,10;", required=true),

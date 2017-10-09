@@ -4,7 +4,7 @@
  * User: inhere
  * Date: 2017-03-17
  * Time: 11:20
- * @var \Inhere\Console\Application $app
+ * @var \Sws\Console\Application $app
  */
 
 $app->commands([

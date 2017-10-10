@@ -12,6 +12,7 @@ use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\OptionsTrait;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Monolog\Logger;
 use Swoole\WebSocket\Server;
 use Sws\Application;
 use Sws\DataParser\JsonDataParser;
@@ -23,7 +24,7 @@ use Sws\WebSocket\Message;
  * Class ARouteHandler
  * @package Sws\Module
  */
-abstract class ModuleAbstracter implements ModuleInterface
+abstract class AbstractModule implements ModuleInterface
 {
     use OptionsTrait;
 
@@ -156,7 +157,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function onError(Application $app, string $msg)
     {
-        $this->log('Accepts a connection on a socket error, when request : ' . $msg, [],'error');
+        $this->log('Accepts a connection on a socket error, when request : ' . $msg, [],Logger::ERROR);
     }
 
     /*******************************************************************************
@@ -176,12 +177,12 @@ abstract class ModuleAbstracter implements ModuleInterface
         // check `Origin`
         // Access-Control-Allow-Origin: *
         if (!$this->checkIsAllowedOrigin($origin)) {
-            $this->log("The #$cid Origin [$origin] is not in the 'allowedOrigins' list.", 'error');
+            $this->log("The #$cid Origin [$origin] is not in the 'allowedOrigins' list.", [], Logger::ERROR);
 
             $response
                 ->setStatus(403)
                 ->setHeaders(['Connection' => 'close'])
-                ->setBodyContent('Deny Access!');
+                ->addContent('Deny Access!');
 
             return false;
         }
@@ -244,7 +245,7 @@ abstract class ModuleAbstracter implements ModuleInterface
             $this->log("The #{$cid} request command is: $command, in route: $route, module: $name, handler: " . static::class);
         } else {
             $command = self::PARSE_ERROR;
-            $this->log("The #{$cid} request data parse failed in route: $route, module: $name. Data: $data", [], 'error');
+            $this->log("The #{$cid} request data parse failed in route: $route, module: $name. Data: $data", [], Logger::ERROR);
         }
 
         // dispatch command
@@ -261,7 +262,7 @@ abstract class ModuleAbstracter implements ModuleInterface
 
         // not found
         if (!method_exists($this, $method)) {
-            $this->log("The #{$cid} request command: $command not found, module: $name, run 'notFound' command", [],'notice');
+            $this->log("The #{$cid} request command: $command not found, module: $name, run 'notFound' command", [],Logger::NOTICE);
             $method = self::NOT_FOUND . $suffix;
 
             return $this->$method($data, $command, $cid, $conn);
@@ -427,7 +428,7 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function respond($data, string $msg = 'success', int $code = 0, bool $doSend = true)
     {
-        return $this->app->wsRespond($data, $msg, $code, $doSend);
+        return \Sws::get('server')->wsRespond($data, $msg, $code, $doSend);
     }
 
     /**
@@ -437,22 +438,25 @@ abstract class ModuleAbstracter implements ModuleInterface
      */
     public function respondText($data, bool $doSend = true)
     {
-        return $this->app->respondText($data, $doSend);
+        return $this->app->getServer()->respondText($data, $doSend);
     }
 
     public function send(string $data, $receivers = 0, $expected = 0, int $sender = 0): int
     {
-        return $this->app->send($data, $receivers, $expected, $sender);
+        return $this->app->getServer()->send($data, $receivers, $expected, $sender);
     }
 
     public function sendText($data)
     {
-        return $this->app->sendText($data);
+        return $this->app->getServer()->sendText($data);
     }
 
-    public function log(string $message, array $data = [], string $type = 'info')
+    /**
+     * {@inheritdoc}
+     */
+    public function log(string $message, array $data = [], $level = Logger::INFO)
     {
-        $this->app->log($message, $data, $type);
+        $this->app->log($message, $data, $level);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////

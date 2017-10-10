@@ -18,7 +18,7 @@ use Inhere\Http\Response;
  *
  * @package Sws\Module
  */
-class EchoModule extends ModuleAbstracter
+class EchoModule extends AbstractModule
 {
     /**
      * @param Request $request

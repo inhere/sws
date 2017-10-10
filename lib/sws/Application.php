@@ -214,7 +214,7 @@ class Application implements ApplicationInterface
      * @param string $catcher
      * @return Response
      */
-    protected function handleHttpException(\Throwable $e, $catcher)
+    protected function handleHttpException($e, $catcher)
     {
         $error = PhpHelper::exceptionToString($e, $this->isDebug(), $catcher);
 

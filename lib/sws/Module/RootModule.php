@@ -18,7 +18,7 @@ use Inhere\Http\Response;
  *
  * @package Sws\Module
  */
-class RootModule extends ModuleAbstracter
+class RootModule extends AbstractModule
 {
     /**
      * @param Request $request

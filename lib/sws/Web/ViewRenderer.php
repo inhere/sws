@@ -8,7 +8,7 @@
 
 namespace Sws\Web;
 
-use Inhere\Files\File;
+use Inhere\Library\Files\File;
 
 /**
  * Class ViewRenderer
@@ -67,6 +67,7 @@ class ViewRenderer
      * @param array $data extract data to view, cannot contain view as a key
      * @param string|null $layout override default layout file
      * @return string
+     * @throws \Throwable
      */
     public function render($view, array $data = [], $layout = null)
     {
@@ -79,6 +80,7 @@ class ViewRenderer
      * @param $view
      * @param array $data
      * @return string
+     * @throws \Throwable
      */
     public function renderPartial($view, array $data = [])
     {
@@ -90,6 +92,7 @@ class ViewRenderer
      * @param array $data
      * @param string|null $layout override default layout file
      * @return string
+     * @throws \Throwable
      */
     public function renderBody($content, array $data = [], $layout = null)
     {
@@ -101,6 +104,7 @@ class ViewRenderer
      * @param array $data
      * @param string|null $layout override default layout file
      * @return string
+     * @throws \Throwable
      */
     public function renderContent($content, array $data = [], $layout = null)
     {
@@ -201,7 +205,6 @@ class ViewRenderer
      * @param $view
      * @param array $data
      * @return mixed
-     * @throws \Exception
      * @throws \Throwable
      */
     public function fetch($view, array $data = [])
@@ -230,9 +233,6 @@ class ViewRenderer
             $this->protectedIncludeScope($file, $data);
             $output = ob_get_clean();
         } catch (\Throwable $e) { // PHP 7+
-            ob_end_clean();
-            throw $e;
-        } catch (\Exception $e) { // PHP < 7
             ob_end_clean();
             throw $e;
         }
@@ -283,7 +283,7 @@ class ViewRenderer
      */
     protected function getRealView($view)
     {
-        $sfx = File::getSuffix($view);
+        $sfx = File::getSuffix($view, true);
         $ext = $this->suffix;
 
         if ($sfx === $ext || in_array($sfx, $this->suffixes, true)) {

@@ -240,6 +240,12 @@ trait WebSocketServerTrait
         if ($fdInfo['websocket_status'] > 0) {
             $meta = $this->delConnection($fd);
 
+            if (!$meta) {
+                $this->log("the #$fd connection info has lost");
+
+                return;
+            }
+
             // call on close callback
             $this->fire(self::ON_WS_CLOSE, [$this, $fd, $meta]);
 

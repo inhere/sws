@@ -8,6 +8,7 @@
 
 namespace Sws\Module;
 
+use Monolog\Logger;
 use Swoole\WebSocket\Server;
 use Sws\Application;
 use Inhere\Http\Request;
@@ -77,7 +78,7 @@ interface ModuleInterface
      */
     public function add(string $command, $handler);
 
-    public function log(string $message, array $data = [], string $type = 'info');
+    public function log(string $message, array $data = [], $level = Logger::INFO);
 
     public function isJsonType();
 

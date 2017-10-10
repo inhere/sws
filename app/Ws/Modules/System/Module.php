@@ -8,13 +8,13 @@
 
 namespace App\Ws\Modules\System;
 
-use Sws\Module\ModuleAbstracter;
+use Sws\Module\AbstractModule;
 
 /**
  * Class Module
  * @package App\Ws\Modules
  */
-class Module extends ModuleAbstracter
+class Module extends AbstractModule
 {
     protected function init()
     {

@@ -103,7 +103,7 @@ final class AppServer extends HttpServer implements WsServerInterface
         $request->server['request_memory'] = memory_get_usage();
         $uri = $request->server['request_uri'];
 
-        $this->log("The request [$uri] start. fd: {$request->fd}");
+        \Sws::info("The request [$uri] start. fd: {$request->fd}");
     }
 
     /**
@@ -124,11 +124,11 @@ final class AppServer extends HttpServer implements WsServerInterface
             ];
         }
 
-        $this->log("The request [$uri] end. fd: {$request->fd}", $info);
+        \Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
 
         $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
 
-        $this->log("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info, Logger::NOTICE);
+        \Sws::info("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info, Logger::NOTICE);
     }
 
     /*******************************************************************************

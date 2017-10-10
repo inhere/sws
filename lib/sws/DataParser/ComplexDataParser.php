@@ -8,6 +8,7 @@
 
 namespace Sws\DataParser;
 
+use Monolog\Logger;
 use Sws\Module\ModuleInterface;
 
 /**
@@ -49,7 +50,7 @@ class ComplexDataParser implements DataParserInterface
             // parse error
             if (json_last_error() > 0) {
                 $errMsg = json_last_error_msg();
-                $module->log("Request data parse to json failed! Error: {$errMsg}, Data: {$data}", [],'error');
+                $module->log("Request data parse to json failed! Error: {$errMsg}, Data: {$data}", [],Logger::ERROR);
                 return false;
             }
         }

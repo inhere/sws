@@ -15,6 +15,8 @@ return [
     'timeZone' => 'Asia/Shanghai',
     'rootPath' => dirname(__DIR__),
 
+    'enableCsrfToken' => true,
+
     'role' => [
         'provider', // 服务提供方
         'consumer' // 服务消费方

@@ -7,7 +7,7 @@
 
 use App\Http\Controllers\HomeController;
 
-$router = Sws::$di->get('httpRouter');
+$router = Sws::get('httpRouter');
 $router->get('/', function () {
     return 'xxx';
 });
@@ -17,7 +17,7 @@ $router->get('/404', function () {
 });
 
 $router->get('/ws', function () {
-    \Sws::info(\Sws::get('renderer'));
+//    \Sws::info(\Sws::get('renderer'));
     return \Sws::get('renderer')->render('ws/index.html');
 });
 

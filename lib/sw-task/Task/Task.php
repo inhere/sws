@@ -8,7 +8,16 @@
 
 namespace Sws\Task;
 
-
+/**
+ * Class Task
+ * @package Sws\Task
+ *
+ * times:
+ *  -1 never stop
+ *  0  disabled
+ *  >0 run defined times, stop and clean it.
+ *
+ */
 class Task
 {
 

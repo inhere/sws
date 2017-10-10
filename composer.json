@@ -45,7 +45,8 @@
         "psr-4": {
             "App\\": "app/",
             "Inhere\\Pool\\": "vendor/inhere/pool/src/",
-            "Sws\\": "lib/sws/"
+            "Sws\\": "lib/sws/",
+            "Sws\\Task\\": "./lib/sw-task/Task/"
         }
     },
     "scripts": {

@@ -20,6 +20,10 @@ use Doctrine\Common\Annotations\Annotation\Target;
  */
 final class Service
 {
+    const POOL = 'pool';
+    const SHARED = 'shared';
+    const SINGLETON = 'singleton';
+
     /**
      * @Required()
      * @var string
@@ -30,6 +34,11 @@ final class Service
      * @var bool
      */
     public $shared = true;
+
+    /**
+     * @var bool
+     */
+    public $scope = self::SHARED;
 
     /**
      * @var array

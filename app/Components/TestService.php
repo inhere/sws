@@ -14,7 +14,7 @@ use Sws\Annotations\Tags\Service;
  * Class TestService
  * @package App\Components
  *
- * @Service("test", shared=0)
+ * @Service("test", shared=false)
  */
 class TestService
 {

@@ -23,8 +23,11 @@ return [
     ],
 
     // for current main server/ outside extend server.
+    // @see \Inhere\Server\Traits\HttpServerTrait::$options
     'options' => [
         'ignoreFavicon' => true,
+        'openGzip' => true,
+        'gzipLevel' => 1,
     ],
 
     // main server
@@ -60,5 +63,9 @@ return [
         'daemonize'     => false,
         'max_request'   => 10000,
         'log_file' => BASE_PATH . '/tmp/logs/swoole.log',
+
+        'upload_tmp_dir' => BASE_PATH . '/tmp/upFiles/',
+//        'document_root' => BASE_PATH . '/web',
+//        'enable_static_handler' => true,
     ]
 ];

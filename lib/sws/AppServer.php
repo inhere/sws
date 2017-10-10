@@ -15,7 +15,6 @@ use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;
 use Monolog\Handler\AbstractHandler;
-use Monolog\Logger;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Server;
@@ -128,7 +127,7 @@ final class AppServer extends HttpServer implements WsServerInterface
 
         $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
 
-        \Sws::info("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info, Logger::NOTICE);
+        \Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info);
     }
 
     /*******************************************************************************

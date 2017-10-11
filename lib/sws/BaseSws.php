@@ -16,7 +16,10 @@ use Inhere\Library\DI\Container;
 use Inhere\Library\Interfaces\LanguageInterface;
 use Inhere\Library\Traits\PathAliasTrait;
 use Sws\Components\LogShortTrait;
-use Sws\Context\ContextStaticGetTrait;
+use Sws\Web\ContextManager;
+use Sws\Web\HttpContext;
+use Sws\WebSocket\Connection;
+use Sws\WebSocket\ConnectionManager;
 
 /**
  * Class BaseSws
@@ -24,7 +27,6 @@ use Sws\Context\ContextStaticGetTrait;
  */
 abstract class BaseSws
 {
-    use ContextStaticGetTrait;
     use PathAliasTrait;
     use LogShortTrait;
 
@@ -41,7 +43,7 @@ abstract class BaseSws
     ];
 
     /**
-     * @var \Sws\ApplicationInterface
+     * @var \Sws\ApplicationInterface|\Sws\Application
      */
     public static $app;
 
@@ -130,6 +132,64 @@ abstract class BaseSws
     public static function log($level, $message, array $context = [])
     {
         self::$di->get('logger')->log($level, $message, $context);
+    }
+
+    /*******************************************************************************
+     * http context
+     ******************************************************************************/
+
+    /**
+     * @return ContextManager
+     */
+    public static function getContextManager()
+    {
+        return self::$di->get('ctxManager');
+    }
+
+    /**
+     * @param null|int $id
+     * @return HttpContext
+     */
+    public static function getContext($id = null)
+    {
+        return self::$di->get('ctxManager')->get($id);
+    }
+
+    /**
+     * @return \Inhere\Http\Request
+     */
+    public static function getRequest()
+    {
+        return self::$di->get('ctxManager')->getRequest();
+    }
+
+    /**
+     * @return \Inhere\Http\Response
+     */
+    public static function getResponse()
+    {
+        return self::$di->get('ctxManager')->getResponse();
+    }
+
+    /*******************************************************************************
+     * websocket context
+     ******************************************************************************/
+
+    /**
+     * @return ConnectionManager
+     */
+    public static function getConnectionManager()
+    {
+        return self::$di->get('cnnManager');
+    }
+
+    /**
+     * @param int $id \Swoole\Http\Request->fd
+     * @return Connection
+     */
+    public static function getConnection($id)
+    {
+        return self::$di->get('cnnManager')->get($id);
     }
 
 }

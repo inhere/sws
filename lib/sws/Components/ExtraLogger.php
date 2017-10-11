@@ -59,8 +59,8 @@ class ExtraLogger extends Logger
     {
         if ($svr) {
             $trace = [
-                'workerId' => $svr->getWorkId(),
-                'workerPid' => $svr->getWorkPid(),
+                'workerId' => $svr->getWorkerId(),
+                'workerPid' => $svr->getWorkerPid(),
                 'isTaskWorker' => $svr->isTaskWorker(),
             ];
 

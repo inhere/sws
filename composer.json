@@ -30,7 +30,8 @@
         "overtrue/pinyin": "^3.0",
         "apache/thrift": "^0.10.0",
         "grpc/grpc": "^1.6",
-        "google/protobuf": "^3.4"
+        "google/protobuf": "^3.4",
+        "php-di/phpdoc-reader": "^2.0"
     },
     "require-dev": {
         "inhere/simple-print-tool": "dev-master"

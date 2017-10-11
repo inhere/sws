@@ -63,7 +63,7 @@ class Connection extends AbstractContext
 
         $this->connectTime = time();
 
-        \Sws::getConnectionManager()->add($this);
+//        \Sws::getConnectionManager()->add($this);
     }
 
     /**
@@ -71,7 +71,7 @@ class Connection extends AbstractContext
      */
     public function destroy()
     {
-        \Sws::getConnectionManager()->del($this->getId());
+//        \Sws::getConnectionManager()->del($this->getId());
 
         parent::destroy();
     }

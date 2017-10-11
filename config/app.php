@@ -11,8 +11,10 @@ use Inhere\Route\ORouter;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
 use Sws\Memory\Language;
+use Sws\Web\ContextManager;
 use Sws\Web\HttpDispatcher;
 use Sws\Web\ViewRenderer;
+use Sws\WebSocket\ConnectionManager;
 
 return Arr::merge(require __DIR__ . '/_base.php', [
     'configCenter' => [
@@ -35,8 +37,16 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             '/uploads' => 'web/uploads'
         ]
     ],
+
+    /**
+     * register service to container
+     * @see \Inhere\Library\DI\Container::set()
+     */
     'services' => [
-        // basic
+        /**
+         * basic service
+         */
+
         'language' => [
             'target' => Language::class,
             '_options' => ['active' => 1],
@@ -45,7 +55,14 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'basePath' => dirname(__DIR__) . '/resources/langs',
         ],
 
-        // http
+        /**
+         * http service
+         */
+
+        'ctxManager' => [
+            'target' => ContextManager::class,
+            '_options' => ['active' => 1, 'aliases' => ['contextManager']],
+        ],
         'httpRouter' => [
             'target' => ORouter::class,
             '_options' => ['active' => 1],
@@ -75,6 +92,19 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'viewsPath' => dirname(__DIR__) . '/resources/views',
         ],
 
+        /**
+         * websocket service
+         */
+
+        'cnnManager' => [
+            'target' => ConnectionManager::class,
+            '_options' => ['active' => 1, 'aliases' => ['connectionManager']],
+        ],
+
+        /**
+         * rpc service
+         */
+
         // rpc services consumer(client)
         'rpcClient' => [
             'target' => RpcClient::class,
@@ -82,11 +112,7 @@ return Arr::merge(require __DIR__ . '/_base.php', [
 
         // rpc services provider(server)'s Dispatcher
         'rpcDispatcher' => function () {
-            $dispatcher = new RpcDispatcher([
-                'filterFavicon' => true,
-                'dynamicAction' => true,
-                RpcDispatcher::ON_NOT_FOUND => 'noService'
-            ]);
+            $dispatcher = new RpcDispatcher();
 
             // register services
             require BASE_PATH . '/app/rpc/services.php';

@@ -8,6 +8,8 @@
 
 namespace Sws\Annotations\Handlers;
 
+use Inhere\Library\Helpers\Obj;
+use PhpDocReader\PhpDocReader;
 use Sws\Annotations\Collector;
 
 /**
@@ -22,6 +24,11 @@ abstract class AbstractHandler implements HandlerInterface
     protected $collector;
 
     /**
+     * @var PhpDocReader
+     */
+    protected $docReader;
+
+    /**
      * @param Collector $collector
      */
     public function setCollector(Collector $collector)
@@ -29,8 +36,49 @@ abstract class AbstractHandler implements HandlerInterface
         $this->collector = $collector;
     }
 
+    /**
+     * @return PhpDocReader
+     */
+    public function getDocReader(): PhpDocReader
+    {
+        if (!$this->docReader) {
+            $this->docReader = new PhpDocReader();
+        }
+
+        return $this->docReader;
+    }
+
     protected function parsePropertyInject(\ReflectionProperty $property)
     {
         $property->setAccessible(true);
+
+        $reader = $this->getDocReader();
+
+        // Read a property type (@var phpdoc)
+        // $property = new ReflectionProperty($className, $propertyName);
+        $propertyClass = $reader->getPropertyClass($property);
+
+        if ($propertyClass) {
+//            return new $propertyClass;
+            return new $propertyClass;
+        }
+
+        return null;
+    }
+
+    protected function parseParameterInject(\ReflectionParameter $parameter)
+    {
+        // Read a parameter type (@param phpdoc)
+//        $parameter = new \ReflectionParameter(array($className, $methodName), $parameterName);
+
+        $reader = $this->getDocReader();
+
+        $parameterClass = $reader->getParameterClass($parameter);
+
+        if ($parameterClass) {
+            return Obj::get($parameterClass);
+        }
+
+        return null;
     }
 }

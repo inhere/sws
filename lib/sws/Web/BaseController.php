@@ -11,7 +11,6 @@ namespace Sws\Web;
 use App\Http\Requests\RequestValidate;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
-use Sws\Context\ContextGetTrait;
 
 /**
  * Class BaseController
@@ -19,7 +18,7 @@ use Sws\Context\ContextGetTrait;
  */
 abstract class BaseController
 {
-    use ContextGetTrait;
+    use HttpContextGetTrait;
 
     /**
      * @var int

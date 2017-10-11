@@ -19,7 +19,6 @@ use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
-use Sws\Context\ContextManager;
 use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
 use Sws\WebSocket\WebSocketServerTrait;
@@ -70,7 +69,7 @@ final class AppServer extends HttpServer implements WsServerInterface
     {
         $info = parent::prepareRuntimeContext();
 
-        if ($ctx = ContextManager::getContext()) {
+        if ($ctx = \Sws::getContext()) {
             $info['ctxId'] = $ctx->getId();
             $info['ctxKey'] = $ctx->getKey();
         }
@@ -116,7 +115,7 @@ final class AppServer extends HttpServer implements WsServerInterface
 //            'context ids' => ContextManager::getIds(),
         ];
 
-        if ($ctx = ContextManager::delContext()) {
+        if ($ctx = \Sws::getContextManager()->del()) {
             $info['_context'] = [
                 'ctxId' => $ctx->getId(),
                 'ctxKey' => $ctx->getKey(),

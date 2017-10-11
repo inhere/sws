@@ -6,20 +6,22 @@
  * Time: 9:24
  */
 
-namespace Sws\Context;
+namespace Sws\Web;
+
+use Sws\Context\ContextInterface;
 
 /**
- * Class ContextGetTrait
- * @package Sws\Context
+ * Class HttpContextGetTrait
+ * @package Sws\Web
  */
-trait ContextGetTrait
+trait HttpContextGetTrait
 {
     /**
      * @return ContextInterface
      */
     public function getContext()
     {
-        return ContextManager::getContext();
+        return \Sws::getContext();
     }
 
     /**
@@ -27,7 +29,7 @@ trait ContextGetTrait
      */
     public function getRequest()
     {
-        return ContextManager::getRequest();
+        return \Sws::getRequest();
     }
 
     /**
@@ -35,6 +37,6 @@ trait ContextGetTrait
      */
     public function getResponse()
     {
-        return ContextManager::getResponse();
+        return \Sws::getResponse();
     }
 }

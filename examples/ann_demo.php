@@ -21,7 +21,7 @@ use Sws\Annotations\Tags\RpcService;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Sws\Context\HttpContext;
+use Sws\Web\HttpContext;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 

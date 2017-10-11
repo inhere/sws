@@ -111,13 +111,4 @@ class HttpHelper
 
         return $swResponse;
     }
-
-    /**
-     * @param $id
-     * @return string
-     */
-    public static function genKey($id)
-    {
-        return md5($id);
-    }
 }

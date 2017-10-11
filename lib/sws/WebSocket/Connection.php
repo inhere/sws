@@ -8,35 +8,19 @@
 
 namespace Sws\WebSocket;
 
-use Inhere\Library\StdObject;
-use Inhere\Library\Traits\ArrayAccessByPropertyTrait;
-use Sws\Components\HttpHelper;
+use Inhere\Library\Helpers\Obj;
 use Inhere\Http\Request;
-use Inhere\Http\Response;
-use Traversable;
+use Sws\Context\AbstractContext;
 
 use Swoole\Http\Request as SwRequest;
-//use Swoole\Http\Response as SwResponse;
+use Swoole\Http\Response as SwResponse;
 
 /**
  * Class Connection - client connection metadata
  * @package Sws\WebSocket
  */
-class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
+class Connection extends AbstractContext
 {
-    use ArrayAccessByPropertyTrait;
-
-    /**
-     * it is `request->fd`
-     * @var int
-     */
-    private $id;
-
-    /**
-     * @var string
-     */
-    private $key;
-
     /**
      * @var string
      */
@@ -68,24 +52,38 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     private $handshakeTime = 0;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Response
-     */
-    private $response;
-
-    /**
-     * ClientMetadata constructor.
+     * class constructor.
      * @param array $config
      */
     public function __construct(array $config = [])
     {
-        parent::__construct($config);
+        Obj::configure($this, $config);
+
+        parent::__construct();
 
         $this->connectTime = time();
+
+        \Sws::getConnectionManager()->add($this);
+    }
+
+    /**
+     * destroy
+     */
+    public function destroy()
+    {
+        \Sws::getConnectionManager()->del($this->getId());
+
+        parent::destroy();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRequestResponse(SwRequest $swRequest, SwResponse $swResponse)
+    {
+        $this->setKey(self::genKey($swRequest->fd));
+
+        parent::setRequestResponse($swRequest, $swResponse);
     }
 
     /**
@@ -93,24 +91,14 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
      */
     public function all()
     {
-        return [
-            'id' => $this->id,
+        return array_merge(parent::all(),[
             'ip' => $this->ip,
-            'key' => $this->key,
             'port' => $this->port,
             'path' => $this->path,
             'handshake' => $this->handshake,
             'connectTime' => $this->connectTime,
             'handshakeTime' => $this->handshakeTime,
-        ];
-    }
-
-    public function initRequestContext(SwRequest $swRequest)
-    {
-        $this->key = HttpHelper::genKey($swRequest->fd);
-
-        $this->request = HttpHelper::createRequest($swRequest);
-        $this->response = HttpHelper::createResponse();
+        ]);
     }
 
     /**
@@ -120,25 +108,9 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     public function handshake(Request $request)
     {
         $this->path = $request->getPath();
-        $this->request = $request;
+//        $this->request = $request;
         $this->handshake = true;
         $this->handshakeTime = time();
-    }
-
-    /**
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * @param string $key
-     */
-    public function setKey(string $key)
-    {
-        $this->key = $key;
     }
 
     /**
@@ -147,22 +119,6 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     public function getIp(): string
     {
         return $this->ip;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     */
-    public function setId(int $id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -243,49 +199,5 @@ class Connection extends StdObject implements \ArrayAccess, \IteratorAggregate
     public function getHandshakeTime(): int
     {
         return $this->handshakeTime;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getRequest(): Request
-    {
-        return $this->request;
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
-     * @return Response
-     */
-    public function getResponse(): Response
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param Response $response
-     */
-    public function setResponse(Response $response)
-    {
-        $this->response = $response;
-    }
-
-    /**
-     * Retrieve an external iterator
-     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
-     * <b>Traversable</b>
-     * @since 5.0.0
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->all());
     }
 }

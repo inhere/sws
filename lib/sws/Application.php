@@ -21,9 +21,8 @@ use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
 use Sws;
 use Sws\Components\HttpHelper;
-use Sws\Context\ContextGetTrait;
-use Sws\Context\ContextManager;
-use Sws\Context\HttpContext;
+use Sws\Web\HttpContextGetTrait;
+use Sws\Web\HttpContext;
 use Sws\Module\ModuleInterface;
 use Sws\WebSocket\Connection;
 
@@ -36,7 +35,7 @@ class Application implements ApplicationInterface
     use ApplicationTrait;
     use EventTrait;
     use OptionsTrait;
-    use ContextGetTrait;
+    use HttpContextGetTrait;
 
     const DATA_JSON = 'json';
     const DATA_TEXT = 'text';
@@ -180,8 +179,8 @@ class Application implements ApplicationInterface
             $uri = $uri ?: $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
             $info = [
-                'context count' =>  ContextManager::count(),
-                'context ids' => ContextManager::getIds(),
+                'context count' =>  Sws::getContextManager()->count(),
+                'context ids' => Sws::getContextManager()->getIds(),
             ];
 
             Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}", $info);

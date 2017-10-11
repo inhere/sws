@@ -8,7 +8,7 @@
 
 namespace Sws\Web;
 
-use Sws\Context\HttpContext;
+use Sws\Web\HttpContext;
 
 /**
  * Class RestController

@@ -8,73 +8,19 @@
 
 namespace Sws\WebSocket;
 
+use Sws\Web\ContextManager;
+
 /**
  * Class ConnectionManager
  * @package Sws\WebSocket
  */
-class ConnectionManager
+class ConnectionManager extends ContextManager
 {
     /**
-     * all connections
-     * @var Connection[]
-     * [
-     *   id => Connection
-     * ]
+     * @return \ArrayIterator
      */
-    private static $connections = [];
-
-    /**
-     * @param $id
-     * @return mixed|null
-     */
-    public static function get($id)
+    public function getConnections()
     {
-        return self::$connections[$id] ?? null;
-    }
-
-    /**
-     * @param $id
-     * @param Connection $connection
-     */
-    public static function add($id, Connection $connection)
-    {
-        self::$connections[$id] = $connection;
-    }
-
-    /**
-     * @param $id
-     * @return mixed|null
-     */
-    public static function del($id)
-    {
-        if ($conn = self::$connections[$id] ?? null) {
-            unset(self::$connections[$id]);
-        }
-
-        return $conn;
-    }
-
-    /**
-     * @return int
-     */
-    public static function count()
-    {
-        return count(self::$connections);
-    }
-
-    /**
-     * @return array
-     */
-    public static function getConnections(): array
-    {
-        return self::$connections;
-    }
-
-    /**
-     * @param array $connections
-     */
-    public static function setConnections(array $connections)
-    {
-        self::$connections = $connections;
+        return $this->getIterator();
     }
 }

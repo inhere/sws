@@ -10,28 +10,84 @@ namespace Sws\Context;
 
 use Inhere\Http\Request;
 use Inhere\Http\Response;
-use Sws\Coroutine\Coroutine;
 
 /**
  * Class ContextManager
  * @package Sws\Context
+ *
  */
-class ContextManager
+class ContextManager implements ContextManagerInterface
 {
     /**
      * @var ContextInterface[]
-     * [
-     *  id => Context
-     * ]
      */
-    private static $contextMap = [];
+    private $contextList = [];
+
+    /**
+     * @param string $id
+     * @return bool
+     */
+    public function has($id)
+    {
+        return isset($this->contextList[$id]);
+    }
+
+    /**
+     * @param ContextInterface $context
+     */
+    public function add(ContextInterface $context)
+    {
+        $this->contextList[$context->getId()] = $context;
+    }
+
+    /**
+     * @param string|int $id
+     * @return ContextInterface|null
+     */
+    public function get($id = null)
+    {
+        if (null === $id) {
+            $id = $this->getDefaultId();
+        }
+
+        return $this->contextList[$id] ?? null;
+    }
+
+    /**
+     * @param int|string|ContextInterface $id
+     * @return ContextInterface|null
+     */
+    public function del($id = null)
+    {
+        if (null === $id) {
+            $id = $this->getDefaultId();
+        }
+
+        if (is_object($id) && $id instanceof ContextInterface) {
+            $id = $id->getId();
+        }
+
+        if ($ctx = $this->get($id)) {
+            unset($this->contextList[$id]);
+        }
+
+        return $ctx;
+    }
+
+    /**
+     * clear
+     */
+    public function clear()
+    {
+        $this->contextList = [];
+    }
 
     /**
      * @return int
      */
-    public static function count()
+    public function count():int
     {
-        return count(self::$contextMap);
+        return count($this->contextList);
     }
 
     /**
@@ -39,11 +95,13 @@ class ContextManager
      * @param bool $thrError
      * @return null|Request
      */
-    public static function getRequest($id = null, $thrError = true)
+    public function getRequest($id = null, $thrError = true)
     {
-        $id = $id ?: Coroutine::tid();
+        if (null === $id) {
+            $id = $this->getDefaultId();
+        }
 
-        if ($ctx = self::getContext($id)) {
+        if ($ctx = $this->get($id)) {
             return $ctx->getRequest();
         }
 
@@ -59,11 +117,13 @@ class ContextManager
      * @param bool $thrError
      * @return null|Response
      */
-    public static function getResponse($id = null, $thrError = true)
+    public function getResponse($id = null, $thrError = true)
     {
-        $id = $id ?: Coroutine::tid();
+        if (null === $id) {
+            $id = $this->getDefaultId();
+        }
 
-        if ($ctx = self::getContext($id)) {
+        if ($ctx = $this->get($id)) {
             return $ctx->getResponse();
         }
 
@@ -75,74 +135,42 @@ class ContextManager
     }
 
     /**
-     * @param string $id
-     * @return bool
+     * @return int|string
      */
-    public static function hasContext($id)
+    protected function getDefaultId()
     {
-        return isset(self::$contextMap[$id]);
-    }
-
-    /**
-     * @param ContextInterface $context
-     */
-    public static function addContext(ContextInterface $context)
-    {
-        self::$contextMap[$context->getId()] = $context;
-    }
-
-    /**
-     * @param string|int $id
-     * @return ContextInterface|null
-     */
-    public static function getContext($id = null)
-    {
-        $id = $id ?: Coroutine::tid();
-
-        return self::$contextMap[$id] ?? null;
-    }
-
-    /**
-     * @param int|string|ContextInterface $id
-     * @return ContextInterface|null
-     */
-    public static function delContext($id = null)
-    {
-        $ctx = null;
-        $id = $id ?: Coroutine::tid();
-
-        if (is_object($id) && $id instanceof ContextInterface) {
-            $id = $id->getId();
-        }
-
-        if ($ctx = self::getContext($id)) {
-            unset(self::$contextMap[$id]);
-        }
-
-        return $ctx;
+        return 0;
     }
 
     /**
      * @return array
      */
-    public static function getContextMap(): array
+    public function getContextList(): array
     {
-        return self::$contextMap;
+        return $this->contextList;
     }
 
     /**
-     * @param array $contextMap
+     * @param array $contextList
      */
-    public static function setContextMap(array $contextMap)
+    public function setContextList(array $contextList)
     {
-        self::$contextMap = $contextMap;
+        $this->contextList = $contextList;
     }
 
     /**
      * @return array
      */
-    public static function getIds()
+    public function getIds()
     {
-        return array_keys(self::$contextMap);
+        return array_keys($this->contextList);
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->contextList);
     }
 }

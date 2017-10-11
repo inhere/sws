@@ -92,7 +92,7 @@ trait WebSocketServerTrait
 
         // 初始化客户端信息
         $meta = new Connection($metaAry);
-        $meta->initRequestContext($swRequest);
+        $meta->setRequestResponse($swRequest, $swResponse);
 
         $request = $meta->getRequest();
         $secKey = $request->getHeaderLine('sec-websocket-key');

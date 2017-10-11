@@ -12,7 +12,7 @@ use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Sws\Annotations\Tags\Route;
-use Sws\Context\HttpContext;
+use Sws\Web\HttpContext;
 use Sws\Web\BaseController;
 
 /**

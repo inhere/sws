@@ -26,8 +26,6 @@ return [
     // @see \Inhere\Server\Traits\HttpServerTrait::$options
     'options' => [
         'ignoreFavicon' => true,
-        'openGzip' => true,
-        'gzipLevel' => 1,
     ],
 
     // main server

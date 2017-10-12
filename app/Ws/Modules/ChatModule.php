@@ -16,7 +16,7 @@ use Sws\Annotations\Tags\WsModule;
  *
  * @WsModule("chat", path="/chat")
  */
-class ChatModule extends \Sws\Module\ChatModule
+class ChatModule extends \Sws\WebSocket\Module\ChatModule
 {
     protected function init()
     {

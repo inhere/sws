@@ -6,11 +6,11 @@
  * Time: 下午11:12
  */
 
-namespace App\Helpers;
+namespace App\Helper;
 
 /**
  * Class AppHelper
- * @package App\Helpers
+ * @package App\Helper
  */
 class AppHelper
 {

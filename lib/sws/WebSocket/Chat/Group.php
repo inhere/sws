@@ -6,11 +6,11 @@
  * Time: 10:33
  */
 
-namespace Sws\WebSocket;
+namespace Sws\WebSocket\Chat;
 
 /**
  * Class Group
- * @package Sws\WebSocket
+ * @package Sws\WebSocket\Chat
  */
 class Group
 {

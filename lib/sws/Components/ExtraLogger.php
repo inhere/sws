@@ -62,11 +62,15 @@ class ExtraLogger extends Logger
                 'workerId' => $svr->getWorkerId(),
                 'workerPid' => $svr->getWorkerPid(),
                 'isTaskWorker' => $svr->isTaskWorker(),
+                'isUserWorker' => $svr->isUserWorker(),
+                'isHttpRequest' => false,
+//                'isWsRequest' => false,
             ];
 
             if ($ctx = \Sws::getContext()) {
                 $trace['ctxId'] = $ctx->getId();
                 $trace['ctxKey'] = $ctx->getKey();
+                $trace['isHttpRequest'] = true;
             }
 
             if (isset($context['_context'])) {
@@ -166,11 +170,16 @@ class ExtraLogger extends Logger
      */
     public function profile($name, array $context = [], $category = 'application')
     {
-        $context['startTime'] = microtime(true);
-        $context['memUsage'] = memory_get_usage();
-        $context['memPeakUsage'] = memory_get_peak_usage();
+        $data = [
+            'before' => $context,
+            '_stat' => [
+                'startTime' => microtime(true),
+                'memUsage' => memory_get_usage(),
+                'memPeakUsage' => memory_get_peak_usage(true),
+            ]
+        ];
 
-        $this->profiles[$category][$name] = $context;
+        $this->profiles[$category][$name] = $data;
     }
 
     /**
@@ -183,13 +192,22 @@ class ExtraLogger extends Logger
     public function profileEnd($name, $message, array $context = [], $category = 'application')
     {
         if (isset($this->profiles[$category][$name])) {
-            $oldInfo = $this->profiles[$category][$name];
-            $info['endTime'] = microtime(true);
-            $info['memUsage'] = memory_get_usage();
-            $info['memPeakUsage'] = memory_get_peak_usage();
+            $data = $this->profiles[$category][$name];
+
+            $old = $data['_stat'];
+            $now = [
+                'startTime' => microtime(true),
+                'memUsage' => memory_get_usage(),
+                'memPeakUsage' => memory_get_peak_usage(true),
+            ];
 
             $this->log(self::DEBUG, $message, $context);
         }
+    }
+
+    protected function calculateConsumption($old, $now)
+    {
+
     }
 
     public function getUniqueId()

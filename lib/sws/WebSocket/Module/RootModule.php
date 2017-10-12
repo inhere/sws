@@ -6,19 +6,19 @@
  * Time: 15:34
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
 /**
- * Class ChatModule
+ * Class RootHandler
  *
- * handle the root '/echo' webSocket request
+ * handle the root '/' webSocket request
  *
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
-class ChatModule extends AbstractModule
+class RootModule extends AbstractModule
 {
     /**
      * @param Request $request

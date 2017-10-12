@@ -15,6 +15,7 @@ if (!defined('BASE_PATH')) {
 use Inhere\Library\DI\Container;
 use Inhere\Library\Interfaces\LanguageInterface;
 use Inhere\Library\Traits\PathAliasTrait;
+use Sws\Components\ExtraLogger;
 use Sws\Components\LogShortTrait;
 use Sws\Web\ContextManager;
 use Sws\Web\HttpContext;
@@ -127,6 +128,7 @@ abstract class BaseSws
     }
 
     /**
+     * @see ExtraLogger::log()
      * {@inheritDoc}
      */
     public static function log($level, $message, array $context = [])

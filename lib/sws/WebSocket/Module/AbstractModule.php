@@ -6,7 +6,7 @@
  * Time: 22:51
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\OptionsTrait;
@@ -22,7 +22,7 @@ use Sws\WebSocket\Message;
 
 /**
  * Class ARouteHandler
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
 abstract class AbstractModule implements ModuleInterface
 {

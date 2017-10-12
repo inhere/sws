@@ -35,7 +35,7 @@ $conf = [
 ];
 
 $clt = new Collector($ff, dirname(__DIR__), $conf);
-$clt->addScan('Sws\\Module\\', 'lib/sws/Module');
+$clt->addScan('Sws\\WebSocket\\Module\\', 'lib/sws/WebSocket/Module');
 
 $clt->registerHandlers([
     'route' => new \Sws\Annotations\Handlers\RouteHandler(),

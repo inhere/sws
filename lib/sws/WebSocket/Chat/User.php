@@ -6,11 +6,11 @@
  * Time: 上午1:16
  */
 
-namespace Sws\WebSocket;
+namespace Sws\WebSocket\Chat;
 
 /**
  * Class User
- * @package Sws\WebSocket
+ * @package Sws\WebSocket\Chat
  */
 class User
 {

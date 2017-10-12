@@ -6,7 +6,7 @@
  * Time: 15:35
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 use Monolog\Logger;
 use Swoole\WebSocket\Server;
@@ -18,7 +18,7 @@ use Sws\WebSocket\Message;
 
 /**
  * Interface ModuleInterface
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
 interface ModuleInterface
 {

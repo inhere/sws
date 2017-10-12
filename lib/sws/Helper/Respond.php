@@ -6,11 +6,11 @@
  * Time: 14:22
  */
 
-namespace Sws\Helpers;
+namespace Sws\Helper;
 
 /**
  * Class Respond
- * @package Sws\Helpers
+ * @package Sws\Helper
  */
 final class Respond
 {

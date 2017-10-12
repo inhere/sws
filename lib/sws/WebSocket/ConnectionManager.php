@@ -8,7 +8,7 @@
 
 namespace Sws\WebSocket;
 
-use Sws\Web\ContextManager;
+use Sws\Context\ContextManager;
 
 /**
  * Class ConnectionManager
@@ -17,10 +17,18 @@ use Sws\Web\ContextManager;
 class ConnectionManager extends ContextManager
 {
     /**
-     * @return \ArrayIterator
+     * @return int|string
+     */
+    protected function getDefaultId()
+    {
+//        return Coroutine::tid();
+    }
+
+    /**
+     * @return array
      */
     public function getConnections()
     {
-        return $this->getIterator();
+        return $this->getContextList();
     }
 }

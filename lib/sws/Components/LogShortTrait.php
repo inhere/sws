@@ -139,7 +139,7 @@ trait LogShortTrait
     {
         $tce = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
-        $context['_called_at'] = $tce[1]['file'];
+        $context['_called_at'] = $tce[1]['class'] . '::' . $tce[1]['function'];
 
         self::log(Logger::DEBUG, $message, $context);
     }

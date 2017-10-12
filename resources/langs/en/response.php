@@ -6,7 +6,7 @@
  * Time: 14:25
  */
 
-use App\Helpers\ResCode;
+use App\Helper\ResCode;
 
 return [
     ResCode::OK => 'successful',

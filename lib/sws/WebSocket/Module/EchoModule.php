@@ -6,19 +6,19 @@
  * Time: 15:34
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
 /**
- * Class RootHandler
+ * Class EchoModule
  *
- * handle the root '/' webSocket request
+ * handle the root '/echo' webSocket request
  *
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
-class RootModule extends AbstractModule
+class EchoModule extends AbstractModule
 {
     /**
      * @param Request $request
@@ -35,9 +35,10 @@ class RootModule extends AbstractModule
     /**
      * index command
      * the default command
+     * @param $data
      */
-    public function indexCommand()
+    public function indexCommand($data)
     {
-        $this->respond('hello, welcome to here!');
+        $this->respondText('you input: ' . $data);
     }
 }

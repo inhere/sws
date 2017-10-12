@@ -8,7 +8,7 @@
 
 namespace App\Ws\Modules\System;
 
-use Sws\Module\AbstractModule;
+use Sws\WebSocket\Module\AbstractModule;
 
 /**
  * Class Module

@@ -6,11 +6,11 @@
  * Time: 14:21
  */
 
-namespace Sws\Helpers;
+namespace Sws\Helper;
 
 /**
  * Class ResCode
- * @package Sws\Helpers
+ * @package Sws\Helper
  */
 class ResCode
 {

@@ -6,11 +6,11 @@
  * Time: 9:49
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 /**
  * Interface CommandInterface
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
 interface CommandInterface
 {

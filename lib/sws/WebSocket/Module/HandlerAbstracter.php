@@ -6,11 +6,11 @@
  * Time: 10:59
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 /**
  * Class HandlerAbstracter
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
 class HandlerAbstracter implements HandlerInterface
 {

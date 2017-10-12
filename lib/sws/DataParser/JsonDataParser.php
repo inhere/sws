@@ -9,7 +9,7 @@
 namespace Sws\DataParser;
 
 use Monolog\Logger;
-use Sws\Module\ModuleInterface;
+use Sws\WebSocket\Module\ModuleInterface;
 
 /**
  * Class JsonDataParser

@@ -20,10 +20,9 @@ use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
 use Sws;
-use Sws\Components\HttpHelper;
 use Sws\Web\HttpContextGetTrait;
 use Sws\Web\HttpContext;
-use Sws\Module\ModuleInterface;
+use Sws\WebSocket\Module\ModuleInterface;
 use Sws\WebSocket\Connection;
 
 /**
@@ -65,6 +64,12 @@ class Application implements ApplicationInterface
 
         // allowed accessed Origins. e.g: [ 'localhost', 'site.com' ]
         'allowedOrigins' => '*',
+
+        // for http
+
+        // @link https://wiki.swoole.com/wiki/page/410.html
+        'openGzip' => true,
+        'gzipLevel' => 1, // allow 1 - 9
     ];
 
     /**
@@ -91,8 +96,6 @@ class Application implements ApplicationInterface
      */
     public function run()
     {
-        $this->server->handleDynamicRequest([$this, 'handleHttpRequest']);
-
         $this->bootstrap();
     }
 
@@ -152,31 +155,43 @@ class Application implements ApplicationInterface
     /*******************************************************************************
      * http handle
      ******************************************************************************/
+    /**
+     * {@inheritdoc}
+     */
+    protected function beforeRequest(SwRequest $request, SwResponse $response)
+    {
+        $request->server['request_memory'] = memory_get_usage();
+        $uri = $request->server['request_uri'];
+
+        Sws::info("The request [$uri] start. fd: {$request->fd}");
+    }
 
     /**
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
-     * @param string|null $uri
-     * @return SwResponse
      * @throws \Throwable
      */
-    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse, $uri = null)
+    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
     {
+        $this->beforeRequest($swRequest, $swResponse);
+
+        /**
+         * 当前请求的上下文对象
+         * 包含：
+         * - request 请求对象
+         * - response 响应对象
+         * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
+         * - args 路由的参数信息
+         * @var HttpContext $context
+         */
+        $context = HttpContext::make($swRequest, $swResponse);
+
         try {
-            /**
-             * 当前请求的上下文对象
-             * 包含：
-             * - request 请求对象
-             * - response 响应对象
-             * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
-             * - args 路由的参数信息
-             * @var HttpContext $context
-             */
-            $context = HttpContext::make($swRequest, $swResponse);
+
             /** @var Sws\Web\HttpDispatcher $dispatcher */
             $dispatcher = $this->di->get('httpDispatcher');
 
-            $uri = $uri ?: $swRequest->server['request_uri'];
+            $uri = $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
             $info = [
                 'context count' =>  Sws::getContextManager()->count(),
@@ -188,13 +203,15 @@ class Application implements ApplicationInterface
             $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
             if (!$result instanceof Response) {
+                $content = $result ?: 'NO CONTENT TO DISPLAY';
+
                 $response = $context->getResponse();
-                $response->getBody()->write((string)$result);
+                $response->getBody()->write(is_string($content) ? $content : json_encode($content));
             } else {
                 $response = $result;
             }
         } catch (\Throwable $e) {
-            $response = $this->handleHttpException($e, __METHOD__);
+            $response = $this->handleHttpException($e, __METHOD__, $context);
         }
 
         $response->setHeader('Server', $this->getName() . '-http-server');
@@ -203,23 +220,118 @@ class Application implements ApplicationInterface
             "Response Status: <info>{$response->getStatusCode()}</info>"
         ]);
         Show::aList($response->getHeaders(), 'Response Headers');
-//        Show::aList($_SESSION ?: [],'server sessions');
 
-        return HttpHelper::paddingSwResponse($response, $swResponse);
+        $this->respondHttp($response, $swResponse);
+
+        $this->afterRequest($swRequest, $swResponse);
     }
 
     /**
-     * @param \Throwable $e
+     * {@inheritDoc}
+     */
+    public function afterRequest(SwRequest $request, SwResponse $response)
+    {
+        $uri = $request->server['request_uri'];
+        $info = [
+//            'context count' =>  ContextManager::count(),
+//            'context ids' => ContextManager::getIds(),
+        ];
+        Sws::trace('test trace1');
+
+        if ($ctx = Sws::getContextManager()->del()) {
+            $info['_context'] = [
+                'ctxId' => $ctx->getId(),
+                'ctxKey' => $ctx->getKey(),
+            ];
+        }
+
+        Sws::trace('test trace');
+        Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
+
+        $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
+
+        Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']} peak-memory={$stat['peakMemory']}", $info);
+    }
+
+    /**
+     * @param Response $response
+     */
+    public function beforeResponse(Response $response)
+    {
+    }
+
+    /**
+     * @param Response $response
+     * @param SwResponse $swResponse
+     * @return mixed
+     */
+    public function respondHttp(Response $response, SwResponse $swResponse)
+    {
+        $this->beforeResponse($response);
+
+        // if open gzip
+        if ($this->getOption('openGzip')) {
+            $swResponse->gzip((int)$this->getOption('gzipLevel'));
+        }
+
+        // set http status
+        $swResponse->status($response->getStatus());
+
+        // set headers
+        foreach ($response->getHeadersObject()->getLines() as $name => $value) {
+            $swResponse->header($name, $value);
+        }
+
+        // set cookies
+        foreach ($response->cookies->toHeaders() as $value) {
+            $swResponse->header('Set-Cookie', $value);
+        }
+
+        // write content
+        if ($body = (string)$response->getBody()) {
+            $swResponse->write($body);
+        }
+
+        // send response to client
+        $ret = $swResponse->end();
+
+        $this->afterResponse($ret);
+
+        return $ret;
+    }
+
+    /**
+     * afterResponse. you can do some clear work
+     * @param $ret
+     */
+    protected function afterResponse($ret)
+    {
+    }
+
+    /**
+     * @param \Throwable|\Exception $e
      * @param string $catcher
+     * @param HttpContext $ctx
      * @return Response
      */
-    protected function handleHttpException($e, $catcher)
+    public function handleHttpException($e, $catcher, HttpContext $ctx)
     {
-        $error = PhpHelper::exceptionToString($e, $this->isDebug(), $catcher);
+        $resp = $ctx->getResponse();
+        $html = PhpHelper::exceptionToHtml($e, $this->isDebug(), $catcher);
 
-        Sws::error($error);
+        // write error log
+        Sws::error(strip_tags($html));
 
-        return $this->getResponse()->write($error);
+        if ($ctx->getRequest()->isAjax()) {
+            $json = PhpHelper::exceptionToJson($e, $this->isDebug(), $catcher);
+            $resp->setHeader('Content-Type', 'application/json; charset=utf-8');
+            $resp->write($json);
+        } else {
+            $resp->setHeader('Content-Type', 'text/html; charset=utf-8');
+            $resp->write($html);
+        }
+
+        return $resp;
     }
 
     /*******************************************************************************

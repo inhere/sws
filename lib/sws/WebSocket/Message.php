@@ -21,7 +21,7 @@ final class Message implements \ArrayAccess
     use PropertyAccessByGetterSetterTrait;
 
     /**
-     * @var WsServerInterface
+     * @var WebSocketServerInterface
      */
     private $ws;
 
@@ -287,18 +287,18 @@ final class Message implements \ArrayAccess
     }
 
     /**
-     * @return WsServerInterface
+     * @return WebSocketServerInterface
      */
-    public function getWs(): WsServerInterface
+    public function getWs(): WebSocketServerInterface
     {
         return $this->ws;
     }
 
     /**
-     * @param WsServerInterface $ws
+     * @param WebSocketServerInterface $ws
      * @return $this
      */
-    public function setWs(WsServerInterface $ws)
+    public function setWs(WebSocketServerInterface $ws)
     {
         $this->ws = $ws;
 

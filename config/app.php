@@ -21,6 +21,10 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         'addr' => '127.0.0.1:5456',
     ],
 
+    'application' => [
+        'openGzip' => true,
+        'gzipLevel' => 1,
+    ],
     'logger' => [
         'name' => 'app',
         'file' => '@tmp/logs/app/application.log',

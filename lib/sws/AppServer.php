@@ -19,16 +19,17 @@ use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
+use Sws;
 use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
 use Sws\WebSocket\WebSocketServerTrait;
-use Sws\WebSocket\WsServerInterface;
+use Sws\WebSocket\WebSocketServerInterface;
 
 /**
  * Class AppServer
  * @package Sws
  */
-final class AppServer extends HttpServer implements WsServerInterface
+final class AppServer extends HttpServer implements WebSocketServerInterface
 {
     use WebSocketServerTrait;
 
@@ -47,7 +48,7 @@ final class AppServer extends HttpServer implements WsServerInterface
      */
     protected function beforeServerStart()
     {
-        $config = \Sws::$di->get('config')->get('assets', []);
+        $config = Sws::$di->get('config')->get('assets', []);
 
         // static handle
         $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);
@@ -57,7 +58,7 @@ final class AppServer extends HttpServer implements WsServerInterface
     {
         parent::onWorkerStop($server, $workerId);
 
-        \Sws::get('logger')->flush();
+        Sws::get('logger')->flush();
 
         $this->flushLog();
     }
@@ -69,7 +70,7 @@ final class AppServer extends HttpServer implements WsServerInterface
     {
         $info = parent::prepareRuntimeContext();
 
-        if ($ctx = \Sws::getContext()) {
+        if ($ctx = Sws::getContext()) {
             $info['ctxId'] = $ctx->getId();
             $info['ctxKey'] = $ctx->getKey();
         }
@@ -101,7 +102,15 @@ final class AppServer extends HttpServer implements WsServerInterface
         $request->server['request_memory'] = memory_get_usage();
         $uri = $request->server['request_uri'];
 
-        \Sws::info("The request [$uri] start. fd: {$request->fd}");
+        Sws::info("The request [$uri] start. fd: {$request->fd}");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function handleHttpRequest(SwRequest $request, SwResponse $response)
+    {
+        $this->app->handleHttpRequest($request, $response);
     }
 
     /**
@@ -114,19 +123,21 @@ final class AppServer extends HttpServer implements WsServerInterface
 //            'context count' =>  ContextManager::count(),
 //            'context ids' => ContextManager::getIds(),
         ];
+        Sws::trace('test trace1');
 
-        if ($ctx = \Sws::getContextManager()->del()) {
+        if ($ctx = Sws::getContextManager()->del()) {
             $info['_context'] = [
                 'ctxId' => $ctx->getId(),
                 'ctxKey' => $ctx->getKey(),
             ];
         }
 
-        \Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
+        Sws::trace('test trace');
+        Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
 
         $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
 
-        \Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']}", $info);
+        Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']} peak-memory={$stat['peakMemory']}", $info);
     }
 
     /*******************************************************************************

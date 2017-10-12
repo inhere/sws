@@ -6,19 +6,19 @@
  * Time: 15:34
  */
 
-namespace Sws\Module;
+namespace Sws\WebSocket\Module;
 
 use Inhere\Http\Request;
 use Inhere\Http\Response;
 
 /**
- * Class EchoModule
+ * Class ChatModule
  *
  * handle the root '/echo' webSocket request
  *
- * @package Sws\Module
+ * @package Sws\WebSocket\Module
  */
-class EchoModule extends AbstractModule
+class ChatModule extends AbstractModule
 {
     /**
      * @param Request $request
@@ -35,10 +35,9 @@ class EchoModule extends AbstractModule
     /**
      * index command
      * the default command
-     * @param $data
      */
-    public function indexCommand($data)
+    public function indexCommand()
     {
-        $this->respondText('you input: ' . $data);
+        $this->respond('hello, welcome to here!');
     }
 }

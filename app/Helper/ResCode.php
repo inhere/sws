@@ -6,13 +6,13 @@
  * Time: 14:21
  */
 
-namespace App\Helpers;
+namespace App\Helper;
 
 /**
  * Class ResCode
- * @package App\Helpers
+ * @package App\Helper
  */
-class ResCode extends \Sws\Helpers\ResCode
+class ResCode extends \Sws\Helper\ResCode
 {
     // more code list
 }

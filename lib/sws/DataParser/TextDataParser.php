@@ -9,7 +9,7 @@
 namespace Sws\DataParser;
 
 
-use Sws\Module\ModuleInterface;
+use Sws\WebSocket\Module\ModuleInterface;
 
 /**
  * Class TextDataParser

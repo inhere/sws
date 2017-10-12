@@ -9,9 +9,9 @@
 
 use Sws\Application;
 use Sws\DataParser\TextDataParser;
-use Sws\Module\EchoModule;
-use Sws\Module\ModuleInterface;
-use Sws\Module\RootModule;
+use Sws\WebSocket\Module\EchoModule;
+use Sws\WebSocket\Module\ModuleInterface;
+use Sws\WebSocket\Module\RootModule;
 
 //$app = \Sws::$app;
 

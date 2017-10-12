@@ -222,6 +222,23 @@ class Application implements ApplicationInterface
         return $this->getResponse()->write($error);
     }
 
+    /**
+     * @param string $path
+     * @param array $args
+     * @param string $method
+     * @throws \Throwable
+     */
+    public function subRequest($path, array $args = [], $method = 'GET')
+    {
+        $this->getContext()->setArgs($args);
+
+        array_unshift($args, $this->getContext());
+
+        /** @var Sws\Web\HttpDispatcher $dispatcher */
+        $dispatcher = $this->di->get('httpDispatcher');
+        $dispatcher->dispatch($path, $method, $args);
+    }
+
     /*******************************************************************************
      * websocket handle
      ******************************************************************************/

@@ -9,7 +9,6 @@
 namespace Sws\WebSocket;
 
 use Inhere\Library\Helpers\Obj;
-use Inhere\Http\Request;
 use Sws\Context\AbstractContext;
 
 use Swoole\Http\Request as SwRequest;
@@ -72,6 +71,7 @@ class Connection extends AbstractContext
     public function destroy()
     {
 //        \Sws::getConnectionManager()->del($this->getId());
+        $this->connectTime = 0;
 
         parent::destroy();
     }
@@ -103,12 +103,10 @@ class Connection extends AbstractContext
 
     /**
      * handshake
-     * @param Request $request
      */
-    public function handshake(Request $request)
+    public function handshake()
     {
-        $this->path = $request->getPath();
-//        $this->request = $request;
+        $this->path = $this->request->getPath();
         $this->handshake = true;
         $this->handshakeTime = time();
     }

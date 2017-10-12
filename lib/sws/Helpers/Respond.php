@@ -6,11 +6,11 @@
  * Time: 14:22
  */
 
-namespace App\Helpers;
+namespace Sws\Helpers;
 
 /**
  * Class Respond
- * @package App\Helpers
+ * @package Sws\Helpers
  */
 final class Respond
 {
@@ -58,16 +58,16 @@ final class Respond
     }
 
     /**
-     * @param $code
+     * @param int $code
      * @param array $msgArgs
      * @return mixed
      */
     public static function getMsgByCode($code, array $msgArgs = [])
     {
-        if ($lang = \Sws::app()->getDi()->getIfExist('lang')) {
-            $lang->tl('response.' . $code, $msgArgs, self::$defaultMsg);
+        if ($lang = \Sws::$di->getIfExist('lang')) {
+            return $lang->tl('response.' . $code, $msgArgs, self::$defaultMsg);
         }
 
-        return $msg;
+        return self::$defaultMsg;
     }
 }

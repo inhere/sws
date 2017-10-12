@@ -23,19 +23,13 @@ use Sws\Components\HttpHelper;
 trait WebSocketServerTrait
 {
     /**
-     * client total number
-     * @var int
-     */
-    private $clientNumber = 0;
-
-    /**
-     * 连接的客户端列表
-     * @var resource[]
+     * 连接的客户端id列表
+     * @var int[]
      * [
-     *  id => socket,
+     *  connection id => connection id
      * ]
      */
-//    protected $clients = [];
+    protected $ids = [];
 
     /**
      * 连接的客户端信息列表
@@ -76,10 +70,12 @@ trait WebSocketServerTrait
      */
     public function onHandShake(SwRequest $swRequest, SwResponse $swResponse)
     {
+//        return $this->simpleHandshake($swRequest, $swResponse);
+
         $cid = $swRequest->fd;
         $info = $this->getClientInfo($cid);
 
-        $this->log("onHandShake: Client #{$swRequest->fd} send handShake request, info: " . var_export($info, 1));
+        $this->log("onHandShake: Client #{$swRequest->fd} send handShake request, connection info: " . var_export($info, 1));
 
         $metaAry = [
             'id' => $cid,
@@ -97,7 +93,7 @@ trait WebSocketServerTrait
         $request = $meta->getRequest();
         $secKey = $request->getHeaderLine('sec-websocket-key');
 
-        $this->log("Handshake: Ready to shake hands with the #$cid client connection. request:\n" . $request->toString());
+        $this->log("Handshake: Ready to shake hands with the #$cid client connection. request info:\n" . $request->toString());
 
         // sec-websocket-key 错误
         if (!$this->validateHeaders($cid, $secKey, $swResponse)) {
@@ -105,7 +101,6 @@ trait WebSocketServerTrait
         }
 
         $response = $meta->getResponse();
-
         $this->fire(self::ON_HANDSHAKE_REQUEST, [$request, $response, $cid]);
 
         // 如果返回 false -- 拒绝连接，比如需要认证，限定路由，限定ip，限定domain等
@@ -127,14 +122,18 @@ trait WebSocketServerTrait
                 'Sec-WebSocket-Accept' => $this->genSign($secKey),
                 'Sec-WebSocket-Version' => self::WS_VERSION,
             ]);
+
+        if (isset($swRequest->header['sec-websocket-protocol'])) {
+            $response->setHeader('Sec-WebSocket-Protocol', $swRequest->header['sec-websocket-protocol']);
+        }
         $this->log("Handshake: response info:\n" . $response->toString());
 
         // 响应握手成功
-        HttpHelper::paddingSwResponse($response, $swResponse);
+        HttpHelper::paddingSwResponse($response, $swResponse)->end();
 
         // 标记已经握手 更新路由 path
-        $meta->handshake($request);
-        $this->clientNumber++;
+        $meta->handshake();
+        $this->ids[$cid] = $cid;
         $this->connections[$cid] = $meta;
 
         $this->log("Handshake: The #{$cid} client handshake successful! ctxKey: {$meta->getKey()}, Meta:\n" . var_export($meta->all(), 1));
@@ -145,6 +144,51 @@ trait WebSocketServerTrait
         $this->server->defer(function () use ($swRequest) {
             $this->onOpen($this->server, $swRequest);
         });
+
+        return true;
+    }
+
+    protected function simpleHandshake(SwRequest $request, SwResponse $response)
+    {
+        // print_r( $request->header );
+        // if (如果不满足我某些自定义的需求条件，那么返回end输出，返回false，握手失败) {
+        //    $response->end();
+        //     return false;
+        // }
+
+        // websocket握手连接算法验证
+        $secWebSocketKey = $request->header['sec-websocket-key'];
+        $patten = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
+        if (0 === preg_match($patten, $secWebSocketKey) || 16 !== strlen(base64_decode($secWebSocketKey))) {
+            $response->end();
+            return false;
+        }
+        echo $request->header['sec-websocket-key'];
+        $key = base64_encode(sha1(
+            $request->header['sec-websocket-key'] . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11',
+            true
+        ));
+
+        $headers = [
+            'Upgrade' => 'websocket',
+            'Connection' => 'Upgrade',
+            'Sec-WebSocket-Accept' => $key,
+            'Sec-WebSocket-Version' => '13',
+        ];
+
+        // WebSocket connection to 'ws://127.0.0.1:9502/'
+        // failed: Error during WebSocket handshake:
+        // Response must not include 'Sec-WebSocket-Protocol' header if not present in request: websocket
+        if (isset($request->header['sec-websocket-protocol'])) {
+            $headers['Sec-WebSocket-Protocol'] = $request->header['sec-websocket-protocol'];
+        }
+
+        foreach ($headers as $key => $val) {
+            $response->header($key, $val);
+        }
+
+        $response->status(101);
+        $response->end();
 
         return true;
     }
@@ -176,8 +220,7 @@ trait WebSocketServerTrait
         $cid = $request->fd;
         $conn = $this->connections[$cid];
 
-        $this->log("onOpen: The #{$cid} client open successful! ctxKey: {$conn->getKey()}, Meta:\n" . var_export($conn->all(), 1));
-
+        $this->log("onOpen: The #{$cid} client open successful! ctxKey: {$conn->getKey()}");
         $this->fire(self::ON_WS_OPEN, [$this, $conn]);
 
         $this->afterOpen($server, $conn);
@@ -249,7 +292,7 @@ trait WebSocketServerTrait
             // call on close callback
             $this->fire(self::ON_WS_CLOSE, [$this, $fd, $meta]);
 
-            $this->log("onClose: The #$fd client has been closed! workerId: {$server->worker_id} ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->clientNumber}");
+            $this->log("onClose: The #$fd client has been closed! workerId: {$server->worker_id} ctxKey:{$meta->getKey()}, From {$meta['ip']}:{$meta['port']}. Count: {$this->count()}");
             $this->log("onClose: Client #{$fd} is closed. client-info:\n" . var_export($fdInfo, 1));
         }
     }
@@ -374,9 +417,8 @@ trait WebSocketServerTrait
     {
         if ($this->hasConnection($cid)) {
             $meta = $this->connections[$cid];
-            $this->clientNumber--;
 
-            unset($this->connections[$cid]);
+            unset($this->connections[$cid], $this->ids[$cid]);
 
             return $meta;
         }
@@ -495,7 +537,11 @@ trait WebSocketServerTrait
 
             /** @var $connList array */
             foreach ($connList as $fd) {
-                $this->server->push($fd, $data);
+                $info = $this->getClientInfo($fd);
+
+                if ($info && $info['websocket_status'] > 0) {
+                    $this->server->push($fd, $data);
+                }
             }
         }
 
@@ -587,20 +633,12 @@ trait WebSocketServerTrait
      */
     public function count(): int
     {
-        return $this->clientNumber;
+        return count($this->ids);
     }
 
 ////////////////////////////////////////////////////////////////////////
 /// get/set methods
 ////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @return int
-     */
-    public function getClientNumber(): int
-    {
-        return $this->clientNumber;
-    }
 
     /**
      * @return Connection[]

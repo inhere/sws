@@ -15,6 +15,7 @@ namespace Sws\WebSocket;
 interface WsServerInterface
 {
     // some events
+    const ON_HTTP_REQUEST = 'httpRequest';
     const ON_WS_CONNECT = 'wsConnect';
     const ON_WS_OPEN = 'wsOpen';
     const ON_WS_DISCONNECT = 'wsDisconnect';

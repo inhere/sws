@@ -183,7 +183,7 @@ class Application implements ApplicationInterface
                 'context ids' => Sws::getContextManager()->getIds(),
             ];
 
-            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}, ctxId: {$context->getId()}, ctxKey: {$context->getKey()}", $info);
+            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}", $info);
 
             $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
 
@@ -237,33 +237,45 @@ class Application implements ApplicationInterface
     {
         $path = $request->getPath();
 
-        // check module. if not exists, response 404 error
-        if (!$module = $this->getModule($path, false)) {
-            Sws::error("The #$cid request's path [$path] route handler not exists.");
+        try {
+            // check module. if not exists, response 404 error
+            if (!$module = $this->getModule($path, false)) {
+                Sws::error("The #$cid request's path [$path] route handler module not exists.");
 
-            $this->fire(self::ON_NO_MODULE, [$cid, $path, $this]);
+                $this->fire(self::ON_NO_MODULE, [$cid, $path, $this]);
 
+                $response
+                    ->setStatus(404)
+                    ->setHeaders(['Connection' => 'close'])
+                    ->write("You request route path [$path] not found!");
+
+                return false;
+            }
+
+            // check request
+            if (!$module->validateRequest($request, $response)) {
+                return false;
+            }
+
+            // application/json
+            // text/plain
+            $response->setHeader('Server', $this->getName() . '-websocket-server');
+            // $response->setHeader('Access-Control-Allow-Origin', '*');
+
+            $module->setApp($this)->onHandshake($request, $response);
+
+            return true;
+        } catch (\Throwable $e) {
             $response
-                ->setStatus(404)
+                ->setStatus(500)
                 ->setHeaders(['Connection' => 'close'])
-                ->write("You request route path [$path] not found!");
+                ->write('Error on handshake: ' . $e->getMessage());
+
+            $error = PhpHelper::exceptionToString($e, 1, __METHOD__);
+            Sws::error($error);
 
             return false;
         }
-
-        // check request
-        if (!$module->validateRequest($request, $response)) {
-            return false;
-        }
-
-        // application/json
-        // text/plain
-        $response->setHeader('Server', $this->getName() . '-websocket-server');
-        // $response->setHeader('Access-Control-Allow-Origin', '*');
-
-        $module->setApp($this)->onHandshake($request, $response);
-
-        return true;
     }
 
     /**
@@ -282,9 +294,23 @@ class Application implements ApplicationInterface
                 }
             }
         } catch (\Throwable $e) {
-            throw $e;
+            $this->handleWsException($e, $conn, __METHOD__);
         }
 //        return;
+    }
+
+    /**
+     * @param \Throwable|\Exception $e
+     * @param Connection $conn
+     * @param $catcher
+     */
+    public function handleWsException($e, Connection $conn, $catcher)
+    {
+        $error = PhpHelper::exceptionToString($e, 1, $catcher);
+
+        Sws::error($error);
+
+        $this->server->sendFormatted('', $e->getMessage(), __LINE__)->to($conn->getId())->send();
     }
 
     /*******************************************************************************

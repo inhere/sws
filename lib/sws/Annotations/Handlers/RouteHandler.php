@@ -66,7 +66,10 @@ class RouteHandler extends AbstractHandler
             $handler = $class . '@' . $action;
             $opts = [
                 'tokens' => $route->tokens,
+                'schemes' => $route->schemes,
                 'domains' => $route->domains,
+                'enter' => $route->enter,
+                'leave' => $route->leave,
             ];
 
             // Allows you to register multiple routes to one method

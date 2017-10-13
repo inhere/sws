@@ -73,10 +73,10 @@ class ExtraLogger extends Logger
                 $trace['isHttpRequest'] = true;
             }
 
-            if (isset($context['_context'])) {
-                $context['_context'] = array_merge($context['_context'], $trace);
+            if (isset($context['_env'])) {
+                $context['_env'] = array_merge($context['_env'], $trace);
             } else {
-                $context['_context'] = $trace;
+                $context['_env'] = $trace;
             }
         }
 
@@ -123,15 +123,15 @@ class ExtraLogger extends Logger
         }
         $ts->setTimezone(static::$timezone);
 
-        $record = array(
+        $record = [
             'message' => (string) $message,
             'context' => $context,
             'level' => $level,
             'level_name' => $levelName,
             'channel' => $this->name,
             'datetime' => $ts,
-            'extra' => array(),
-        );
+            'extra' => [],
+        ];
 
         foreach ($this->processors as $processor) {
             $record = $processor($record);
@@ -171,12 +171,12 @@ class ExtraLogger extends Logger
     public function profile($name, array $context = [], $category = 'application')
     {
         $data = [
-            'before' => $context,
-            '_stat' => [
+            '_stats' => [
                 'startTime' => microtime(true),
-                'memUsage' => memory_get_usage(),
-                'memPeakUsage' => memory_get_peak_usage(true),
-            ]
+                'startMem' => memory_get_usage(),
+            ],
+            'start' => $context,
+            'end' => null,
         ];
 
         $this->profiles[$category][$name] = $data;
@@ -184,24 +184,23 @@ class ExtraLogger extends Logger
 
     /**
      * mark data analysis end
-     * @param $name
-     * @param $message
+     * @param string $name
+     * @param string|null $title
      * @param array $context
      * @param string $category
      */
-    public function profileEnd($name, $message, array $context = [], $category = 'application')
+    public function profileEnd($name, $title = null, array $context = [], $category = 'application')
     {
         if (isset($this->profiles[$category][$name])) {
             $data = $this->profiles[$category][$name];
 
-            $old = $data['_stat'];
-            $now = [
-                'startTime' => microtime(true),
-                'memUsage' => memory_get_usage(),
-                'memPeakUsage' => memory_get_peak_usage(true),
-            ];
+            $old = $data['_stats'];
+            $data['_stats'] = PhpHelper::runtime($old['startTime'], $old['startMem']);
+            $data['end'] = $context;
 
-            $this->log(self::DEBUG, $message, $context);
+            $title = $category . ' - ' . ($title ?: "$name");
+
+            $this->log(self::DEBUG, $title, $data);
         }
     }
 

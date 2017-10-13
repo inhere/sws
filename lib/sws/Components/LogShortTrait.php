@@ -139,7 +139,9 @@ trait LogShortTrait
     {
         $tce = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
 
-        $context['_called_at'] = $tce[1]['class'] . '::' . $tce[1]['function'];
+        if ($info = $tce[1] ?? null) {
+            $context['_called_at'] = sprintf('%s::%s Line %d', $info['class'], $info['function'], $tce[0]['line']);
+        }
 
         self::log(Logger::DEBUG, $message, $context);
     }

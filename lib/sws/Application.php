@@ -200,7 +200,9 @@ class Application implements ApplicationInterface
 
             Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}", $info);
 
+            Sws::profile('dispatch');
             $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
+            Sws::profileEnd('dispatch');
 
             if (!$result instanceof Response) {
                 $content = $result ?: 'NO CONTENT TO DISPLAY';

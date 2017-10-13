@@ -95,49 +95,11 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
      ******************************************************************************/
 
     /**
-     * {@inheritdoc}
-     */
-    protected function beforeRequest(SwRequest $request, SwResponse $response)
-    {
-        $request->server['request_memory'] = memory_get_usage();
-        $uri = $request->server['request_uri'];
-
-        Sws::info("The request [$uri] start. fd: {$request->fd}");
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function handleHttpRequest(SwRequest $request, SwResponse $response)
     {
         $this->app->handleHttpRequest($request, $response);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function afterRequest(SwRequest $request, SwResponse $response)
-    {
-        $uri = $request->server['request_uri'];
-        $info = [
-//            'context count' =>  ContextManager::count(),
-//            'context ids' => ContextManager::getIds(),
-        ];
-        Sws::trace('test trace1');
-
-        if ($ctx = Sws::getContextManager()->del()) {
-            $info['_context'] = [
-                'ctxId' => $ctx->getId(),
-                'ctxKey' => $ctx->getKey(),
-            ];
-        }
-
-        Sws::trace('test trace');
-        Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
-
-        $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
-
-        Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']} peak-memory={$stat['peakMemory']}", $info);
     }
 
     /*******************************************************************************

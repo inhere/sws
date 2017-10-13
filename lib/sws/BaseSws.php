@@ -136,6 +136,24 @@ abstract class BaseSws
         self::$di->get('logger')->log($level, $message, $context);
     }
 
+    /**
+     * @see ExtraLogger::profile()
+     * {@inheritDoc}
+     */
+    public static function profile($name, array $context = [], $category = 'application')
+    {
+        self::$di->get('logger')->profile($name, $context, $category);
+    }
+
+    /**
+     * @see ExtraLogger::profileEnd()
+     * {@inheritDoc}
+     */
+    public static function profileEnd($name, $title = null, array $context = [], $category = 'application')
+    {
+        self::$di->get('logger')->profileEnd($name, $title, $context, $category);
+    }
+
     /*******************************************************************************
      * http context
      ******************************************************************************/

@@ -30,7 +30,8 @@ class HttpDispatcher extends Dispatcher
     protected function executeRouteHandler($path, $method, $handler, array $args = [], array $prependArgs = [])
     {
         if ($args) {
-            \Sws::$app->getRequest()->setAttribute('args', $args);
+            \Sws::$app->getRequest()->setAttributes($args);
+            $args = array_values($args);
         }
 
         // is a \Closure or a callable object

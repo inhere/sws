@@ -16,7 +16,7 @@ return [
     'error_handler' => \Sws\Components\ErrorHandler::class,
     'log' => [
         'name' => 'server',
-        'file' => BASE_PATH . '/tmp/logs/server/sws.log',
+        'file' => BASE_PATH . '/tmp/logs/server/server.log',
         'level' => \Monolog\Logger::DEBUG,
         'splitType' => 1,
         'bufferSize' => 0, //0 1000,

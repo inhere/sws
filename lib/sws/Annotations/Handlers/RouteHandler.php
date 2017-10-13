@@ -64,14 +64,18 @@ class RouteHandler extends AbstractHandler
             $actions[$action] = $mName;
             $path = $route->path ?? $action;
             $handler = $class . '@' . $action;
+            $opts = [
+                'tokens' => $route->tokens,
+                'domains' => $route->domains,
+            ];
 
             // Allows you to register multiple routes to one method
             if (is_array($path)) {
                 foreach ($path as $p) {
-                    $router->map($route->method, $this->getRealPath($p, $prefix), $handler);
+                    $router->map($route->method, $this->getRealPath($p, $prefix), $handler, $opts);
                 }
             } else {
-                $router->map($route->method, $this->getRealPath($path, $prefix), $handler);
+                $router->map($route->method, $this->getRealPath($path, $prefix), $handler, $opts);
             }
         }
 

@@ -12,6 +12,7 @@ use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Sws\Annotations\Tags\Route;
+use Sws\Helper\Respond;
 use Sws\Web\HttpContext;
 use Sws\Web\BaseController;
 
@@ -55,14 +56,12 @@ class TestController extends BaseController
     }
 
     /**
-     * @Route("/demo1")
+     * @Route("{id}/detail", tokens={"id"="\d+"})
      * @return string
      */
-    public function demo1Action()
+    public function detailAction()
     {
-        $id = spl_object_hash($this);
-
-        return "<pre>$id</pre>";
+        return Respond::fmtJson($this->getRequest()->getAttributes());
     }
 
     /**

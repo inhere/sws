@@ -39,11 +39,13 @@ final class Route
     public $schemes = [];
 
     /**
+     * {"localhost", "127.0.0.1"}
      * @var array
      */
     public $domains = [];
 
     /**
+     * {"id"="\d+"}
      * @var array
      */
     public $tokens = [];

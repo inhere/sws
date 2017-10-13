@@ -55,12 +55,12 @@ class HomeController extends BaseController
     }
 
     /**
-     * @Route("/hi/{name}", method="GET")
+     * @Route("/hi/{name}", method="GET", tokens={"name"="\w+"})
      * @return string
      */
     public function hiAction()
     {
-        $name = $this->getRequest()->getAttribute('args')[0];
+        $name = $this->getRequest()->getAttribute('name');
 
         return "<h2>hi, {$name}</h2>";
     }

@@ -40,6 +40,11 @@ abstract class AbstractContext implements ContextInterface, \ArrayAccess
     protected $key;
 
     /**
+     * @var array
+     */
+    private $args = [];
+
+    /**
      * @var Request
      */
     protected $request;
@@ -119,6 +124,7 @@ abstract class AbstractContext implements ContextInterface, \ArrayAccess
      */
     public function destroy()
     {
+        $this->args = [];
         $this->id = $this->key = null;
         $this->request = $this->response = $this->swRequest = $this->swResponse = null;
     }
@@ -221,6 +227,22 @@ abstract class AbstractContext implements ContextInterface, \ArrayAccess
     public function setSwResponse(SwResponse $swResponse)
     {
         $this->swResponse = $swResponse;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgs(): array
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param array $args
+     */
+    public function setArgs(array $args)
+    {
+        $this->args = $args;
     }
 
 }

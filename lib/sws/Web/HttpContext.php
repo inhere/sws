@@ -35,11 +35,6 @@ class HttpContext extends AbstractContext
     ];
 
     /**
-     * @var array
-     */
-    private $args = [];
-
-    /**
      * @param SwRequest $swRequest
      * @param SwResponse $swResponse
      * @return static
@@ -87,23 +82,6 @@ class HttpContext extends AbstractContext
         \Sws::getContextManager()->del($this->getId());
 
         parent::destroy();
-
-        $this->args = [];
     }
 
-    /**
-     * @return array
-     */
-    public function getArgs(): array
-    {
-        return $this->args;
-    }
-
-    /**
-     * @param array $args
-     */
-    public function setArgs(array $args)
-    {
-        $this->args = $args;
-    }
 }

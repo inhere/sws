@@ -94,8 +94,9 @@ class HomeController extends BaseController
         $ctx->getResponse()->setHeader('Content-Type', 'application/json;charset=utf-8');
 
         return json_encode([
-            'static' => $router->getStaticRoutes(),
-            'regular' => $router->getRegularRoutes(),
+            'StaticRoutes' => $router->getStaticRoutes(),
+            'RegularRoutes' => $router->getRegularRoutes(),
+            'VagueRoutes' => $router->getVagueRoutes(),
         ]);
     }
 

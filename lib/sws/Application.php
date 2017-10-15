@@ -311,6 +311,21 @@ class Application implements ApplicationInterface
     }
 
     /**
+     * @param null|string $message
+     */
+    public function endRequest($message = null)
+    {
+        $ctx = \Sws::getContext();
+        $res = $ctx->getResponse();
+
+        if ($message) {
+            $res->write((string)$message);
+        }
+
+        $this->respondHttp($res, $ctx->getSwResponse());
+    }
+
+    /**
      * @param \Throwable|\Exception $e
      * @param string $catcher
      * @param HttpContext $ctx

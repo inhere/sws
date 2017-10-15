@@ -65,6 +65,15 @@ class TestController extends BaseController
     }
 
     /**
+     * @Route("/{name}/profile")
+     * @return string
+     */
+    public function profileAction()
+    {
+        return Respond::fmtJson($this->getRequest()->getAttributes());
+    }
+
+    /**
      * @Route("error")
      */
     public function errorAction()

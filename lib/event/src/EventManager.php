@@ -78,10 +78,8 @@ class EventManager implements EventManagerInterface
             $event = new Event(trim($event), $args);
         }
 
-        /**
-         * @var $event Event
-         */
-        if (($event instanceof EventInterface) && !isset($this->events[$event->name])) {
+        /** @var $event Event */
+        if (($event instanceof EventInterface) && !isset($this->events[$event->getName()])) {
             $this->events[$event->getName()] = $event;
         }
 

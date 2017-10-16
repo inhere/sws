@@ -223,7 +223,7 @@ class Application implements ApplicationInterface
         ]);
         Show::aList($response->getHeaders(), 'Response Headers');
 
-        $this->respondHttp($response, $swResponse);
+        $this->sendResponse($response, $swResponse);
 
         $this->afterRequest($swRequest, $swResponse);
     }
@@ -264,9 +264,10 @@ class Application implements ApplicationInterface
      * @param SwResponse $swResponse
      * @return mixed
      */
-    public function respondHttp(Response $response, SwResponse $swResponse)
+    public function sendResponse(Response $response, SwResponse $swResponse = null)
     {
         $this->beforeResponse($response);
+        $swResponse = $swResponse ?: \Sws::getContext()->getSwResponse();
 
         // if open gzip
         if ($this->getOption('openGzip')) {
@@ -319,7 +320,7 @@ class Application implements ApplicationInterface
             $res->write((string)$message);
         }
 
-        $this->respondHttp($res, $ctx->getSwResponse());
+        $this->sendResponse($res, $ctx->getSwResponse());
     }
 
     /**

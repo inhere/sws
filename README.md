@@ -50,6 +50,22 @@ php lib:
 composer require apache/thrift
 ```
 
+### PSR
+
+http://www.php-fig.org/psr/
+
+#### ACCEPTED
+
+NUM |	TITLE
+-------|-------
+psr-3 |	Logger Interface
+psr-6 |	Caching Interface
+psr-7 |	HTTP Message Interface
+psr-11 |	Container Interface
+psr-16 |	Simple Cache
+
+#### DRAFT
+
 ## license
 
 MIT

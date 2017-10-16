@@ -26,7 +26,7 @@ class ErrorHandler extends \Inhere\Library\Components\ErrorHandler
 
         if ($ctx = \Sws::getContext()) {
             $res = \Sws::$app->handleHttpException($e, __METHOD__, $ctx);
-            \Sws::$app->respondHttp($res, $ctx->getSwResponse());
+            \Sws::$app->sendResponse($res);
         }
     }
 

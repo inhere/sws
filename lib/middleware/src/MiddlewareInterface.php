@@ -8,7 +8,6 @@
 
 namespace Inhere\Middleware;
 
-
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -32,8 +31,5 @@ interface MiddlewareInterface
      *
      * @return ResponseInterface
      */
-    public function process(
-        ServerRequestInterface $request,
-        RequestHandlerInterface $handler
-    );
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler);
 }

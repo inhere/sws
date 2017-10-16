@@ -25,5 +25,5 @@ interface RequestHandlerInterface
      * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request);
+    public function handle(ServerRequestInterface $request): ResponseInterface;
 }

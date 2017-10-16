@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\ResCode;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
@@ -56,12 +57,31 @@ class TestController extends BaseController
     }
 
     /**
-     * @Route("{id}/detail", tokens={"id"="\d+"})
+     * @Route("/my[/{name}[/{age}]]", tokens={"age"="[1-9][0-9]?"})
+     * @param HttpContext $ctx
+     * @param array $args
      * @return string
      */
-    public function detailAction()
+    public function myAction(HttpContext $ctx, array $args)
     {
-        return Respond::fmtJson($this->getRequest()->getAttributes());
+        return Respond::fmtJson([
+            'args' => $args,
+            'im' => "my name is {$args['name']}" . (isset($args['age']) ? " and age {$args['age']}" : '')
+        ], ResCode::OK, 'test optional url argument [age]');
+    }
+
+    /**
+     * @Route("{id}/detail", tokens={"id"="\d+"})
+     * @param HttpContext $ctx
+     * @param array $args
+     * @return string
+     */
+    public function detailAction(HttpContext $ctx, array $args)
+    {
+        return Respond::fmtJson([
+            'args from request' => $ctx->getRequest()->getAttributes(),
+            'args from method' => $args,
+        ]);
     }
 
     /**
@@ -71,6 +91,20 @@ class TestController extends BaseController
     public function profileAction()
     {
         return Respond::fmtJson($this->getRequest()->getAttributes());
+    }
+
+    /**
+     * @Route({"zhPy", "zh-py"})
+     */
+    public function zh2pyAction()
+    {
+        $raw = '带着希望去旅行';
+        $str = \Sws::$di['pinyin']->permalink($raw); // dai-zhe-xi-wang-qu-lv-xing
+
+        return Respond::json([
+            'raw' => $raw,
+            'pinyin' => $str,
+        ]);
     }
 
     /**

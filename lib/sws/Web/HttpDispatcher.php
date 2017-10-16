@@ -20,25 +20,18 @@ class HttpDispatcher extends Dispatcher
 {
     /**
      * execute the matched Route Handler
-     * @param string $path The route path
-     * @param string $method The request method
-     * @param callable $handler The route path handler
-     * @param array $args Matched param from path
-     * @param array $prependArgs
-     * @return mixed
+     * {@inheritdoc}
      */
-    protected function executeRouteHandler($path, $method, $handler, array $args = [], array $prependArgs = [])
+    protected function callRouteHandler($path, $method, $handler, array $args = [])
     {
-        if ($args) {
-            \Sws::$app->getRequest()->setAttributes($args);
-            $args = array_values($args);
+        if ($vars = $args['matches']) {
+            \Sws::$app->getRequest()->setAttributes($vars);
         }
+
+        $args = array_values($args);
 
         // is a \Closure or a callable object
         if (is_object($handler)) {
-            // push prepend args
-            $args = array_merge($prependArgs, $args);
-
             return $handler(...$args);
         }
 
@@ -49,8 +42,6 @@ class HttpDispatcher extends Dispatcher
             $segments = $handler;
         } elseif (is_string($handler)) {
             if (strpos($handler, '@') === false && function_exists($handler)) {
-                // push prepend args
-                $args = array_merge($prependArgs, $args);
                 return $handler(...$args);
             }
 
@@ -61,22 +52,21 @@ class HttpDispatcher extends Dispatcher
         }
 
         // Instantiation controller
-//        $controller = new $segments[0]();
+        // $controller = new $segments[0]();
         $controller = Obj::get($segments[0]);
 
         if (isset($segments[1])) {
             $action = $segments[1];
 
             // use dynamic action
-        } elseif ((bool)$this->getConfig('dynamicAction')) {
-            $action = isset($args[0]) ? trim($args[0], '/') : $this->getConfig('defaultAction');
+        } elseif ($this->config['dynamicAction'] && ($var = $this->config['dynamicActionVar'])) {
+            $action = isset($vars[$var]) ? trim($vars[$var], '/') : $this->config['defaultAction'];
 
             // defined default action
         } elseif (!$action = $this->getConfig('defaultAction')) {
             throw new \RuntimeException("please config the route path [$path] controller action to call");
         }
 
-        $args = array_merge($prependArgs, $args);
         $action = ORouter::convertNodeStr($action);
         $actionMethod = $action . $this->getConfig('actionSuffix');
 

@@ -234,10 +234,7 @@ class Application implements ApplicationInterface
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
         $uri = $request->server['request_uri'];
-        $info = [
-//            'context count' =>  ContextManager::count(),
-//            'context ids' => ContextManager::getIds(),
-        ];
+        $info = [];
         Sws::trace('test trace1');
 
         if ($ctx = Sws::getContextManager()->del()) {

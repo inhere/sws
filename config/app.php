@@ -10,6 +10,8 @@ use Inhere\Library\Helpers\Arr;
 use Inhere\Route\ORouter;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
+use Overtrue\Pinyin\MemoryFileDictLoader;
+use Overtrue\Pinyin\Pinyin;
 use Sws\Memory\Language;
 use Sws\Web\ContextManager;
 use Sws\Web\HttpDispatcher;
@@ -57,6 +59,11 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'langs' => ['en', 'zh-CN'],
             'basePath' => dirname(__DIR__) . '/resources/langs',
             '_options' => ['active' => 1, 'aliases' => ['lang']],
+        ],
+        'pinyin' => [
+            'target' => Pinyin::class,
+            '_args' => [MemoryFileDictLoader::class],
+            '_options' => ['active' => 1, 'aliases' => ['zhTransfer']],
         ],
 
         /**

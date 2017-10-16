@@ -25,7 +25,7 @@ define('APP_DEBUG', $config->get('debug'));
 // create app server.
 $server = $di->get('server');
 
-$server->on(AppServer::ON_BOOTSTRAP, function () {
+$server->on(AppServer::ON_BOOTSTRAP, function ($svr) {
     // load ws modules
 //    require dirname(__DIR__) . '/app/Ws/modules.php';
 });

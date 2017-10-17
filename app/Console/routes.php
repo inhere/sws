@@ -7,7 +7,7 @@
  * @var \Sws\Console\Application $app
  */
 
-use App\Console\Commands\BuildCommand;
+use App\Console\Commands\PackCommand;
 
 $app->commands([
     'test' => function () {
@@ -15,7 +15,7 @@ $app->commands([
     },
 //    'demo' => \App\console\commands\DemoCommand::class,
     //'book:build' => \App\console\commands\BuildCommand::class,
-    BuildCommand::class,
+    PackCommand::class,
 ]);
 
 $app->controllers([

@@ -17,12 +17,19 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RequestHandler implements RequestHandlerInterface
 {
+    /** @var ResponseInterface */
+    protected $response;
+
     protected $responseFactory;
 
     /** @var MiddlewareInterface[] */
     protected $middlewares;
 
-    public function __construct(MiddlewareInterface ...$middlewares)
+    /**
+     * RequestHandler constructor.
+     * @param MiddlewareInterface[] ...$middlewares
+     */
+    public function __construct(...$middlewares)
     {
         $this->middlewares = $middlewares;
     }
@@ -35,14 +42,19 @@ class RequestHandler implements RequestHandlerInterface
         $handler = clone $this;
 
         if (null === key($handler->middlewares)) {
-            return null;
 //            return $this->responseFactory->createResponse();
+            return $this->response;
         }
 
+        $response = $this->response;
         $middleware = current($handler->middlewares);
         next($handler->middlewares);
 
-        $response = $middleware->process($request, $handler);
+        if (method_exists($middleware, '__invoke')) {
+            $response = $middleware($request, $handler);
+        } elseif ($middleware instanceof MiddlewareInterface) {
+            $response = $middleware->process($request, $handler);
+        }
 
         if (!$response instanceof ResponseInterface) {
             throw new \HttpInvalidParamException('error response');
@@ -50,4 +62,21 @@ class RequestHandler implements RequestHandlerInterface
 
         return $response;
     }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param ResponseInterface $response
+     */
+    public function setResponse(ResponseInterface $response)
+    {
+        $this->response = $response;
+    }
+
 }

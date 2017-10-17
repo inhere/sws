@@ -78,6 +78,8 @@ class ExtraLogger extends Logger
             } else {
                 $context['_env'] = $trace;
             }
+
+             unset($context['_env']);
         }
 
         return $context;
@@ -171,12 +173,12 @@ class ExtraLogger extends Logger
     public function profile($name, array $context = [], $category = 'application')
     {
         $data = [
-            '_stats' => [
+            '_profile_stats' => [
                 'startTime' => microtime(true),
                 'startMem' => memory_get_usage(),
             ],
-            'start' => $context,
-            'end' => null,
+            '_profile_start' => $context,
+            '_profile_end' => null,
         ];
 
         $this->profiles[$category][$name] = $data;
@@ -194,11 +196,11 @@ class ExtraLogger extends Logger
         if (isset($this->profiles[$category][$name])) {
             $data = $this->profiles[$category][$name];
 
-            $old = $data['_stats'];
-            $data['_stats'] = PhpHelper::runtime($old['startTime'], $old['startMem']);
-            $data['end'] = $context;
+            $old = $data['_profile_stats'];
+            $data['_profile_stats'] = PhpHelper::runtime($old['startTime'], $old['startMem']);
+            $data['_profile_end'] = $context;
 
-            $title = $category . ' - ' . ($title ?: "$name");
+            $title = $category . ' - ' . ($title ?: $name);
 
             $this->log(self::DEBUG, $title, $data);
         }

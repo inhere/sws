@@ -160,10 +160,6 @@ class Application implements ApplicationInterface
      */
     protected function beforeRequest(SwRequest $request, SwResponse $response)
     {
-        $request->server['request_memory'] = memory_get_usage();
-        $uri = $request->server['request_uri'];
-
-        Sws::info("The request [$uri] start. fd: {$request->fd}");
     }
 
     /**
@@ -175,6 +171,9 @@ class Application implements ApplicationInterface
     {
         $this->beforeRequest($swRequest, $swResponse);
 
+        Sws::profile('request');
+        Sws::profile('prepare-request');
+
         /**
          * 当前请求的上下文对象
          * 包含：
@@ -185,24 +184,33 @@ class Application implements ApplicationInterface
          * @var HttpContext $context
          */
         $context = HttpContext::make($swRequest, $swResponse);
+        $uri = $swRequest->server['request_uri'];
+
+        // if open gzip
+        if ($this->getOption('openGzip')) {
+            $acceptedEncodes = $context->getRequest()->getHeadersObject()->getAcceptEncodes();
+
+            if (in_array('gzip', $acceptedEncodes, true)) {
+                $swResponse->gzip((int)$this->getOption('gzipLevel'));
+            }
+        }
+
+        Sws::profileEnd('prepare-request');
+        Sws::profile('dispatch');
 
         try {
-
             /** @var Sws\Web\HttpDispatcher $dispatcher */
             $dispatcher = $this->di->get('httpDispatcher');
 
-            $uri = $swRequest->server['request_uri'];
             $method = $swRequest->server['request_method'];
             $info = [
                 'context count' =>  Sws::getContextManager()->count(),
                 'context ids' => Sws::getContextManager()->getIds(),
             ];
 
-            Sws::info("begin dispatch URI: $uri, METHOD: $method, fd: {$swRequest->fd}", $info);
+            // Sws::info("[$uri] begin dispatch, METHOD: $method", $info);
 
-            Sws::profile('dispatch');
             $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
-            Sws::profileEnd('dispatch');
 
             if (!$result instanceof Response) {
                 $content = $result ?: 'NO CONTENT TO DISPLAY';
@@ -216,16 +224,27 @@ class Application implements ApplicationInterface
             $response = $this->handleHttpException($e, __METHOD__, $context);
         }
 
+        Sws::profileEnd('dispatch');
+
+        Sws::profile('response');
         $response->setHeader('Server', $this->getName() . '-http-server');
 
-        Show::write([
-            "Response Status: <info>{$response->getStatusCode()}</info>"
-        ]);
-        Show::aList($response->getHeaders(), 'Response Headers');
+        $stats = [
+            'http-status' => $response->getStatus(),
+        ];
 
-        $this->sendResponse($response, $swResponse);
+        $this->beforeResponse($response);
+        $ret = $this->sendResponse($response, $swResponse);
+        $this->afterResponse($ret);
+        Sws::profileEnd('response');
 
         $this->afterRequest($swRequest, $swResponse);
+
+        $stats = PhpHelper::runtime($swRequest->server['request_time_float'], $swRequest->server['request_memory'], $stats);
+        Sws::notice("[$uri] request stats", $stats);
+        Sws::profileEnd('request');
+
+        Show::aList($response->getHeaders(), 'Response Headers');
     }
 
     /**
@@ -233,23 +252,12 @@ class Application implements ApplicationInterface
      */
     public function afterRequest(SwRequest $request, SwResponse $response)
     {
-        $uri = $request->server['request_uri'];
-        $info = [];
-        Sws::trace('test trace1');
-
         if ($ctx = Sws::getContextManager()->del()) {
             $info['_context'] = [
                 'ctxId' => $ctx->getId(),
                 'ctxKey' => $ctx->getKey(),
             ];
         }
-
-        Sws::trace('test trace');
-        Sws::info("The request [$uri] end. fd: {$request->fd}", $info);
-
-        $stat = PhpHelper::runtime($request->server['request_time_float'], $request->server['request_memory']);
-
-        Sws::notice("request stat: runtime={$stat['runtime']} memory={$stat['memory']} peak-memory={$stat['peakMemory']}", $info);
     }
 
     /**
@@ -266,13 +274,12 @@ class Application implements ApplicationInterface
      */
     public function sendResponse(Response $response, SwResponse $swResponse = null)
     {
-        $this->beforeResponse($response);
         $swResponse = $swResponse ?: \Sws::getContext()->getSwResponse();
 
         // if open gzip
-        if ($this->getOption('openGzip')) {
-            $swResponse->gzip((int)$this->getOption('gzipLevel'));
-        }
+//        if ($this->getOption('openGzip')) {
+//            $swResponse->gzip((int)$this->getOption('gzipLevel'));
+//        }
 
         // set http status
         $swResponse->status($response->getStatus());
@@ -293,11 +300,7 @@ class Application implements ApplicationInterface
         }
 
         // send response to client
-        $ret = $swResponse->end();
-
-        $this->afterResponse($ret);
-
-        return $ret;
+        return $swResponse->end();
     }
 
     /**

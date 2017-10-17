@@ -12,6 +12,10 @@ $router->get('/', function () {
     return 'xxx';
 });
 
+$router->get('/ab', function () {
+    return 'hello';
+});
+
 $router->get('/404', function () {
     return '404, PAGE NOT FOUND!';
 });

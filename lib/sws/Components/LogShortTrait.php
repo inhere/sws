@@ -8,6 +8,7 @@
 
 namespace Sws\Components;
 
+use Inhere\Library\Helpers\PhpHelper;
 use Monolog\Logger;
 
 /**
@@ -141,6 +142,11 @@ trait LogShortTrait
 
         if ($info = $tce[1] ?? null) {
             $context['_called_at'] = sprintf('%s::%s Line %d', $info['class'], $info['function'], $tce[0]['line']);
+        }
+
+        if ($ctx = \Sws::getContext()) {
+            $req = $ctx->getSwRequest();
+            $context['_stats'] = PhpHelper::runtime($req->server['request_time_float'], $req->server['request_memory']);
         }
 
         self::log(Logger::DEBUG, $message, $context);

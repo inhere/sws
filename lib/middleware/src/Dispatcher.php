@@ -37,7 +37,7 @@ class Dispatcher implements MiddlewareInterface
         if (count($stack) === 0) {
             throw new \InvalidArgumentException('an empty middleware stack was given');
         }
-
+//        $this->storage = new \SplObjectStorage();
         $this->stack = $stack;
     }
 

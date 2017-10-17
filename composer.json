@@ -46,7 +46,8 @@
             "App\\": "app/",
             "Inhere\\Pool\\": "vendor/inhere/pool/src/",
             "Sws\\": "lib/sws/",
-            "Sws\\Task\\": "./lib/sw-task/Task/"
+            "Sws\\Task\\": "./lib/sw-task/Task/",
+            "Inhere\\Middleware\\": "./lib/middleware/src/"
         }
     },
     "scripts": {

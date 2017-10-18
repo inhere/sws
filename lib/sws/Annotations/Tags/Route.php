@@ -48,7 +48,13 @@ final class Route
      * {"id"="\d+"}
      * @var array
      */
-    public $tokens = [];
+    public $params = [];
+
+    /**
+     * [ "id" => 12 ]
+     * @var array
+     */
+    public $defaults = [];
 
     /**
      * on enter
@@ -72,7 +78,7 @@ final class Route
             $this->path = $values['value'];
         }
 
-        $props = ['path', 'method', 'enter', 'leave', 'tokens', 'schemes', 'domains'];
+        $props = ['path', 'method', 'enter', 'leave', 'params', 'defaults', 'schemes', 'domains'];
 
         foreach ($props as $name) {
             if (isset($values[$name])) {

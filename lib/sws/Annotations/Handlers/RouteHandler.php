@@ -65,7 +65,8 @@ class RouteHandler extends AbstractHandler
             $path = $route->path ?? $action;
             $handler = $class . '@' . $action;
             $opts = [
-                'tokens' => $route->tokens,
+                'params' => $route->params,
+                'defaults' => $route->defaults,
                 'schemes' => $route->schemes,
                 'domains' => $route->domains,
                 'enter' => $route->enter,

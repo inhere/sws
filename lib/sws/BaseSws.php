@@ -13,10 +13,12 @@ if (!defined('BASE_PATH')) {
 }
 
 use Inhere\Library\DI\Container;
+use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Interfaces\LanguageInterface;
+use Inhere\Library\Traits\LogShortTrait;
 use Inhere\Library\Traits\PathAliasTrait;
+use Monolog\Logger;
 use Sws\Components\ExtraLogger;
-use Sws\Components\LogShortTrait;
 use Sws\Web\ContextManager;
 use Sws\Web\HttpContext;
 use Sws\WebSocket\Connection;
@@ -134,6 +136,26 @@ abstract class BaseSws
     public static function log($level, $message, array $context = [])
     {
         self::$di->get('logger')->log($level, $message, $context);
+    }
+
+    /**
+     * @param string $message
+     * @param array $context
+     */
+    public static function trace($message, array $context = array())
+    {
+        $tce = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+
+        if ($info = $tce[1] ?? null) {
+            $context['_called_at'] = sprintf('%s::%s Line %d', $info['class'], $info['function'], $tce[0]['line']);
+        }
+
+        if ($ctx = \Sws::getContext()) {
+            $req = $ctx->getSwRequest();
+            $context['_stats'] = PhpHelper::runtime($req->server['request_time_float'], $req->server['request_memory']);
+        }
+
+        self::log(Logger::DEBUG, $message, $context);
     }
 
     /**

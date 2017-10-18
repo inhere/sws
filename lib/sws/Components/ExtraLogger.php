@@ -10,6 +10,7 @@ namespace Sws\Components;
 
 use Inhere\Console\Utils\Show;
 use Inhere\Library\Helpers\PhpHelper;
+use Inhere\Library\Traits\LogProfileTrait;
 use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -21,6 +22,8 @@ use Sws\AppServer;
  */
 class ExtraLogger extends Logger
 {
+    use LogProfileTrait;
+
     /**
      * {@inheritDoc}
      */
@@ -156,53 +159,6 @@ class ExtraLogger extends Logger
             if ($handler instanceof AbstractHandler) {
                 $handler->close();
             }
-        }
-    }
-
-    /**
-     * @var array
-     */
-    private $profiles = [];
-
-    /**
-     * mark data analysis start
-     * @param $name
-     * @param array $context
-     * @param string $category
-     */
-    public function profile($name, array $context = [], $category = 'application')
-    {
-        $data = [
-            '_profile_stats' => [
-                'startTime' => microtime(true),
-                'startMem' => memory_get_usage(),
-            ],
-            '_profile_start' => $context,
-            '_profile_end' => null,
-        ];
-
-        $this->profiles[$category][$name] = $data;
-    }
-
-    /**
-     * mark data analysis end
-     * @param string $name
-     * @param string|null $title
-     * @param array $context
-     * @param string $category
-     */
-    public function profileEnd($name, $title = null, array $context = [], $category = 'application')
-    {
-        if (isset($this->profiles[$category][$name])) {
-            $data = $this->profiles[$category][$name];
-
-            $old = $data['_profile_stats'];
-            $data['_profile_stats'] = PhpHelper::runtime($old['startTime'], $old['startMem']);
-            $data['_profile_end'] = $context;
-
-            $title = $category . ' - ' . ($title ?: $name);
-
-            $this->log(self::DEBUG, $title, $data);
         }
     }
 

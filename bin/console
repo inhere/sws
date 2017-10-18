@@ -1,5 +1,8 @@
 #!/usr/bin/env php
 <?php
+/**
+ * @var $di \Inhere\Library\DI\Container
+ */
 
 // define project path
 define('BASE_PATH', dirname(__DIR__) );

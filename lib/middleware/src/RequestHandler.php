@@ -10,6 +10,9 @@ namespace Inhere\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
+use SplDoublyLinkedList;
+use SplStack;
 
 /**
  * Class RequestHandler
@@ -25,13 +28,67 @@ class RequestHandler implements RequestHandlerInterface
     /** @var MiddlewareInterface[] */
     protected $middlewares;
 
+    private $stack;
+
+    /** @var bool  */
+    private $locked = false;
+
     /**
      * RequestHandler constructor.
+     * @param ResponseInterface $response
      * @param MiddlewareInterface[] ...$middlewares
      */
-    public function __construct(...$middlewares)
+    public function __construct(ResponseInterface $response,...$middlewares)
     {
+        $this->response = $response;
         $this->middlewares = $middlewares;
+        $this->stack = new \SplStack();
+    }
+
+    /**
+     * Add middleware
+     * This method prepends new middleware to the application middleware stack.
+     * @param array ...$middleware Any callable that accepts two arguments:
+     *                           1. A Request object
+     *                           2. A Handler object
+     * @return $this
+     */
+    public function add(...$middleware)
+    {
+        if ($this->locked) {
+            throw new RuntimeException('Middleware can’t be added once the stack is dequeuing');
+        }
+
+        if (null === $this->stack) {
+            $this->seedStack();
+        }
+
+        foreach ($middleware as $item) {
+            $this->stack[] = $item;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Seed middleware stack with first callable(setting the core node of the middleware stack)
+     * @param callable|mixed $kernel The last item to run as middleware
+     * @throws RuntimeException if the stack is seeded more than once
+     */
+    protected function seedStack(callable $kernel = null)
+    {
+        if (null !== $this->stack) {
+            throw new RuntimeException('MiddlewareStack can only be seeded once.');
+        }
+
+        // setting the core node use self.
+        if ($kernel === null) {
+            $kernel = $this;
+        }
+
+        $this->stack = new SplStack;
+        $this->stack->setIteratorMode(SplDoublyLinkedList::IT_MODE_LIFO | SplDoublyLinkedList::IT_MODE_KEEP);
+        $this->stack[] = $kernel;
     }
 
     /**
@@ -39,12 +96,15 @@ class RequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $handler = clone $this;
+        $handler = $this;
+//        $handler = clone $this;
 
         if (null === key($handler->middlewares)) {
 //            return $this->responseFactory->createResponse();
             return $this->response;
         }
+
+        printf("%s line %d\n", __METHOD__,__LINE__);
 
         $response = $this->response;
         $middleware = current($handler->middlewares);
@@ -56,11 +116,13 @@ class RequestHandler implements RequestHandlerInterface
             $response = $middleware->process($request, $handler);
         }
 
+        printf("%s line %d\n", __METHOD__,__LINE__);
+
         if (!$response instanceof ResponseInterface) {
             throw new \HttpInvalidParamException('error response');
         }
 
-        return $response;
+        return ($this->response = $response);
     }
 
     /**

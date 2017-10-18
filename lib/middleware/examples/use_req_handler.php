@@ -10,43 +10,52 @@ use Inhere\Http\Request;
 use Inhere\Http\Response;
 use Inhere\Http\Uri;
 use Inhere\Middleware\RequestHandler;
+use Inhere\Middleware\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 require dirname(__DIR__) . '/../../vendor/autoload.php';
 
-
 $handler = new RequestHandler(
-    function ($request, $handler) {
+    new Response(),
+    function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
         echo "1 before >>> \n";
         $res = $handler->handle($request);
-        $res->write('+node 1');
+        $res->getBody()->write('+node 1');
         echo "1 after <<< \n";
 
         return $res;
     },
-    function ($request, $handler) {
+    function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
         echo "2 before >>> \n";
         $res = $handler->handle($request);
-        $res->write('+node 2');
+        $res->getBody()->write('+node 2');
         echo "2 after <<< \n";
 
         return $res;
     },
-    function ($request, $handler) {
+    function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
         echo "3 before >>> \n";
         $res = $handler->handle($request);
-        $res->write('+node 3');
+        $res->getBody()->write('+node 3');
         echo "3 after <<< \n";
+
+        return $res;
+    },
+    function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
+        $res = $handler->getResponse();
+        $res->getBody()->write('content');
+
+        echo  "<<handle route and dispatch on there>>.\n";
 
         return $res;
     }
 );
 
-$initRes = new Response();
-$handler->setResponse($initRes->write('content'));
+//$handler->setResponse(new Response());
 
 $res = $handler->handle(new Request('GET', Uri::createFromString('/home')));
 
-echo 'response: ', (string)$res->getBody();
+echo PHP_EOL . 'response content: ', (string)$res->getBody() . PHP_EOL;
 
 /*
 OUTPUT:

@@ -11,6 +11,7 @@ namespace Sws\Web;
 use App\Http\Requests\RequestValidate;
 use Inhere\Http\Request;
 use Inhere\Http\Response;
+use Inhere\Library\Web\ViewRendererTrait;
 
 /**
  * Class BaseController
@@ -18,7 +19,7 @@ use Inhere\Http\Response;
  */
 abstract class BaseController
 {
-    use HttpContextGetTrait;
+    use HttpContextGetTrait, ViewRendererTrait;
 
     /**
      * @var int
@@ -61,6 +62,14 @@ abstract class BaseController
         $response = $response ?: $this->getResponse();
 
         return $response->redirect($url, $status);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRenderer()
+    {
+        return \Sws::$di->get('renderer');
     }
 
     /**

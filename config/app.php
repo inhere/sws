@@ -7,6 +7,7 @@
  */
 
 use Inhere\Library\Helpers\Arr;
+use Inhere\Library\Web\ViewRenderer;
 use Inhere\Route\ORouter;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;
@@ -15,7 +16,6 @@ use Overtrue\Pinyin\Pinyin;
 use Sws\Memory\Language;
 use Sws\Web\ContextManager;
 use Sws\Web\HttpDispatcher;
-use Sws\Web\ViewRenderer;
 use Sws\WebSocket\ConnectionManager;
 
 return Arr::merge(require __DIR__ . '/_base.php', [

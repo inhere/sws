@@ -9,7 +9,7 @@
 namespace Sws\Web;
 
 use App\Http\Requests\RequestValidate;
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 use Inhere\Library\Web\ViewRendererTrait;
 

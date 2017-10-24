@@ -11,7 +11,7 @@ namespace Sws\Context;
 use Inhere\Library\Traits\PropertyAccessByGetterSetterTrait;
 use Inhere\Library\Traits\ArrayAccessByPropertyTrait;
 
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 
 use Swoole\Http\Request as SwRequest;

@@ -11,7 +11,7 @@ namespace Sws\WebSocket\Module;
 use Monolog\Logger;
 use Swoole\WebSocket\Server;
 use Sws\Application;
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
@@ -51,7 +51,6 @@ interface ModuleInterface
     /**
      * @param int $id
      * @param Connection $conn
-     * @return
      */
     public function onClose(int $id, Connection $conn);
 

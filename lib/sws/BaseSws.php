@@ -198,7 +198,7 @@ abstract class BaseSws
     }
 
     /**
-     * @return \Inhere\Http\Request
+     * @return \Inhere\Http\ServerRequest
      */
     public static function getRequest()
     {

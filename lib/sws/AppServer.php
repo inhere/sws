@@ -9,7 +9,7 @@
 namespace Sws;
 
 use Inhere\Console\Utils\Show;
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 use Inhere\Server\Components\StaticResourceProcessor;
 use Inhere\Server\Servers\HttpServer;

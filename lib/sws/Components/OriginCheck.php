@@ -8,7 +8,7 @@
 
 namespace Sws\Components;
 
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 
 /**
  * Class OriginCheck

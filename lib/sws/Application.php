@@ -9,7 +9,7 @@
 namespace Sws;
 
 use Inhere\Console\Utils\Show;
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 use Inhere\Library\Helpers\Obj;
 use Inhere\Library\Helpers\PhpHelper;
@@ -276,11 +276,6 @@ class Application implements ApplicationInterface
     {
         $swResponse = $swResponse ?: \Sws::getContext()->getSwResponse();
 
-        // if open gzip
-//        if ($this->getOption('openGzip')) {
-//            $swResponse->gzip((int)$this->getOption('gzipLevel'));
-//        }
-
         // set http status
         $swResponse->status($response->getStatus());
 
@@ -290,7 +285,7 @@ class Application implements ApplicationInterface
         }
 
         // set cookies
-        foreach ($response->cookies->toHeaders() as $value) {
+        foreach ($response->getCookies()->toHeaders() as $value) {
             $swResponse->header('Set-Cookie', $value);
         }
 

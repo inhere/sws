@@ -25,7 +25,7 @@ trait HttpContextGetTrait
     }
 
     /**
-     * @return \Inhere\Http\Request
+     * @return \Inhere\Http\ServerRequest
      */
     public function getRequest()
     {

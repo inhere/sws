@@ -8,7 +8,7 @@
 
 namespace Sws\Context;
 
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 //use Psr\Http\Message\ResponseInterface;
 //use Psr\Http\Message\ServerRequestInterface;

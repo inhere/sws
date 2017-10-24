@@ -8,7 +8,7 @@
 
 namespace Sws\Components;
 
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest;
 use Inhere\Http\Response;
 use Inhere\Http\UploadedFile;
 use Inhere\Http\Uri;
@@ -24,13 +24,13 @@ class HttpHelper
 {
     /**
      * @param SwRequest $swRequest
-     * @return Request
+     * @return ServerRequest
      */
     public static function createRequest(SwRequest $swRequest)
     {
         $uri = $swRequest->server['request_uri'];
         $method = $swRequest->server['request_method'];
-        $request = new Request($method, Uri::createFromString($uri));
+        $request = new ServerRequest($method, Uri::createFromString($uri));
 
         // add attribute data
         $request->setAttribute('_fd', $swRequest->fd);
@@ -89,7 +89,7 @@ class HttpHelper
      * @param SwResponse $swResponse
      * @return SwResponse
      */
-    public static function paddingSwResponse(Response $response, SwResponse $swResponse)
+    public static function sendResponse(Response $response, SwResponse $swResponse)
     {
         // set http status
         $swResponse->status($response->getStatus());
@@ -100,7 +100,7 @@ class HttpHelper
         }
 
         // set cookies
-        foreach ($response->cookies->toHeaders() as $value) {
+        foreach ($response->getCookies()->toHeaders() as $value) {
             $swResponse->header('Set-Cookie', $value);
         }
 
@@ -109,6 +109,7 @@ class HttpHelper
             $swResponse->write($body);
         }
 
-        return $swResponse;
+        // send response to client
+        return $swResponse->end();
     }
 }

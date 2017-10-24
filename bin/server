@@ -8,7 +8,7 @@
  * @usage `php bin/server start|stop|...`
  */
 
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest;
 use Inhere\Http\Uri;
 use Inhere\Library\DI\Container;
 use Sws\Application;
@@ -35,7 +35,7 @@ $server->on(AppServer::ON_BOOTSTRAP, function ($svr) {
 
 $server->on(AppServer::ON_SERVER_CREATE, function () {
   // prepare load classes
-  $req = new Request('GET', Uri::createFromString('/'));
+  $req = new ServerRequest('GET', Uri::createFromString('/'));
   $res = HttpHelper::createResponse();
 });
 

@@ -10,7 +10,7 @@ namespace Sws\WebSocket\Module;
 
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\OptionsTrait;
-use Inhere\Http\Request;
+use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
 use Monolog\Logger;
 use Swoole\WebSocket\Server;

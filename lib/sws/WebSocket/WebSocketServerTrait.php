@@ -108,7 +108,7 @@ trait WebSocketServerTrait
         if (false === $this->handleHandshake($request, $response, $cid)) {
             $this->log("The #$cid client handshake's callback return false, will close the connection");
 
-            HttpHelper::paddingSwResponse($response, $swResponse)->end();
+            HttpHelper::sendResponse($response, $swResponse);
 
             return false;
         }
@@ -129,7 +129,7 @@ trait WebSocketServerTrait
         $this->log("Handshake: response info:\n" . $response->toString());
 
         // 响应握手成功
-        HttpHelper::paddingSwResponse($response, $swResponse)->end();
+        HttpHelper::sendResponse($response, $swResponse);
 
         // 标记已经握手 更新路由 path
         $meta->handshake();

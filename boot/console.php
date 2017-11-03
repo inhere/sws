@@ -14,7 +14,7 @@ require __DIR__ . '/container.php';
 
 $di->set('config', function () {
     return Configuration::makeByEnv(
-        dirname(__DIR__) . '/.local', // locFile
+        dirname(__DIR__) . '/.env', // locFile
         dirname(__DIR__)  . '/config/console.php', // baseFile
         dirname(__DIR__)  . '/config/console/{env}.php' // envFile
     );

@@ -24,7 +24,7 @@ if (IN_CODE_TESTING) {
 }
 
 // create app server.
-$server = $di->get('server');
+$server = Sws::$di->get('server');
 
 $server->on(AppServer::ON_BOOTSTRAP, function ($svr) {
     // load ws modules

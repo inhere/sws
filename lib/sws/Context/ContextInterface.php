@@ -50,4 +50,14 @@ interface ContextInterface
      * @return Response
      */
     public function getResponse();
+
+    /**
+     * @return array
+     */
+    public function getArgs(): array;
+
+    /**
+     * @param array $args
+     */
+    public function setArgs(array $args);
 }

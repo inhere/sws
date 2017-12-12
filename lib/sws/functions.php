@@ -23,12 +23,17 @@ function message(string $data = '', array $receivers = [], array $excepted = [],
 }
 
 /**
- * @param null|string $prop
+ * @param null|string $service
  * @return mixed
  */
-function app($prop = null)
+function app($service = null)
 {
-    return $prop ? \Sws::$app->$prop : \Sws::$app;
+    return $service ? \Sws::$di->get($service) : \Sws::$app;
+}
+
+function get($service = null)
+{
+    return $service ? \Sws::$di->get($service) : \Sws::$di;
 }
 
 function di($service = null)
@@ -39,4 +44,9 @@ function di($service = null)
 function config($name, $default = null)
 {
     return \Sws::$di->get('config')->get($name, $default);
+}
+
+function path($path)
+{
+    return \Sws::alias($path);
 }

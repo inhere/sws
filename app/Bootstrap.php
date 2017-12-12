@@ -15,8 +15,9 @@ use App\Providers\WebServiceProvider;
 use Inhere\Library\Components\EnvDetector;
 use \Inhere\Library\DI\Container;
 use Inhere\Library\Components\PhpDotEnv;
-use Mco\Web\App as WebApp;
-use Mco\Console\App as CliApp;
+use Inhere\Library\DI\ContainerManager;
+use Sws\Application as WebApp;
+use Sws\Console\Application as CliApp;
 
 /**
  * Class Bootstrap
@@ -34,9 +35,13 @@ class Bootstrap
      * @param Container $di
      * @return CliApp|WebApp
      */
-    public static function boot(Container $di)
+    public static function boot(Container $di = null)
     {
-        \Mco::$di = $di;
+        if (!$di) {
+            $di = ContainerManager::make();
+        }
+
+        \Sws::$di = $di;
 
         return (new self)->run($di);
     }
@@ -50,7 +55,9 @@ class Bootstrap
         EnvDetector::setDomain2env(DOMAIN2ENV);
 
         // define current is IN_CODE_TESTING.
-        \defined('IN_CODE_TESTING') || \define('IN_CODE_TESTING', false);
+        if (!\defined('IN_CODE_TESTING')) {
+            \define('IN_CODE_TESTING', false);
+        }
 
         date_default_timezone_set(env('TIMEZONE', 'UTC'));
     }

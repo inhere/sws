@@ -11,3 +11,18 @@ require dirname(__DIR__) . '/boot/console.php';
 
 // do run
 $di['app']->run();
+
+define('RUN_MODE',  'cli');
+
+include dirname(__DIR__) . '/conf/defined.php';
+include dirname(__DIR__) . '/vendor/autoload.php';
+
+// boot
+$app = \App\Bootstrap::boot();
+
+// in the unit testing.
+if (IN_CODE_TESTING) {
+    return $app;
+}
+
+$app->run();

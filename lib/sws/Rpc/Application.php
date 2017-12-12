@@ -36,7 +36,6 @@ class Application extends RpcServerListener implements ApplicationInterface
 
         parent::__construct($options);
 
-        $this->di = \Sws::$di;
         $this->setParsers([
             new JsonParser(),
             new TextParser(),
@@ -55,14 +54,14 @@ class Application extends RpcServerListener implements ApplicationInterface
             $request = $this->parser->decode($buffer);
 
             /** @var RpcDispatcher $dispatcher */
-            $dispatcher = $this->di->get('rpcDispatcher');
+            $dispatcher = \Sws\get('rpcDispatcher');
             $resp = $dispatcher->dispatch($request['s'], $request['p']);
             $resp = $this->parser->encode($resp);
 
             $server->send($fd, $resp);
 
             if ($error = $server->getLastError()) {
-                $this->get('logger')->error($error);
+                \Sws\get('logger')->error($error);
             }
 
         } catch (\Throwable $e) {

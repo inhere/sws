@@ -12,6 +12,11 @@ use Inhere\Library\Collections\Configuration;
 use Inhere\Library\DI\Container;
 use Inhere\Library\DI\ServiceProviderInterface;
 use Inhere\Route\ORouter;
+use Monolog\Handler\FingersCrossedHandler;
+use Sws\Application;
+use Sws\AppServer;
+use Sws\Components\AppLogHandler;
+use Sws\Components\ExtraLogger;
 
 /**
  * Class WebServiceProvider
@@ -34,7 +39,7 @@ class WebServiceProvider implements ServiceProviderInterface
         $config->load(include BASE_PATH . '/conf/web.php');
 
         // current env config file. e.g '/config/web/dev.php'
-        $envFile = get_path('conf/web/' . APP_ENV. '.php');
+        $envFile = \Sws\path('@conf/web/' . APP_ENV. '.php');
 
         if (is_readable($envFile)) {
             $config->load(include $envFile);
@@ -46,6 +51,37 @@ class WebServiceProvider implements ServiceProviderInterface
         $this->loadWebRoutes($di->get('router'));
 
         // ...
+
+        $di->set('logger', function (Container $di) {
+            $opts = $di->get('config')->get('logger', []);
+
+            $file = \Sws::alias($opts['file']);
+            $fileHandler = new AppLogHandler($file, (int)$opts['level'], (int)$opts['splitType']);
+            $mainHandler = new FingersCrossedHandler($fileHandler, (int)$opts['level'], $opts['bufferSize']);
+
+            $logger = new ExtraLogger($opts['name']);
+            // $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+            $logger->pushHandler($mainHandler);
+
+            return $logger;
+        });
+
+        $di->set('server', function (Container $di) {
+            $config = require \Sws\path('@conf/server.php');
+            // $sever = new SwsServer($config);
+
+            return new AppServer($config);
+        });
+
+        $di->set('app', function (Container $di) {
+            $opts = $di->get('config')->get('application', []);
+
+            $app = new Application($opts);
+            $app->setServer($di->get('server'));
+            // $app->setDi($di);
+
+            return $app;
+        });
     }
 
     /**

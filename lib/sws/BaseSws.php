@@ -30,8 +30,7 @@ use Sws\WebSocket\ConnectionManager;
  */
 abstract class BaseSws
 {
-    use PathAliasTrait;
-    use LogShortTrait;
+    use PathAliasTrait, LogShortTrait;
 
     /**
      * defined path aliases
@@ -41,7 +40,8 @@ abstract class BaseSws
         '@root' => BASE_PATH,
         '@app' => BASE_PATH . '/app',
         '@bin' => BASE_PATH . '/bin',
-        '@config' => BASE_PATH . '/config',
+        '@conf' => BASE_PATH . '/conf',
+        '@res' => BASE_PATH . '/res',
         '@tmp' => BASE_PATH . '/tmp',
     ];
 

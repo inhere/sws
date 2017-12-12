@@ -11,6 +11,10 @@ namespace App\Providers;
 use Inhere\Library\Collections\Configuration;
 use Inhere\Library\DI\Container;
 use Inhere\Library\DI\ServiceProviderInterface;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Sws\Console\Application;
 
 /**
  * Class ConsoleServiceProvider
@@ -33,7 +37,7 @@ class ConsoleServiceProvider implements ServiceProviderInterface
         $config->load(include BASE_PATH . '/conf/console.php');
 
         // current env config file. e.g '/config/console/dev.php'
-        $envFile = get_path('conf/console/' . APP_ENV. '.php');
+        $envFile = \Sws\path('@conf/console/' . APP_ENV. '.php');
 
         if (is_readable($envFile)) {
             $config->load(include $envFile);
@@ -42,5 +46,40 @@ class ConsoleServiceProvider implements ServiceProviderInterface
         // load services from config
         $di->sets($config->remove('services'));
 
+        $di->set('logger', function (Container $di) {
+            $settings = $di->get('config')->get('logger', []);
+
+            $logger = new Logger($settings['name']);
+            // $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+            $logger->pushHandler(new StreamHandler($settings['file'], (int)$settings['level']));
+
+            return $logger;
+        });
+
+        // monolog - database logger
+        $di['dbLogger'] = function (Container $c) {
+            $settings = $c->get('config')->get('dbLogger', []);
+
+            $logger = new Logger($settings['name']);
+            // $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
+            $handler = new StreamHandler($settings['path'], Logger::DEBUG);
+
+            // formatter, ordering log rows
+            $handler->setFormatter(new LineFormatter("[%datetime%] SQL: %message% \n"));
+            $logger->pushHandler($handler);
+
+            return $logger;
+        };
+
+        $di->set('app', function (Container $di) {
+            $settings = $di->get('config')->get('application', []);
+            $app = new Application($settings);
+            // $app->setDi($di);
+
+            // register commands
+            require \Sws\path('@app/Console/routes.php');
+
+            return $app;
+        });
     }
 }

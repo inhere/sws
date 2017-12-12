@@ -77,6 +77,8 @@ class Application implements ApplicationInterface
      */
     public function __construct(array $options = [])
     {
+        \Sws::$app = $this;
+
         if ($options) {
             $this->setOptions($options);
         }
@@ -200,7 +202,7 @@ class Application implements ApplicationInterface
 
         try {
             /** @var Sws\Web\HttpDispatcher $dispatcher */
-            $dispatcher = $this->di->get('httpDispatcher');
+            $dispatcher = \Sws\get('httpDispatcher');
 
             $method = $swRequest->server['request_method'];
             $info = [
@@ -360,7 +362,7 @@ class Application implements ApplicationInterface
         array_unshift($args, $this->getContext());
 
         /** @var Sws\Web\HttpDispatcher $dispatcher */
-        $dispatcher = $this->di->get('httpDispatcher');
+        $dispatcher = \Sws\get('httpDispatcher');
         $dispatcher->dispatch($path, $method, $args);
     }
 
@@ -581,7 +583,7 @@ class Application implements ApplicationInterface
      */
     public function log($msg, array $data = [], $level = Logger::INFO)
     {
-        $this->get('logger')->log($level, $msg, $data);
+        \Sws\get('logger')->log($level, $msg, $data);
     }
 
     /**

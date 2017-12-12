@@ -20,7 +20,7 @@
       "Sws\\" : "./"
     },
     "files" : [
-      "./functions.php",
+      "./functions.php"
     ]
   },
   "suggest": {

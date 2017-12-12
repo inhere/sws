@@ -31,17 +31,17 @@ class HttpDispatcher extends Dispatcher
         $args = array_values($args);
 
         // is a \Closure or a callable object
-        if (is_object($handler)) {
+        if (\is_object($handler)) {
             return $handler(...$args);
         }
 
         //// $handler is string
 
         // is array ['controller', 'action']
-        if (is_array($handler)) {
+        if (\is_array($handler)) {
             $segments = $handler;
-        } elseif (is_string($handler)) {
-            if (strpos($handler, '@') === false && function_exists($handler)) {
+        } elseif (\is_string($handler)) {
+            if (strpos($handler, '@') === false && \function_exists($handler)) {
                 return $handler(...$args);
             }
 

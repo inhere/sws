@@ -34,7 +34,11 @@ class Memory implements CacheInterface
         return true;
     }
 
-    public function deleteMultiple(array $keys)
+    /**
+     * @param iterable $keys
+     * @return bool
+     */
+    public function deleteMultiple($keys)
     {
         foreach ($keys as $key) {
             $this->delete($key);
@@ -52,7 +56,12 @@ class Memory implements CacheInterface
         return $default;
     }
 
-    public function getMultiple(array $keys, $default = null)
+    /**
+     * @param iterable $keys
+     * @param null $default
+     * @return array|iterable
+     */
+    public function getMultiple($keys, $default = null)
     {
         $results = [];
         foreach ($keys as $key) {
@@ -74,7 +83,12 @@ class Memory implements CacheInterface
         return true;
     }
 
-    public function setMultiple(array $values, $ttl = null)
+    /**
+     * @param iterable $values
+     * @param null $ttl
+     * @return bool
+     */
+    public function setMultiple($values, $ttl = null)
     {
         foreach ($values as $key => $value) {
             $this->set($key, $value);

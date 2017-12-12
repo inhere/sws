@@ -74,7 +74,7 @@ class RouteHandler extends AbstractHandler
             ];
 
             // Allows you to register multiple routes to one method
-            if (is_array($path)) {
+            if (\is_array($path)) {
                 foreach ($path as $p) {
                     $router->map($route->method, $this->getRealPath($p, $prefix), $handler, $opts);
                 }

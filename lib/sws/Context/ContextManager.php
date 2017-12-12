@@ -63,7 +63,7 @@ class ContextManager implements ContextManagerInterface
             $id = $this->getDefaultId();
         }
 
-        if (is_object($id) && $id instanceof ContextInterface) {
+        if (\is_object($id) && $id instanceof ContextInterface) {
             $id = $id->getId();
         }
 
@@ -87,7 +87,7 @@ class ContextManager implements ContextManagerInterface
      */
     public function count():int
     {
-        return count($this->contextList);
+        return \count($this->contextList);
     }
 
     /**

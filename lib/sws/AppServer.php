@@ -168,7 +168,7 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
 
             // text
         } else {
-            if ($data && is_array($data)) {
+            if ($data && \is_array($data)) {
                 $data = json_encode($data);
             }
 
@@ -213,7 +213,7 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
      */
     public function respondText($data, bool $doSend = true)
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             $data = implode('', $data);
         }
 
@@ -246,7 +246,7 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
      */
     public function sendText($data)
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             $data = implode('', $data);
         }
 

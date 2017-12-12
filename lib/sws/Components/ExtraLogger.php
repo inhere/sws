@@ -30,7 +30,7 @@ class ExtraLogger extends Logger
     public function log($level, $message, array $context = array())
     {
         // translate object to string.
-        if (is_object($message)) {
+        if (\is_object($message)) {
             $message = PhpHelper::dumpVars($message);
         }
 

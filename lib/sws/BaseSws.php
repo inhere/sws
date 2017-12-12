@@ -8,7 +8,7 @@
 
 namespace Sws;
 
-if (!defined('BASE_PATH')) {
+if (!\defined('BASE_PATH')) {
     throw new \LogicException('Must be defined the constant [BASE_PATH - the project root path]');
 }
 
@@ -179,6 +179,14 @@ abstract class BaseSws
     /*******************************************************************************
      * http context
      ******************************************************************************/
+
+    /**
+     * @return ContextManager
+     */
+    public static function getCtxManager()
+    {
+        return self::$di->get('ctxManager');
+    }
 
     /**
      * @return ContextManager

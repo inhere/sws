@@ -216,7 +216,7 @@ abstract class Protocol
      */
     public function generateKey()
     {
-        if (extension_loaded('openssl')) {
+        if (\extension_loaded('openssl')) {
             $key = openssl_random_pseudo_bytes(16);
         } else {
             // SHA1 is 128 bit (= 16 bytes)
@@ -332,7 +332,7 @@ abstract class Protocol
         if (!$scheme) {
             throw new InvalidArgumentException('No scheme specified');
         }
-        if (!in_array($scheme, self::$schemes, true)) {
+        if (!\in_array($scheme, self::$schemes, true)) {
             throw new InvalidArgumentException(
                 'Unknown socket scheme: ' . $scheme
             );
@@ -527,7 +527,7 @@ abstract class Protocol
     {
         $parts = explode("\r\n\r\n", $response, 2);
 
-        if (count($parts) < 2) {
+        if (\count($parts) < 2) {
             $parts[] = '';
         }
 
@@ -536,12 +536,12 @@ abstract class Protocol
         $return = [];
         foreach (explode("\r\n", $headers) as $header) {
             $parts = explode(': ', $header, 2);
-            if (count($parts) === 2) {
+            if (\count($parts) === 2) {
                 list($name, $value) = $parts;
                 if (!isset($return[$name])) {
                     $return[$name] = $value;
                 } else {
-                    if (is_array($return[$name])) {
+                    if (\is_array($return[$name])) {
                         $return[$name][] = $value;
                     } else {
                         $return[$name] = [$return[$name], $value];

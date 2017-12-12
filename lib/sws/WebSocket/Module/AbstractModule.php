@@ -206,7 +206,7 @@ abstract class AbstractModule implements ModuleInterface
         }
 
         // allow all
-        if (is_string($allowed) && $allowed === self::ALLOW_ALL) {
+        if (\is_string($allowed) && $allowed === self::ALLOW_ALL) {
             return true;
         }
 
@@ -214,7 +214,7 @@ abstract class AbstractModule implements ModuleInterface
             return false;
         }
 
-        return in_array($from, (array)$allowed, true);
+        return \in_array($from, (array)$allowed, true);
     }
 
     /*******************************************************************************

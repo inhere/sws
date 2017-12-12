@@ -36,10 +36,10 @@ class IPLimiter
 
         // if 'whitelists' exists, only check it.
         if ($this->whitelists) {
-            return in_array($long, $this->whitelists, true);
+            return \in_array($long, $this->whitelists, true);
         }
 
-        if (in_array($long, $this->blacklists, true)) {
+        if (\in_array($long, $this->blacklists, true)) {
             return false;
         }
 

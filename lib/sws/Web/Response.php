@@ -31,7 +31,7 @@ class Response extends \Inhere\Http\Response
         }
 
         // set cookies
-        foreach ($this->cookies->toHeaders() as $value) {
+        foreach ($this->getCookies()->toHeaders() as $value) {
             $swResponse->header('Set-Cookie', $value);
         }
 

@@ -190,7 +190,7 @@ class Application implements ApplicationInterface
         if ($this->getOption('openGzip')) {
             $acceptedEncodes = $context->getRequest()->getHeadersObject()->getAcceptEncodes();
 
-            if (in_array('gzip', $acceptedEncodes, true)) {
+            if (\in_array('gzip', $acceptedEncodes, true)) {
                 $swResponse->gzip((int)$this->getOption('gzipLevel'));
             }
         }
@@ -204,8 +204,8 @@ class Application implements ApplicationInterface
 
             $method = $swRequest->server['request_method'];
             $info = [
-                'context count' =>  Sws::getContextManager()->count(),
-                'context ids' => Sws::getContextManager()->getIds(),
+                'context count' =>  Sws::getCtxManager()->count(),
+                'context ids' => Sws::getCtxManager()->getIds(),
             ];
 
             // Sws::info("[$uri] begin dispatch, METHOD: $method", $info);
@@ -216,7 +216,7 @@ class Application implements ApplicationInterface
                 $content = $result ?: 'NO CONTENT TO DISPLAY';
 
                 $response = $context->getResponse();
-                $response->getBody()->write(is_string($content) ? $content : json_encode($content));
+                $response->getBody()->write(\is_string($content) ? $content : json_encode($content));
             } else {
                 $response = $result;
             }
@@ -431,7 +431,7 @@ class Application implements ApplicationInterface
             if ($module = $this->getModule($conn->getPath())) {
                 $result = $module->dispatch($frame->data, $conn, $server);
 
-                if ($result && is_string($result)) {
+                if ($result && \is_string($result)) {
                     $this->server->send($result);
                 }
             }
@@ -483,7 +483,7 @@ class Application implements ApplicationInterface
             throw new \InvalidArgumentException("The route path[$path] have been registered!");
         }
 
-        Sws::info("register the ws module for path: $path, module: {$module->getName()}, class: " . get_class($module));
+        Sws::info("register the ws module for path: $path, module: {$module->getName()}, class: " . \get_class($module));
 
         $this->modules[$path] = $module;
 
@@ -504,7 +504,7 @@ class Application implements ApplicationInterface
      * @param bool $throwError
      * @return ModuleInterface
      */
-    public function getModule(string $path = '/', $throwError = true): ?ModuleInterface
+    public function getModule(string $path = '/', $throwError = true)
     {
         if (!$this->hasModule($path)) {
             if ($throwError) {

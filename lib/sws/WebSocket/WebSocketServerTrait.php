@@ -160,7 +160,7 @@ trait WebSocketServerTrait
         $secWebSocketKey = $request->header['sec-websocket-key'];
         $patten = '#^[+/0-9A-Za-z]{21}[AQgw]==$#';
 
-        if (0 === preg_match($patten, $secWebSocketKey) || 16 !== strlen(base64_decode($secWebSocketKey))) {
+        if (0 === preg_match($patten, $secWebSocketKey) || 16 !== \strlen(base64_decode($secWebSocketKey))) {
             $response->end();
             return false;
         }
@@ -353,7 +353,7 @@ trait WebSocketServerTrait
      */
     public function isInvalidSecWSKey($secWSKey)
     {
-        return 0 === preg_match(self::WS_KEY_PATTEN, $secWSKey) || 16 !== strlen(base64_decode($secWSKey));
+        return 0 === preg_match(self::WS_KEY_PATTEN, $secWSKey) || 16 !== \strlen(base64_decode($secWSKey));
     }
 
     /**
@@ -450,7 +450,7 @@ trait WebSocketServerTrait
         $expected = (array)$expected;
 
         // only one receiver
-        if (1 === count($receivers)) {
+        if (1 === \count($receivers)) {
             return $this->sendTo(array_shift($receivers), $data, $sender);
         }
 
@@ -498,7 +498,7 @@ trait WebSocketServerTrait
         }
 
         // only one receiver
-        if (1 === count($receivers)) {
+        if (1 === \count($receivers)) {
             return $this->sendTo(array_shift($receivers), $data, $sender);
         }
 
@@ -530,7 +530,7 @@ trait WebSocketServerTrait
         while (true) {
             $connList = $this->server->connection_list($startFd, 50);
 
-            if ($connList === false || ($num = count($connList)) === 0) {
+            if ($connList === false || ($num = \count($connList)) === 0) {
                 break;
             }
 
@@ -561,7 +561,7 @@ trait WebSocketServerTrait
     {
         $count = 0;
         $res = $data;
-        $len = strlen($res);
+        $len = \strlen($res);
         $fromUser = $sender < 1 ? 'SYSTEM' : $sender;
 
         // to receivers
@@ -585,7 +585,7 @@ trait WebSocketServerTrait
         while (true) {
             $connList = $this->server->connection_list($startFd, 50);
 
-            if ($connList === false || ($num = count($connList)) === 0) {
+            if ($connList === false || ($num = \count($connList)) === 0) {
                 break;
             }
 
@@ -635,7 +635,7 @@ trait WebSocketServerTrait
      */
     public function count(): int
     {
-        return count($this->ids);
+        return \count($this->ids);
     }
 
 ////////////////////////////////////////////////////////////////////////

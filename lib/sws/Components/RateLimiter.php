@@ -215,7 +215,7 @@ class RateLimiter extends StdObject implements LoggerAwareInterface
             array_shift($this->requests[$id]);
         }
 
-        if (count($this->requests[$id]) > $this->options['requests_per_minute']) {
+        if (\count($this->requests[$id]) > $this->options['requests_per_minute']) {
             $this->limit($connection, 'Requests per minute');
         }
     }

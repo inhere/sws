@@ -196,7 +196,7 @@ final class Message implements \ArrayAccess
 
     public function addReceiver(int $cid)
     {
-        if (!in_array($cid, $this->receivers, true)) {
+        if (!\in_array($cid, $this->receivers, true)) {
             $this->receivers[] = $cid;
         }
 
@@ -233,7 +233,7 @@ final class Message implements \ArrayAccess
      */
     public function except(int $receiver)
     {
-        if (!in_array($receiver, $this->excepted, true)) {
+        if (!\in_array($receiver, $this->excepted, true)) {
             $this->excepted[] = $receiver;
         }
 

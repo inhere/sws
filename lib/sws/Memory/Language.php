@@ -109,7 +109,7 @@ class Language extends Collection
      */
     public function translate(string $key, array $args = [], $lang = null)
     {
-        if (!is_string($key)) {
+        if (!\is_string($key)) {
             throw new \InvalidArgumentException('The translate key must be a string.');
         }
 
@@ -348,7 +348,7 @@ class Language extends Collection
     }
     public function isLang($lang)
     {
-        return $lang && in_array($lang, $this->langs,true);
+        return $lang && \in_array($lang, $this->langs,true);
     }
 
     /**
@@ -400,7 +400,7 @@ class Language extends Collection
      */
     public function setFormat($format)
     {
-        if (in_array($format, self::$formats, true)) {
+        if (\in_array($format, self::$formats, true)) {
             $this->format = $format;
         }
     }

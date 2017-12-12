@@ -38,7 +38,7 @@ class ErrorHandler extends \Inhere\Library\Components\ErrorHandler
         $this->reservedMemory = null;
         $lastError = error_get_last();
 
-        if (!$lastError || !in_array($lastError['type'], self::$fatalErrors, true)) {
+        if (!$lastError || !\in_array($lastError['type'], self::$fatalErrors, true)) {
             return;
         }
 

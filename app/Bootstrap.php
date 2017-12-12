@@ -135,7 +135,9 @@ class Bootstrap
         }
 
         // APP_ENV Current application environment
-        \defined('APP_ENV') || \define('APP_ENV', $envName);
+        if (!\defined('APP_ENV')) {
+            \define('APP_ENV', $envName);
+        }
 
         // Some services for WEB
         $di->registerServiceProvider(new WebServiceProvider());
@@ -143,8 +145,7 @@ class Bootstrap
         $em = $di->get('eventManager');
         $em->attach('app', new AppListener());
 
-        $app = new WebApp($di);
-        $app->setEventManager($em);
+        $app = $di->get('app');
 
         return $app;
     }
@@ -161,7 +162,9 @@ class Bootstrap
         }
 
         // APP_ENV Current application environment
-        \defined('APP_ENV') || \define('APP_ENV', $envName);
+        if (!\defined('APP_ENV')) {
+            \define('APP_ENV', $envName);
+        }
 
         // some services for CLI
         $di->registerServiceProvider(new ConsoleServiceProvider());
@@ -169,12 +172,8 @@ class Bootstrap
         $em = $di->get('eventManager');
         $em->attach('app', new AppListener());
 
-        $app = new CliApp($di);
-
-        // save to DI
-        // $di->set('app', $app);
-
-        $app->setEventManager($em);
+        $app = $di->get('app');
+        // $app->setEventManager($em);
 
         return $app;
     }

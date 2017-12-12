@@ -197,6 +197,14 @@ abstract class BaseSws
     }
 
     /**
+     * @return HttpContext
+     */
+    public static function getCtx()
+    {
+        return self::$di->get('ctxManager')->get();
+    }
+
+    /**
      * @param null|int $id
      * @return HttpContext
      */

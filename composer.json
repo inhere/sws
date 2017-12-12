@@ -15,12 +15,13 @@
         "inhere/asset-manager": "dev-master",
         "inhere/console": "dev-master",
         "inhere/database": "dev-master",
+        "inhere/event": "dev-master",
         "inhere/http": "dev-master",
         "inhere/middleware": "dev-master",
         "inhere/library": "dev-master",
         "inhere/library-plus": "dev-master",
         "inhere/php-validate": "dev-master",
-        "inhere/resource-pool": "dev-master"
+        "inhere/resource-pool": "dev-master",
         "inhere/server": "dev-master",
         "inhere/websocket": "dev-master",
         "inhere/sroute": "dev-master",
@@ -71,6 +72,10 @@
         "2": {
             "type": "git",
             "url": "https://github.com/inhere/php-web-library"
+        },
+        "3": {
+            "type": "git",
+            "url": "https://github.com/inhere/php-resource-pool"
         }
     }
 }

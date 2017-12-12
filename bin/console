@@ -4,14 +4,6 @@
  * @var $di \Inhere\Library\DI\Container
  */
 
-// define project path
-define('BASE_PATH', dirname(__DIR__) );
-
-require dirname(__DIR__) . '/boot/console.php';
-
-// do run
-$di['app']->run();
-
 define('RUN_MODE',  'cli');
 
 include dirname(__DIR__) . '/conf/defined.php';

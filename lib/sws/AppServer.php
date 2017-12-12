@@ -48,9 +48,10 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
     protected function beforeServerStart()
     {
         $config = Sws::$di->get('config')->get('assets', []);
+        $config['basePath'] = BASE_PATH;
 
         // static handle
-        $this->staticAccessHandler = new StaticResourceProcessor(BASE_PATH, $config['ext'], $config['dirMap']);
+        $this->staticAccessHandler = new StaticResourceProcessor($config);
     }
 
     public function onWorkerStop(Server $server, $workerId)

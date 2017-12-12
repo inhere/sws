@@ -8,22 +8,20 @@
  * @usage `php bin/server start|stop|...`
  */
 
-use Inhere\Http\ServerRequest;
-use Inhere\Http\Uri;
 use Inhere\Library\DI\Container;
-use Inhere\Server\Helpers\Psr7Http;
 use Sws\Application;
 use Sws\AppServer;
 
-define('BASE_PATH', dirname(__DIR__) );
+include dirname(__DIR__) . '/conf/defined.php';
+include dirname(__DIR__) . '/vendor/autoload.php';
 
-require dirname(__DIR__) . '/boot/app.php';
+// boot
+$app = \App\Bootstrap::boot();
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-
-define('RUNTIME_ENV', $config->get('env'));
-define('APP_DEBUG', $config->get('debug'));
+// in the unit testing.
+if (IN_CODE_TESTING) {
+    return $app;
+}
 
 // create app server.
 $server = $di->get('server');
@@ -35,8 +33,8 @@ $server->on(AppServer::ON_BOOTSTRAP, function ($svr) {
 
 $server->on(AppServer::ON_SERVER_CREATE, function () {
   // prepare load classes
-  $req = new ServerRequest('GET', Uri::createFromString('/'));
-  $res = Psr7Http::createResponse();
+  // $req = Psr7Http::createServerRequest();
+  // $res = Psr7Http::createResponse();
 });
 
 // 启动worker 后，再初始化应用(加载应用配置、路由 ...)
@@ -61,6 +59,3 @@ $server->on(AppServer::ON_WORKER_STARTED, function (AppServer $server) {
 //exit;
 
 $server->run();
-
-//$app = $di->get('app');
-//$app->run();

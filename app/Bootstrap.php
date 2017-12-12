@@ -102,6 +102,7 @@ class Bootstrap
     {
         // date timezone
 //        date_default_timezone_set($config->get('timezone', 'UTC'));
+        \define('APP_DEBUG', $di['config']->get('debug'));
 
         switch (APP_ENV) {
             case APP_DEV:

@@ -57,7 +57,7 @@ return Arr::merge(require __DIR__ . '/_base.php', [
             'target' => Language::class,
             'lang' => 'zh-CN',
             'langs' => ['en', 'zh-CN'],
-            'basePath' => dirname(__DIR__) . '/resources/langs',
+            'basePath' => dirname(__DIR__) . '/res/langs',
             '_options' => ['active' => 1, 'aliases' => ['lang']],
         ],
         'pinyin' => [
@@ -99,7 +99,7 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         ],
         'renderer' => [
             'target' => ViewRenderer::class,
-            'viewsPath' => dirname(__DIR__) . '/resources/views',
+            'viewsPath' => dirname(__DIR__) . '/res/views',
             '_options' => ['active' => 1, 'aliases' => 'viewRenderer'],
         ],
 

@@ -8,6 +8,7 @@
 
 namespace Sws\Components;
 
+use Inhere\Event\EventManager;
 use Inhere\Library\DI\Container;
 use Inhere\Library\DI\ServiceProviderInterface;
 
@@ -19,10 +20,14 @@ class CoreServiceProvider implements ServiceProviderInterface
 {
     /**
      * 注册一项服务(可能含有多个服务)提供者到容器中
-     * @param Container $container
+     * @param Container $di
      */
-    public function register(Container $container)
+    public function register(Container $di)
     {
-        // TODO: Implement register() method.
+        if (!isset($di['eventManager'])) {
+            $di->set('eventManager', function () {
+                return new EventManager();
+            });
+        }
     }
 }

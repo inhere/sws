@@ -35,14 +35,6 @@ return Arr::merge(require __DIR__ . '/_base.php', [
         'bufferSize' => 0, // 0 1000,
     ],
 
-    'assets' => [
-        'ext' => [],
-        'dirMap' => [
-            // 'url_match' => 'assets dir',
-            '/assets' => 'web/assets',
-            '/uploads' => 'web/uploads'
-        ]
-    ],
 
     /**
      * register service to container

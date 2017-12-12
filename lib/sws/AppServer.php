@@ -11,7 +11,7 @@ namespace Sws;
 use Inhere\Console\Utils\Show;
 use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
-use Inhere\Server\Components\StaticResourceProcessor;
+use Inhere\Server\Helpers\Psr7Http;
 use Inhere\Server\Servers\HttpServer;
 use Monolog\Handler\AbstractHandler;
 use Swoole\Http\Request as SwRequest;
@@ -19,6 +19,7 @@ use Swoole\Http\Response as SwResponse;
 use Swoole\Server;
 use Swoole\WebSocket\Frame;
 use Sws;
+use Sws\Web\HttpContext;
 use Sws\WebSocket\Connection;
 use Sws\WebSocket\Message;
 use Sws\WebSocket\WebSocketServerTrait;
@@ -40,18 +41,6 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
      */
     protected function beforeRun()
     {
-    }
-
-    /**
-     * before Server Start
-     */
-    protected function beforeServerStart()
-    {
-        $config = Sws::$di->get('config')->get('assets', []);
-        $config['basePath'] = BASE_PATH;
-
-        // static handle
-        $this->staticAccessHandler = new StaticResourceProcessor($config);
     }
 
     public function onWorkerStop(Server $server, $workerId)
@@ -99,7 +88,36 @@ final class AppServer extends HttpServer implements WebSocketServerInterface
      */
     public function handleHttpRequest(SwRequest $request, SwResponse $response)
     {
-        $this->app->handleHttpRequest($request, $response);
+        // $this->app->handleHttpRequest($request, $response);
+
+        /**
+         * 当前请求的上下文对象
+         * 包含：
+         * - request 请求对象
+         * - response 响应对象
+         * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
+         * - args 路由的参数信息
+         * @var HttpContext $context
+         */
+        $context = HttpContext::make($request, $response);
+        // $psr7Req = Psr7Http::createServerRequest($request);
+        // $psr7Res = Psr7Http::createResponse([
+        //     'Content-Type' => 'text/html; charset=' . \Mco::get('config')->get('charset', 'UTF-8')
+        // ]);
+
+        // handle request
+        $psr7Res = $this->app->handleHttpRequest($context);
+
+        // if open gzip
+        if ($this->getOption('openGzip')) {
+            $acceptedEncodes = $context->getRequest()->getHeadersObject()->getAcceptEncodes();
+
+            if (\in_array('gzip', $acceptedEncodes, true)) {
+                $response->gzip((int)$this->getOption('gzipLevel'));
+            }
+        }
+
+        $this->app->httpEnd($psr7Res, $response);
     }
 
     /*******************************************************************************

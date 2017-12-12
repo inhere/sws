@@ -7,6 +7,7 @@
  */
 
 namespace Sws\Components;
+
 use Monolog\Handler\AbstractHandler;
 use Monolog\Logger;
 use Psr\Log\LogLevel;
@@ -26,7 +27,7 @@ class ErrorHandler extends \Inhere\Library\Components\ErrorHandler
 
         if ($ctx = \Sws::getContext()) {
             $res = \Sws::$app->handleHttpException($e, __METHOD__, $ctx);
-            \Sws::$app->sendResponse($res);
+            \Sws::$app->httpEnd($res);
         }
     }
 

@@ -25,10 +25,20 @@ use Sws\Console\Application as CliApp;
  */
 class Bootstrap
 {
+    /**
+     * for swoole app
+     */
     const SWOOLE_EVENTS = [
         'start' => [
 
         ],
+    ];
+
+    /**
+     * for swoole app
+     */
+    const ACTIVE_SERVICES = [
+        'logger', 'httpRouter',
     ];
 
     /**

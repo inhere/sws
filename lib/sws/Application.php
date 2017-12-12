@@ -9,21 +9,22 @@
 namespace Sws;
 
 use Inhere\Console\Utils\Show;
-use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
+use Inhere\Http\ServerRequest;
 use Inhere\Library\Helpers\Obj;
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\EventTrait;
 use Inhere\Library\Traits\OptionsTrait;
+use Inhere\Server\Helpers\Psr7Http;
 use Monolog\Logger;
-use Swoole\Http\Request as SwRequest;
+use Psr\Http\Message\ResponseInterface;
 use Swoole\Http\Response as SwResponse;
 use Swoole\Websocket\Frame;
 use Sws;
-use Sws\Web\HttpContextGetTrait;
 use Sws\Web\HttpContext;
-use Sws\WebSocket\Module\ModuleInterface;
+use Sws\Web\HttpContextGetTrait;
 use Sws\WebSocket\Connection;
+use Sws\WebSocket\Module\ModuleInterface;
 
 /**
  * Class Application
@@ -53,7 +54,7 @@ class Application implements ApplicationInterface
     /** @var  AppServer */
     private $server;
 
-    /** @var array  */
+    /** @var array */
     protected $options = [
         'debug' => false,
 
@@ -66,10 +67,6 @@ class Application implements ApplicationInterface
         'allowedOrigins' => '*',
 
         // for http
-
-        // @link https://wiki.swoole.com/wiki/page/410.html
-        'openGzip' => true,
-        'gzipLevel' => 1, // allow 1 - 9
     ];
 
     /**
@@ -101,7 +98,7 @@ class Application implements ApplicationInterface
         $this->bootstrap();
     }
 
-    /** @var array  */
+    /** @var array */
     protected $httpMiddlewares = [];
 
     /**
@@ -160,42 +157,22 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
-    protected function beforeRequest(SwRequest $request, SwResponse $response)
+    protected function beforeRequest(HttpContext $context)
     {
     }
 
     /**
-     * @param SwRequest $swRequest
-     * @param SwResponse $swResponse
-     * @throws \Throwable
+     * @param HttpContext $context 当前请求的上下文对象
+     * @return ResponseInterface
      */
-    public function handleHttpRequest(SwRequest $swRequest, SwResponse $swResponse)
+    public function handleHttpRequest(HttpContext $context)
     {
-        $this->beforeRequest($swRequest, $swResponse);
+        $this->beforeRequest($context);
 
         Sws::profile('request');
         Sws::profile('prepare-request');
 
-        /**
-         * 当前请求的上下文对象
-         * 包含：
-         * - request 请求对象
-         * - response 响应对象
-         * - rid 本次请求的唯一ID(根据此ID 可以获取到原始的 swoole request)
-         * - args 路由的参数信息
-         * @var HttpContext $context
-         */
-        $context = HttpContext::make($swRequest, $swResponse);
-        $uri = $swRequest->server['request_uri'];
-
-        // if open gzip
-        if ($this->getOption('openGzip')) {
-            $acceptedEncodes = $context->getRequest()->getHeadersObject()->getAcceptEncodes();
-
-            if (\in_array('gzip', $acceptedEncodes, true)) {
-                $swResponse->gzip((int)$this->getOption('gzipLevel'));
-            }
-        }
+        $uriPath = $context->request->getUri()->getPath();
 
         Sws::profileEnd('prepare-request');
         Sws::profile('dispatch');
@@ -204,15 +181,15 @@ class Application implements ApplicationInterface
             /** @var Sws\Web\HttpDispatcher $dispatcher */
             $dispatcher = \Sws\get('httpDispatcher');
 
-            $method = $swRequest->server['request_method'];
+            $method = $context->request->getMethod();
             $info = [
-                'context count' =>  Sws::getCtxManager()->count(),
+                'context count' => Sws::getCtxManager()->count(),
                 'context ids' => Sws::getCtxManager()->getIds(),
             ];
 
-            // Sws::info("[$uri] begin dispatch, METHOD: $method", $info);
+            Sws::info("[$uriPath] begin dispatch, METHOD: $method", $info);
 
-            $result = $dispatcher->dispatch(parse_url($uri, PHP_URL_PATH), $method, [$context]);
+            $result = $dispatcher->dispatch($uriPath, $method, [$context]);
 
             if (!$result instanceof Response) {
                 $content = $result ?: 'NO CONTENT TO DISPLAY';
@@ -228,33 +205,33 @@ class Application implements ApplicationInterface
 
         Sws::profileEnd('dispatch');
 
-        Sws::profile('response');
-        $response->setHeader('Server', $this->getName() . '-http-server');
+        $response->setHeader('Server', $this->getName() . '-Http-Server');
 
         $stats = [
             'http-status' => $response->getStatus(),
         ];
 
-        $this->beforeResponse($response);
-        $ret = $this->sendResponse($response, $swResponse);
-        $this->afterResponse($ret);
-        Sws::profileEnd('response');
+        $this->afterRequest($context);
 
-        $this->afterRequest($swRequest, $swResponse);
-
-        $stats = PhpHelper::runtime($swRequest->server['request_time_float'], $swRequest->server['request_memory'], $stats);
-        Sws::notice("[$uri] request stats", $stats);
+        $stats = PhpHelper::runtime(
+            $context->request->getServerParam('request_time_float'),
+            $context->request->getServerParam('request_memory'),
+            $stats
+        );
+        Sws::notice("[$uriPath] request stats", $stats);
         Sws::profileEnd('request');
 
         Show::aList($response->getHeaders(), 'Response Headers');
+
+        return $response;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function afterRequest(SwRequest $request, SwResponse $response)
+    public function afterRequest(HttpContext $context)
     {
-        if ($ctx = Sws::getContextManager()->del()) {
+        if ($ctx = Sws::getCtxManager()->del($context)) {
             $info['_context'] = [
                 'ctxId' => $ctx->getId(),
                 'ctxKey' => $ctx->getKey(),
@@ -270,41 +247,22 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * @param Response $response
+     * @param ResponseInterface $response
      * @param SwResponse $swResponse
      * @return mixed
      */
-    public function sendResponse(Response $response, SwResponse $swResponse = null)
+    public function httpEnd(ResponseInterface $response, SwResponse $swResponse = null)
     {
-        $swResponse = $swResponse ?: \Sws::getContext()->getSwResponse();
-
-        // set http status
-        $swResponse->status($response->getStatus());
-
-        // set headers
-        foreach ($response->getHeadersObject()->getLines() as $name => $value) {
-            $swResponse->header($name, $value);
-        }
-
-        // set cookies
-        foreach ($response->getCookies()->toHeaders() as $value) {
-            $swResponse->header('Set-Cookie', $value);
-        }
-
-        // write content
-        if ($body = (string)$response->getBody()) {
-            $swResponse->write($body);
-        }
+        $swResponse = $swResponse ?: \Sws::getCtx()->getSwResponse();
 
         // send response to client
-        return $swResponse->end();
+        return Psr7Http::respond($response, $swResponse);
     }
 
     /**
      * afterResponse. you can do some clear work
-     * @param $ret
      */
-    protected function afterResponse($ret)
+    protected function afterResponse()
     {
     }
 
@@ -320,7 +278,7 @@ class Application implements ApplicationInterface
             $res->write((string)$message);
         }
 
-        $this->sendResponse($res, $ctx->getSwResponse());
+        $this->httpEnd($res, $ctx->getSwResponse());
     }
 
     /**
@@ -372,12 +330,12 @@ class Application implements ApplicationInterface
 
     /**
      * webSocket 只会在连接握手时会有 request, response
-     * @param Request $request
+     * @param ServerRequest $request
      * @param Response $response
      * @param int $cid
      * @return bool
      */
-    public function handleHandshake(Request $request, Response $response, int $cid)
+    public function handleHandshake(ServerRequest $request, Response $response, int $cid)
     {
         $path = $request->getPath();
 
@@ -472,6 +430,7 @@ class Application implements ApplicationInterface
     {
         return $this->module($path, $module, $replace);
     }
+
     public function module(string $path, ModuleInterface $module, $replace = false)
     {
         $path = trim($path) ?: '/';

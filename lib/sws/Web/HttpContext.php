@@ -58,14 +58,6 @@ class HttpContext extends AbstractContext
         \Sws::getCtxManager()->add($this);
     }
 
-    /**
-     * @return array
-     */
-    public static function getDataTypes(): array
-    {
-        return self::$dataTypes;
-    }
-
     protected function init()
     {
         $id = Coroutine::id();
@@ -84,4 +76,11 @@ class HttpContext extends AbstractContext
         parent::destroy();
     }
 
+    /**
+     * @return array
+     */
+    public static function getDataTypes(): array
+    {
+        return self::$dataTypes;
+    }
 }

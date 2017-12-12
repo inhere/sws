@@ -24,10 +24,22 @@ return [
         'bufferSize' => 0, //0 1000,
     ],
 
-    // for current main server/ outside extend server.
+    // for current main server extend server.
     // @see \Inhere\Server\Traits\HttpServerTrait::$options
     'options' => [
+        'openGzip' => true,
+        'gzipLevel' => 1,
+
         'ignoreFavicon' => true,
+        'staticSettings' => [
+            'ext' => [],
+            'basePath' => BASE_PATH,
+            'dirMap' => [
+                // 'url_match' => 'assets dir',
+                '/assets' => 'web/assets',
+                '/uploads' => 'web/uploads'
+            ]
+        ],
     ],
 
     // main server

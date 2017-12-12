@@ -13,10 +13,10 @@ use Inhere\Library\Traits\ArrayAccessByPropertyTrait;
 
 use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
+use Inhere\Server\Helpers\Psr7Http;
 
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
-use Sws\Components\HttpHelper;
 
 /**
  * Class Context
@@ -47,22 +47,22 @@ abstract class AbstractContext implements ContextInterface, \ArrayAccess
     /**
      * @var Request
      */
-    protected $request;
+    public $request;
 
     /**
      * @var Response
      */
-    protected $response;
+    public $response;
 
     /**
      * @var SwRequest
      */
-    protected $swRequest;
+    public $swRequest;
 
     /**
      * @var SwResponse
      */
-    protected $swResponse;
+    public $swResponse;
 
     /**
      * @param $id
@@ -92,8 +92,8 @@ abstract class AbstractContext implements ContextInterface, \ArrayAccess
      */
     public function setRequestResponse(SwRequest $swRequest, SwResponse $swResponse)
     {
-        $this->request = HttpHelper::createRequest($swRequest);
-        $this->response = HttpHelper::createResponse();
+        $this->request = Psr7Http::createServerRequest($swRequest);
+        $this->response = Psr7Http::createResponse();
 
         $this->swRequest = $swRequest;
         $this->swResponse = $swResponse;

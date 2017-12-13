@@ -6,22 +6,22 @@
  * Time: 14:25
  */
 
-use App\Helper\ResCode;
+use App\Helper\Respond;
 
 return [
     // basic
-    ResCode::OK => '操作成功',
-    ResCode::ERR => '发生错误',
-    ResCode::FAIL => '操作失败',
-    ResCode::EXP => '操作异常',
+    Respond::OK => '操作成功',
+    Respond::ERR => '发生错误',
+    Respond::FAIL => '操作失败',
+    Respond::EXP => '操作异常',
 
     // category: user(100 ~ 300)
-    ResCode::NEED_LOGIN => '需要登录访问',
-    ResCode::NEED_AUTH => '需要认证',
+    Respond::NEED_LOGIN => '需要登录访问',
+    Respond::NEED_AUTH => '需要认证',
 
     // category: request(300 ~ 399)
-    ResCode::MISS_PARAM => '缺少必要参数',
-    ResCode::PARAM_ERROR => '参数错误',
+    Respond::MISS_PARAM => '缺少必要参数',
+    Respond::PARAM_ERROR => '参数错误',
 
     // category 1
 

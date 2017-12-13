@@ -8,12 +8,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\ResCode;
 use Sws\Annotations\Tags\Controller;
 use Sws\Annotations\Tags\Parameter;
 use Sws\Annotations\Tags\Parameters;
 use Sws\Annotations\Tags\Route;
-use Sws\Helper\Respond;
+use App\Helper\Respond;
 use Sws\Web\HttpContext;
 use Sws\Web\BaseController;
 
@@ -67,7 +66,7 @@ class TestController extends BaseController
         return Respond::fmtJson([
             'args' => $args,
             'im' => "my name is {$args['name']}" . (isset($args['age']) ? " and age {$args['age']}" : '')
-        ], ResCode::OK, 'test optional url argument [age]');
+        ], Respond::OK, 'test optional url argument [age]');
     }
 
     /**

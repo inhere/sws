@@ -7,7 +7,7 @@
  */
 
 use Inhere\Library\Helpers\Arr;
-use Inhere\Library\Web\ViewRenderer;
+use Inhere\Web\ViewRenderer;
 use Inhere\Route\ORouter;
 use Inhere\Server\Rpc\RpcClient;
 use Inhere\Server\Rpc\RpcDispatcher;

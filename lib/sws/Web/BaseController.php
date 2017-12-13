@@ -11,7 +11,7 @@ namespace Sws\Web;
 use App\Http\Requests\RequestValidate;
 use Inhere\Http\ServerRequest as Request;
 use Inhere\Http\Response;
-use Inhere\Library\Web\ViewRendererTrait;
+use Inhere\Web\ViewRendererAwareTrait;
 
 /**
  * Class BaseController
@@ -19,7 +19,7 @@ use Inhere\Library\Web\ViewRendererTrait;
  */
 abstract class BaseController
 {
-    use HttpContextGetTrait, ViewRendererTrait;
+    use HttpContextGetTrait, ViewRendererAwareTrait;
 
     /**
      * @var int

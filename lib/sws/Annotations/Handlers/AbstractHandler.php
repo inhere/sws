@@ -48,6 +48,11 @@ abstract class AbstractHandler implements HandlerInterface
         return $this->docReader;
     }
 
+    /**
+     * @param \ReflectionProperty $property
+     * @return mixed
+     * @throws \PhpDocReader\AnnotationException
+     */
     protected function parsePropertyInject(\ReflectionProperty $property)
     {
         $property->setAccessible(true);
@@ -66,6 +71,11 @@ abstract class AbstractHandler implements HandlerInterface
         return null;
     }
 
+    /**
+     * @param \ReflectionParameter $parameter
+     * @return mixed|null
+     * @throws \PhpDocReader\AnnotationException
+     */
     protected function parseParameterInject(\ReflectionParameter $parameter)
     {
         // Read a parameter type (@param phpdoc)

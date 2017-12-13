@@ -61,12 +61,13 @@ class Language extends Collection
     /**
      * Language constructor.
      * @param array $config
+     * @throws \RangeException
      */
     public function __construct(array $config = [])
     {
         parent::__construct();
 
-        Obj::smartConfigure($this, $config);
+        Obj::init($this, $config);
     }
 
     /*********************************************************************************

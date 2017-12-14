@@ -20,6 +20,8 @@
         "inhere/middleware": "dev-master",
         "inhere/library": "dev-master",
         "inhere/library-plus": "dev-master",
+        "inhere/lite-cache": "dev-master",
+        "inhere/lite-db": "dev-master",
         "inhere/php-validate": "^2.0",
         "inhere/resource-pool": "dev-master",
         "inhere/server": "dev-master",
@@ -65,6 +67,14 @@
         "0": {
             "type": "git",
             "url": "https://github.com/inhere/php-database"
+        },
+        "1": {
+            "type": "git",
+            "url": "https://github.com/inhere/php-lite-cache"
+        },
+        "2": {
+            "type": "git",
+            "url": "https://github.com/inhere/php-lite-database"
         }
     }
 }

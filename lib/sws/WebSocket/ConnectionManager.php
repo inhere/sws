@@ -8,7 +8,8 @@
 
 namespace Sws\WebSocket;
 
-use Sws\Context\ContextManager;
+use SwooleLib\Context\ContextManager;
+
 
 /**
  * Class ConnectionManager

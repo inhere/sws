@@ -14,7 +14,7 @@ use Sws\Coroutine\Coroutine;
  * Class ContextManager
  * @package Sws\Web
  */
-class ContextManager extends \Sws\Context\ContextManager
+class ContextManager extends \SwooleLib\Context\ContextManager
 {
     /**
      * @return int|string

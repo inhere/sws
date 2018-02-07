@@ -8,14 +8,14 @@
 
 namespace Sws\Async;
 
-use Inhere\Pool\Swoole\CoroSuspendPool;
+use Inhere\Pool\Swoole\CorSuspendPool;
 use Swoole\MySQL;
 
 /**
  * Class AsyncMysqlPool
  * @package Sws\Components
  */
-class AsyncMysqlPool extends CoroSuspendPool
+class AsyncMysqlPool extends CorSuspendPool
 {
     /**
      * @var array

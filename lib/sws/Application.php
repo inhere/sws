@@ -15,7 +15,7 @@ use Inhere\Library\Helpers\Obj;
 use Inhere\Library\Helpers\PhpHelper;
 use Inhere\Library\Traits\EventTrait;
 use Inhere\Library\Traits\OptionsTrait;
-use Inhere\Server\Helpers\Psr7Http;
+use Inhere\Server\Helper\Psr7Http;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Swoole\Http\Response as SwResponse;

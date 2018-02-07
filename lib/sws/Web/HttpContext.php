@@ -11,7 +11,7 @@ namespace Sws\Web;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 
-use Sws\Context\AbstractContext;
+use SwooleLib\Context\AbstractContext;
 use Sws\Coroutine\Coroutine;
 
 /**

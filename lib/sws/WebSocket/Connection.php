@@ -9,10 +9,10 @@
 namespace Sws\WebSocket;
 
 use Inhere\Library\Helpers\Obj;
-use Sws\Context\AbstractContext;
 
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
+use SwooleLib\Context\AbstractContext;
 
 /**
  * Class Connection - client connection metadata

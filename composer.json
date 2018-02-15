@@ -26,7 +26,6 @@
         "inhere/resource-pool": "dev-master",
         "inhere/server": "dev-master",
         "inhere/simple-active-record": "dev-master",
-        "inhere/websocket": "dev-master",
         "inhere/web-library": "dev-master",
         "inhere/sroute": "dev-master",
         "psr/log": "~1.0",
@@ -38,7 +37,9 @@
         "google/protobuf": "^3.4",
         "php-di/phpdoc-reader": "^2.0",
         "mtdowling/cron-expression": "^1.2",
-        "psr/cache": "^1.0"
+        "swoole-libs/connection-pool": "dev-master",
+        "swoole-libs/task": "dev-master",
+        "swoole-libs/utils": "dev-master"
     },
     "require-dev": {
     },
